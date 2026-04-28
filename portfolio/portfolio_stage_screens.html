@@ -1,0 +1,374 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:transparent;font-family:'JetBrains Mono',monospace}
+
+.wrap{padding:0 0 32px}
+.row-label{font-size:10px;color:#444;letter-spacing:.16em;text-transform:uppercase;margin:28px 0 10px;padding-left:2px;display:flex;align-items:center;gap:10px}
+.row-label::after{content:'';flex:1;height:1px;background:#1e1e1e}
+.screens-row{display:grid;gap:8px}
+.screens-row.col2{grid-template-columns:1fr 1fr}
+.screens-row.col3{grid-template-columns:1fr 1fr 1fr}
+.screens-row.col1{grid-template-columns:1fr}
+
+.screen{background:#080808;border:1px solid #1c1c1c;overflow:hidden;position:relative}
+.screen-chrome{display:flex;align-items:center;gap:5px;padding:6px 10px;border-bottom:1px solid #141414;background:#090909}
+.sc-dot{width:5px;height:5px;border-radius:50%}
+.sc-label{font-size:9px;color:#282828;letter-spacing:.1em;margin-left:5px}
+.sc-badge{margin-left:auto;font-size:8px;padding:2px 7px;border:1px solid;letter-spacing:.08em}
+.sc-badge.teal{color:#00a88d;border-color:rgba(0,229,192,.2)}
+.sc-badge.amber{color:#ba7517;border-color:rgba(239,159,39,.2)}
+.sc-badge.purple{color:#7f77dd;border-color:rgba(127,119,221,.2)}
+.sc-badge.dim{color:#2a2a2a;border-color:#1a1a1a}
+
+.stage-tag{position:absolute;top:8px;left:8px;font-size:8px;color:#00e5c0;letter-spacing:.12em;background:#080808;padding:2px 7px;border:1px solid rgba(0,229,192,.18);z-index:10}
+
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+
+.ac{color:#00e5c0}
+.dim{color:#2a2a2a}
+.muted{color:#444}
+.bright{color:#d8d8d8}
+.mono{font-family:'JetBrains Mono',monospace}
+.syne{font-family:'Syne',sans-serif;font-weight:800}
+</style>
+
+<div class="wrap">
+<h2 class="sr-only">Nine-stage progressive portfolio design — all screens shown as static mockups</h2>
+
+<div class="row-label">Stage 1 — Landing &nbsp;·&nbsp; Stage 2 — Boot sequence</div>
+<div class="screens-row col2">
+
+  <div class="screen" style="height:260px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">LANDING — entry only</span>
+      <span class="sc-badge teal">STAGE 1</span>
+    </div>
+    <div class="grid-bg"></div>
+    <div style="height:232px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative">
+      <div style="font-size:9px;color:#00e5c0;letter-spacing:.2em">SYS://PORTFOLIO — v2.4.1</div>
+      <div class="syne" style="font-size:26px;color:#e8e8e8;letter-spacing:-.02em;line-height:1.05;text-align:center">A designer who<br>engineers <span class="ac">experiences.</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <div style="width:2px;height:12px;background:#00e5c0"></div>
+        <span style="font-size:10px;color:#555;letter-spacing:.14em">INITIALIZE SYSTEM</span>
+      </div>
+      <div style="position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:24px">
+        <span style="font-size:8px;color:#1a1a1a">HUD hidden</span>
+        <span style="font-size:8px;color:#1a1a1a">nav hidden</span>
+        <span style="font-size:8px;color:#1a1a1a">scenes hidden</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" style="height:260px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">BOOT SEQUENCE</span>
+      <span class="sc-badge teal">STAGE 2</span>
+    </div>
+    <div style="height:232px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 40px">
+      <div style="width:100%;max-width:300px">
+        <div style="display:flex;align-items:center;gap:10px;height:22px;margin-bottom:3px">
+          <span class="ac" style="font-size:10px">›</span>
+          <span style="font-size:10px;color:#888">Loading modules…</span>
+          <span style="font-size:8px;color:#2a2a2a;margin-left:auto">✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;height:22px;margin-bottom:3px">
+          <span class="ac" style="font-size:10px">›</span>
+          <span style="font-size:10px;color:#888">Initializing interface…</span>
+          <span style="font-size:8px;color:#2a2a2a;margin-left:auto">✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;height:22px;margin-bottom:3px">
+          <span class="ac" style="font-size:10px">›</span>
+          <span style="font-size:10px;color:#888">Mounting scene graph…</span>
+          <span style="font-size:8px;color:#2a2a2a;margin-left:auto">✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;height:22px;margin-bottom:16px">
+          <span class="ac" style="font-size:10px">›</span>
+          <span class="ac" style="font-size:10px">System ready.</span>
+          <div style="width:6px;height:11px;background:#00e5c0;margin-left:4px"></div>
+        </div>
+        <div style="height:2px;background:#141414;width:100%">
+          <div style="height:100%;background:#00e5c0;width:100%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px">
+          <span style="font-size:8px;color:#1e1e1e">HUD fades in after boot</span>
+          <span style="font-size:8px;color:#1e1e1e">~3.2s total</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row-label">Stage 3 — Intro scene &nbsp;·&nbsp; Stage 4 — HUD + nav active</div>
+<div class="screens-row col2">
+
+  <div class="screen" style="height:280px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">INTRO SCENE</span>
+      <span class="sc-badge teal">STAGE 3</span>
+    </div>
+    <div style="position:relative;height:252px">
+      <div style="padding:22px 24px 16px">
+        <div style="font-size:9px;color:#00e5c0;margin-bottom:2px">// Currently available for work<span style="display:inline-block;width:5px;height:9px;background:#00e5c0;vertical-align:middle;margin-left:3px"></span></div>
+        <div class="syne" style="font-size:34px;color:#e8e8e8;letter-spacing:-.03em;line-height:.92;margin:14px 0 11px">Alex<br>Mercer.</div>
+        <div style="font-size:9px;color:#00e5c0;margin-bottom:12px">Frontend Engineer · UI Designer · Creative Coder</div>
+        <div style="font-size:10px;color:#444;line-height:1.65;max-width:340px;margin-bottom:18px">I build interfaces that feel alive — blending system thinking with craft.</div>
+        <div style="display:flex;gap:8px">
+          <div style="font-size:9px;color:#555;border:1px solid #1e1e1e;padding:7px 16px;letter-spacing:.1em">Skills</div>
+          <div style="font-size:9px;color:#555;border:1px solid #1e1e1e;padding:7px 16px;letter-spacing:.1em">Projects</div>
+          <div style="font-size:9px;color:#555;border:1px solid #1e1e1e;padding:7px 16px;letter-spacing:.1em">Contact</div>
+        </div>
+      </div>
+      <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" style="height:280px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">HUD OVERLAY ACTIVE</span>
+      <span class="sc-badge teal">STAGE 4</span>
+    </div>
+    <div style="position:relative;height:252px;background:#090909">
+      <div style="position:absolute;top:10px;left:14px;display:flex;align-items:center;gap:7px">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+        <span style="font-size:9px;color:#666;letter-spacing:.12em">SKILLS</span>
+      </div>
+      <div style="position:absolute;bottom:10px;left:14px;font-size:8px;color:#252525;letter-spacing:.06em">12.3401°N 77.2901°E</div>
+      <div style="position:absolute;bottom:10px;right:14px;display:flex;gap:8px">
+        <div style="font-size:8px;color:#2a2a2a;border:1px solid #1a1a1a;padding:5px 11px;letter-spacing:.08em">TERMINAL</div>
+        <div style="font-size:8px;color:#00e5c0;border:1px solid rgba(0,229,192,.25);padding:5px 11px;letter-spacing:.08em">CHAT</div>
+      </div>
+      <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px">
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+      </div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;max-width:260px">
+          <div style="font-size:9px;color:#00e5c0;border:1px solid rgba(0,229,192,.25);padding:6px 12px;background:rgba(0,229,192,.05)">React / Next.js</div>
+          <div style="font-size:9px;color:#444;border:1px solid #1c1c1c;padding:6px 12px">TypeScript</div>
+          <div style="font-size:9px;color:#444;border:1px solid #1c1c1c;padding:6px 12px">CSS Systems</div>
+          <div style="font-size:9px;color:#444;border:1px solid #1c1c1c;padding:6px 12px">Motion Design</div>
+          <div style="font-size:9px;color:#444;border:1px solid #1c1c1c;padding:6px 12px">WebGL / 3D</div>
+          <div style="font-size:9px;color:#444;border:1px solid #1c1c1c;padding:6px 12px">Node / APIs</div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:32px;left:14px;right:60px;background:#0d0d0d;border:1px solid rgba(0,229,192,.15);padding:8px 10px;font-size:9px;color:#333;display:flex;gap:8px">
+        <span style="color:#00e5c0">›</span>
+        Building production-grade React apps with focus on performance and DX.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row-label">Stage 5 — Projects scene &nbsp;·&nbsp; Stage 6 — Project modal (focus mode)</div>
+<div class="screens-row col2">
+
+  <div class="screen" style="height:280px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">PROJECTS — 3 cards first</span>
+      <span class="sc-badge amber">STAGE 5</span>
+    </div>
+    <div style="position:relative;height:252px">
+      <div style="position:absolute;top:10px;left:14px;display:flex;align-items:center;gap:7px">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+        <span style="font-size:9px;color:#666;letter-spacing:.12em">PROJECTS</span>
+      </div>
+      <div style="padding:34px 14px 10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="background:#0d0d0d;border:1px solid #1e1e1e;padding:14px 12px;position:relative">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:#00e5c0"></div>
+          <div style="font-size:8px;color:#252525;margin-bottom:8px">001</div>
+          <div class="syne" style="font-size:11px;color:#00e5c0;margin-bottom:5px">Flux OS</div>
+          <div style="font-size:8px;color:#333;line-height:1.5;margin-bottom:8px">Browser-based OS with window management.</div>
+          <div style="display:flex;gap:4px"><span style="font-size:7px;color:#252525;border:1px solid #1a1a1a;padding:1px 5px">React</span><span style="font-size:7px;color:#252525;border:1px solid #1a1a1a;padding:1px 5px">TS</span></div>
+        </div>
+        <div style="background:#0d0d0d;border:1px solid #1e1e1e;padding:14px 12px">
+          <div style="font-size:8px;color:#252525;margin-bottom:8px">002</div>
+          <div class="syne" style="font-size:11px;color:#d8d8d8;margin-bottom:5px">Signal</div>
+          <div style="font-size:8px;color:#333;line-height:1.5;margin-bottom:8px">Real-time analytics dashboard.</div>
+          <div style="display:flex;gap:4px"><span style="font-size:7px;color:#252525;border:1px solid #1a1a1a;padding:1px 5px">D3.js</span></div>
+        </div>
+        <div style="background:#0d0d0d;border:1px solid #1e1e1e;padding:14px 12px">
+          <div style="font-size:8px;color:#252525;margin-bottom:8px">003</div>
+          <div class="syne" style="font-size:11px;color:#d8d8d8;margin-bottom:5px">Chronicle</div>
+          <div style="font-size:8px;color:#333;line-height:1.5;margin-bottom:8px">Spatial timeline storytelling.</div>
+          <div style="display:flex;gap:4px"><span style="font-size:7px;color:#252525;border:1px solid #1a1a1a;padding:1px 5px">Three.js</span></div>
+        </div>
+      </div>
+      <div style="margin:6px 14px 0">
+        <div style="font-size:9px;color:#2a2a2a;border:1px solid #1a1a1a;padding:6px 14px;display:inline-block;letter-spacing:.1em">+ LOAD MORE</div>
+      </div>
+      <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px">
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" style="height:280px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">MODAL — focus mode on</span>
+      <span class="sc-badge amber">STAGE 6</span>
+    </div>
+    <div style="height:252px;position:relative;background:#080808">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.72)"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+        <div style="background:#0d0d0d;border:1px solid rgba(0,229,192,.25);width:78%;padding:18px 20px;position:relative">
+          <div style="height:1px;background:#00e5c0;margin-bottom:14px"></div>
+          <div style="font-size:8px;color:#2a2a2a;position:absolute;top:14px;right:14px;cursor:pointer">[ ESC ]</div>
+          <div class="syne" style="font-size:16px;color:#e8e8e8;margin-bottom:4px">Flux OS</div>
+          <div style="font-size:8px;color:#00e5c0;margin-bottom:12px">React · TypeScript · Canvas API · 2024</div>
+          <div style="font-size:9px;color:#444;line-height:1.65;margin-bottom:14px">A fully functional browser-based OS interface with drag-and-drop window manager, virtual filesystem, and custom terminal. Built entirely with web APIs.</div>
+          <div style="display:flex;gap:7px">
+            <div style="font-size:8px;color:#00a88d;border:1px solid rgba(0,229,192,.2);padding:5px 11px;letter-spacing:.08em">↗ VIEW</div>
+            <div style="font-size:8px;color:#2a2a2a;border:1px solid #1a1a1a;padding:5px 11px;letter-spacing:.08em">CLOSE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row-label">Stage 7 — Terminal &nbsp;·&nbsp; Stage 8 — Chatbot &nbsp;·&nbsp; Stage 9 — Contact scene</div>
+<div class="screens-row col3">
+
+  <div class="screen" style="height:270px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">TERMINAL — on demand</span>
+      <span class="sc-badge purple">STAGE 7</span>
+    </div>
+    <div style="height:242px;background:#070707;display:flex;flex-direction:column">
+      <div style="padding:10px 12px 6px;flex:1;overflow:hidden">
+        <div style="font-size:9px;color:#444;margin-bottom:2px">System online. Type "help" to continue.</div>
+        <div style="height:1px;background:#141414;margin:6px 0"></div>
+        <div style="font-size:9px;color:#00e5c0;margin-bottom:2px">~/portfolio › help</div>
+        <div style="font-size:9px;color:#444;margin-bottom:1px">Available commands:</div>
+        <div style="font-size:9px;color:#282828;margin-bottom:1px">&nbsp;&nbsp;about &nbsp;&nbsp;&nbsp;— who is this?</div>
+        <div style="font-size:9px;color:#282828;margin-bottom:1px">&nbsp;&nbsp;skills &nbsp;&nbsp;— tech stack</div>
+        <div style="font-size:9px;color:#282828;margin-bottom:1px">&nbsp;&nbsp;projects — work</div>
+        <div style="font-size:9px;color:#282828;margin-bottom:8px">&nbsp;&nbsp;nav [scene]</div>
+        <div style="font-size:9px;color:#00e5c0;margin-bottom:2px">~/portfolio › about</div>
+        <div style="font-size:9px;color:#888;margin-bottom:1px">Alex Mercer</div>
+        <div style="font-size:9px;color:#888;margin-bottom:1px">Frontend Eng · UI Designer</div>
+        <div style="font-size:9px;color:#444;margin-bottom:8px">Open to: freelance, full-time</div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:9px;color:#00e5c0">~/portfolio ›</span>
+          <div style="width:5px;height:9px;background:#00e5c0"></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid #141414;padding:6px 12px;display:flex;gap:6px;align-items:center">
+        <span style="font-size:9px;color:#00e5c0">~/portfolio ›</span>
+        <span style="font-size:9px;color:#1e1e1e">type a command...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" style="height:270px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">CHATBOT — on demand</span>
+      <span class="sc-badge purple">STAGE 8</span>
+    </div>
+    <div style="height:242px;background:#070707;display:flex;flex-direction:column">
+      <div style="padding:8px 12px;border-bottom:1px solid #141414;display:flex;align-items:center;gap:6px">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+        <span style="font-size:9px;color:#444">SYS_AGENT — ONLINE</span>
+      </div>
+      <div style="flex:1;padding:10px 0 6px;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+        <div style="margin:0 10px;background:#111;border:1px solid #1c1c1c;padding:7px 10px;font-size:9px;color:#444;line-height:1.5;max-width:85%">Hey — I'm Alex's site agent. Ask me anything.</div>
+        <div style="margin:0 10px;background:rgba(0,229,192,.05);border:1px solid rgba(0,229,192,.15);padding:7px 10px;font-size:9px;color:#888;max-width:80%;align-self:flex-end">Are you available for hire?</div>
+        <div style="display:flex;gap:3px;padding:4px 10px">
+          <div style="width:4px;height:4px;border-radius:50%;background:#2a2a2a"></div>
+          <div style="width:4px;height:4px;border-radius:50%;background:#2a2a2a"></div>
+          <div style="width:4px;height:4px;border-radius:50%;background:#2a2a2a"></div>
+        </div>
+        <div style="margin:0 10px;background:#111;border:1px solid #1c1c1c;padding:7px 10px;font-size:9px;color:#444;line-height:1.5;max-width:85%">Yes — open to freelance and full-time. Best to email alex@mercer.io directly.</div>
+      </div>
+      <div style="padding:4px 10px 6px;display:flex;flex-wrap:wrap;gap:4px;border-top:1px solid #111">
+        <div style="font-size:8px;color:#2a2a2a;border:1px solid #181818;padding:3px 8px">Specialties?</div>
+        <div style="font-size:8px;color:#2a2a2a;border:1px solid #181818;padding:3px 8px">Best work?</div>
+      </div>
+      <div style="border-top:1px solid #141414;padding:6px 10px;display:flex;gap:6px;align-items:center">
+        <span style="flex:1;font-size:9px;color:#1e1e1e">Ask something...</span>
+        <div style="font-size:8px;color:#282828;border:1px solid #1a1a1a;padding:3px 8px">SEND</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" style="height:270px">
+    <div class="screen-chrome">
+      <div class="sc-dot" style="background:#e04040"></div>
+      <div class="sc-dot" style="background:#e0a040"></div>
+      <div class="sc-dot" style="background:#40c060"></div>
+      <span class="sc-label">CONTACT SCENE</span>
+      <span class="sc-badge dim">STAGE 9</span>
+    </div>
+    <div style="height:242px;position:relative;padding:16px 16px">
+      <div style="position:absolute;top:10px;left:14px;display:flex;align-items:center;gap:7px">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+        <span style="font-size:9px;color:#666;letter-spacing:.12em">CONTACT</span>
+      </div>
+      <div style="margin-top:26px">
+        <div class="syne" style="font-size:20px;color:#e8e8e8;letter-spacing:-.02em;line-height:.95;margin-bottom:6px">Start a<br>conversation.</div>
+        <div style="font-size:9px;color:#333;margin-bottom:16px">Open to new projects — replies within 24h.</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid #1c1c1c;background:#0d0d0d">
+            <span style="font-size:8px;color:#252525;min-width:42px;letter-spacing:.1em">EMAIL</span>
+            <span style="font-size:10px;color:#888">alex@mercer.io</span>
+            <span style="margin-left:auto;font-size:10px;color:#252525">→</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid #1c1c1c;background:#0d0d0d">
+            <span style="font-size:8px;color:#252525;min-width:42px;letter-spacing:.1em">GITHUB</span>
+            <span style="font-size:10px;color:#888">github.com/alexmercer</span>
+            <span style="margin-left:auto;font-size:10px;color:#252525">→</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid rgba(0,229,192,.15);background:rgba(0,229,192,.04)">
+            <span style="font-size:8px;color:#252525;min-width:42px;letter-spacing:.1em">TWITTER</span>
+            <span style="font-size:10px;color:#00e5c0">@alexmercer</span>
+            <span style="margin-left:auto;font-size:10px;color:#00a88d">→</span>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px">
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:4px;height:4px;border-radius:50%;background:#282828"></div>
+        <div style="width:5px;height:5px;border-radius:50%;background:#00e5c0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

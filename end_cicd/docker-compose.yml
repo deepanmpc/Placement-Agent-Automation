@@ -1,0 +1,9 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker-git-fullstackapp/Dockerfile.frontend
+    container_name: hospital_management_systemfrontend
+    restart: always
+    ports:
+      - "80:80"
