@@ -55,11 +55,11 @@ const Landing: React.FC = () => {
   return (
     <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
       <div className={styles.content}>
-        <div className={styles.systemLabel}>SYS://PORTFOLIO — v2.4.1</div>
+        <div className={styles.systemLabel}>SYS://DEEPAN — v4.0.1_RAG</div>
         
         <h1 className={`${styles.headline} syne`}>
-          A designer who<br />
-          engineers <span className="ac">experiences.</span>
+          An engineer who<br />
+          architects <span className="ac">intelligence.</span>
         </h1>
 
         <div className={styles.ctaWrapper}>

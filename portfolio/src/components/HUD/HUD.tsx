@@ -55,7 +55,7 @@ const HUD: React.FC = () => {
       {/* Top HUD Label */}
       <div className={`${styles.topHUD} ${showLabel ? styles.active : ''}`}>
         <div className={styles.accentDot} />
-        <span className={styles.sectionLabel}>{displaySection}</span>
+        <span className={styles.sectionLabel}>SYS://{displaySection}_DEEPAN</span>
       </div>
 
       {/* Bottom Coordinates */}

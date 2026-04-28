@@ -11,16 +11,16 @@ const Intro: React.FC = () => {
         </div>
         
         <h1 className={`${styles.name} syne`}>
-          Alex<br />
-          Mercer.
+          Deepan<br />
+          Chandrasekaran.
         </h1>
         
         <div className={styles.role}>
-          Frontend Engineer <span className={styles.dot}>·</span> UI Designer <span className={styles.dot}>·</span> Creative Coder
+          CS + AI Engineer <span className={styles.dot}>·</span> Full-Stack Developer <span className={styles.dot}>·</span> Robotic-AI Researcher
         </div>
         
         <p className={styles.tagline}>
-          I build interfaces that feel alive — blending system thinking with craft.
+          I engineer semantic systems and AI-human interfaces — from low-cost therapy companions to spatial file systems.
         </p>
 
         <div className={styles.actions}>
