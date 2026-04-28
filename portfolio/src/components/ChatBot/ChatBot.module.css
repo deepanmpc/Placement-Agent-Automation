@@ -28,7 +28,7 @@
   max-height: min(620px, calc(100vh - 72px));
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--glow-color, rgba(0, 229, 192, 0.25));
+  border: 1px solid rgba(0, 229, 192, 0.25);
   background: rgba(9, 9, 9, 0.94);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(10px);
@@ -41,25 +41,14 @@
 .open .panel {
   opacity: 1;
   transform: translate(0, -50%) scale(1);
-  animation: chatColorCycle 8s linear infinite, chatPanelGlow 4s ease-in-out infinite;
+  animation: chatAmbientShift 10s ease-in-out infinite 2s;
 }
 
-@keyframes chatPanelGlow {
-  0%, 100% { box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 24px rgba(0, 229, 192, 0.15), 0 0 48px rgba(0, 229, 192, 0.08); }
-  50% { box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 32px rgba(0, 229, 192, 0.2), 0 0 64px rgba(0, 229, 192, 0.1); }
-}
-
-@keyframes chatColorCycle {
-  0%, 100% { --glow-color: rgba(0, 229, 192, 0.25); border-color: rgba(0, 229, 192, 0.25); }
-  25% { --glow-color: rgba(255, 87, 87, 0.25); border-color: rgba(255, 87, 87, 0.25); }
-  50% { --glow-color: rgba(255, 193, 7, 0.25); border-color: rgba(255, 193, 7, 0.25); }
-  75% { --glow-color: rgba(33, 150, 243, 0.25); border-color: rgba(33, 150, 243, 0.25); }
-  100% { --glow-color: rgba(0, 229, 192, 0.25); border-color: rgba(0, 229, 192, 0.25); }
-}
-
-@keyframes chatPanelPulse {
-  0%, 100% { box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52); }
-  50% { box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 40px var(--glow-color); }
+@keyframes chatAmbientShift {
+  0% { border-color: rgba(0, 229, 192, 0.25); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 16px rgba(0, 229, 192, 0.1), 0 0 32px rgba(0, 229, 192, 0.05); }
+  33% { border-color: rgba(0, 200, 255, 0.25); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 18px rgba(0, 200, 255, 0.1), 0 0 36px rgba(0, 200, 255, 0.05); }
+  66% { border-color: rgba(122, 92, 255, 0.2); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 16px rgba(122, 92, 255, 0.08), 0 0 32px rgba(122, 92, 255, 0.04); }
+  100% { border-color: rgba(0, 229, 192, 0.25); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 16px rgba(0, 229, 192, 0.1), 0 0 32px rgba(0, 229, 192, 0.05); }
 }
 
 .header {
@@ -69,34 +58,33 @@
   justify-content: space-between;
   gap: 16px;
   padding: 18px 18px 14px;
-  border-bottom: 1px solid var(--glow-color);
-  animation: chatHeaderPulse 8s linear infinite;
+  border-bottom: 1px solid rgba(0, 229, 192, 0.12);
+  background: linear-gradient(180deg, rgba(0, 229, 192, 0.08) 0%, transparent 100%);
+  animation: chatHeaderAmbient 10s ease-in-out infinite 2s;
 }
 
-@keyframes chatHeaderPulse {
+@keyframes chatHeaderAmbient {
   0%, 100% { background: linear-gradient(180deg, rgba(0, 229, 192, 0.08) 0%, transparent 100%); border-bottom-color: rgba(0, 229, 192, 0.12); }
-  25% { background: linear-gradient(180deg, rgba(255, 87, 87, 0.08) 0%, transparent 100%); border-bottom-color: rgba(255, 87, 87, 0.12); }
-  50% { background: linear-gradient(180deg, rgba(255, 193, 7, 0.08) 0%, transparent 100%); border-bottom-color: rgba(255, 193, 7, 0.12); }
-  75% { background: linear-gradient(180deg, rgba(33, 150, 243, 0.08) 0%, transparent 100%); border-bottom-color: rgba(33, 150, 243, 0.12); }
+  33% { background: linear-gradient(180deg, rgba(0, 200, 255, 0.08) 0%, transparent 100%); border-bottom-color: rgba(0, 200, 255, 0.12); }
+  66% { background: linear-gradient(180deg, rgba(122, 92, 255, 0.06) 0%, transparent 100%); border-bottom-color: rgba(122, 92, 255, 0.1); }
   100% { background: linear-gradient(180deg, rgba(0, 229, 192, 0.08) 0%, transparent 100%); border-bottom-color: rgba(0, 229, 192, 0.12); }
 }
 
 .status {
   display: block;
   margin-bottom: 5px;
-  color: var(--glow-text, #00e5c0);
+  color: #00e5c0;
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.16em;
-  animation: chatStatusPulse 8s linear infinite;
+  animation: chatStatusAmbient 10s ease-in-out infinite 2s;
 }
 
-@keyframes chatStatusPulse {
-  0%, 100% { --glow-text: #00e5c0; text-shadow: 0 0 8px rgba(0, 229, 192, 0.5); }
-  25% { --glow-text: #ff5757; text-shadow: 0 0 8px rgba(255, 87, 87, 0.5); }
-  50% { --glow-text: #ffc107; text-shadow: 0 0 8px rgba(255, 193, 7, 0.5); }
-  75% { --glow-text: #2196f3; text-shadow: 0 0 8px rgba(33, 150, 243, 0.5); }
-  100% { --glow-text: #00e5c0; text-shadow: 0 0 8px rgba(0, 229, 192, 0.5); }
+@keyframes chatStatusAmbient {
+  0%, 100% { color: #00e5c0; text-shadow: 0 0 6px rgba(0, 229, 192, 0.4); }
+  33% { color: #00c8ff; text-shadow: 0 0 6px rgba(0, 200, 255, 0.4); }
+  66% { color: #7a5cff; text-shadow: 0 0 6px rgba(122, 92, 255, 0.3); }
+  100% { color: #00e5c0; text-shadow: 0 0 6px rgba(0, 229, 192, 0.4); }
 }
 
 .title {
@@ -169,9 +157,9 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--glow-text, #00e5c0);
+  background: #00e5c0;
   opacity: 0.35;
-  animation: typingDot 0.9s infinite ease-in-out, typingGlow 8s linear infinite;
+  animation: typingDot 0.9s infinite ease-in-out, typingAmbient 10s ease-in-out infinite 2s;
 }
 
 @keyframes typingDot {
@@ -179,12 +167,11 @@
   50% { transform: translateY(-3px); opacity: 0.8; }
 }
 
-@keyframes typingGlow {
-  0%, 100% { background: #00e5c0; box-shadow: 0 0 6px rgba(0, 229, 192, 0.6); }
-  25% { background: #ff5757; box-shadow: 0 0 6px rgba(255, 87, 87, 0.6); }
-  50% { background: #ffc107; box-shadow: 0 0 6px rgba(255, 193, 7, 0.6); }
-  75% { background: #2196f3; box-shadow: 0 0 6px rgba(33, 150, 243, 0.6); }
-  100% { background: #00e5c0; box-shadow: 0 0 6px rgba(0, 229, 192, 0.6); }
+@keyframes typingAmbient {
+  0%, 100% { background: #00e5c0; box-shadow: 0 0 6px rgba(0, 229, 192, 0.5); }
+  33% { background: #00c8ff; box-shadow: 0 0 6px rgba(0, 200, 255, 0.5); }
+  66% { background: #7a5cff; box-shadow: 0 0 6px rgba(122, 92, 255, 0.4); }
+  100% { background: #00e5c0; box-shadow: 0 0 6px rgba(0, 229, 192, 0.5); }
 }
 
 .typing span:nth-child(2) {
