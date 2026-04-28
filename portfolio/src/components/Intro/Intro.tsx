@@ -10,7 +10,7 @@ const Intro: React.FC = () => {
     <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
       <div className={styles.content}>
         <div className={styles.statusLine}>
-          <span className={styles.accentText}>//</span> Currently available for work
+          <span className={styles.accentText}>//</span> Available for work
         </div>
         
         <h1 className={`${styles.name} syne`}>
@@ -38,6 +38,8 @@ const Intro: React.FC = () => {
           <span className={styles.eduDegree}>{EDUCATION.degree}</span>
           <span className={styles.eduDot}>·</span>
           <span className={styles.eduSchool}>{EDUCATION.school}</span>
+          <span className={styles.eduDot}>·</span>
+          <span className={styles.eduCgpa}>CGPA: {EDUCATION.cgpa} / 10</span>
           <span className={styles.eduDot}>·</span>
           <span className={styles.eduYear}>{EDUCATION.year}</span>
         </div>

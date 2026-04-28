@@ -141,6 +141,10 @@
   color: var(--text-secondary);
 }
 
+.eduCgpa {
+  color: var(--accent-color);
+}
+
 .eduYear {
   color: var(--accent-color);
   opacity: 0.7;

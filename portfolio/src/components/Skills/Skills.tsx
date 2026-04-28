@@ -3,17 +3,10 @@ import { useStage } from '../../context/useStage';
 import { SKILLS, CERTIFICATIONS } from '../../data/projects';
 import styles from './Skills.module.css';
 
-interface Certification {
-  id: string;
-  name: string;
-  provider: string;
-  detail: string;
-}
-
 const Skills: React.FC = () => {
   const { isTransitioning } = useStage();
   const [selectedSkill, setSelectedSkill] = useState<{ id: string; name: string; detail: string } | null>(null);
-  const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
+  const [selectedCert, setSelectedCert] = useState<{ id: string; name: string; provider: string; year: string } | null>(null);
 
   return (
     <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
@@ -62,7 +55,7 @@ const Skills: React.FC = () => {
             <div className={styles.certDetail} key={selectedCert.id}>
               <span className={styles.prefix}>›</span>
               <span className={styles.certProvider}>{selectedCert.provider}</span>
-              <span className={styles.certDetailText}> — {selectedCert.detail}</span>
+              <span className={styles.certDetailText}> — {selectedCert.year}</span>
             </div>
           )}
         </div>
