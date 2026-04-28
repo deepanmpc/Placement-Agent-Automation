@@ -17,9 +17,23 @@ const SKILLS_DATA: Skill[] = [
   { id: '6', name: 'Python / Data Science', detail: 'Leveraging data-driven insights and advanced ML models for complex problem solving.' },
 ];
 
+interface Certification {
+  id: string;
+  name: string;
+  provider: string;
+  detail: string;
+}
+
+const CERTIFICATIONS_DATA: Certification[] = [
+  { id: 's9d2mz', name: 'Google ML Certificate', provider: 'Coursera', detail: 'Machine LearningSpecialization' },
+  { id: 'c8k3w1', name: 'AWS Cloud Practitioner', provider: 'Amazon', detail: 'Cloud Fundamentals' },
+  { id: '9m2zlr', name: 'Deep Learning Specialization', provider: 'Andrew Ng', detail: 'Neural Networks & Deep Learning' },
+];
+
 const Skills: React.FC = () => {
   const { isTransitioning } = useStage();
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
 
   return (
     <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
@@ -47,6 +61,31 @@ const Skills: React.FC = () => {
             <p className={styles.detailText}>{selectedSkill.detail}</p>
           </div>
         )}
+
+        <div className={styles.certSection}>
+          <div className={styles.certLabel}>
+            <span className={styles.accentDot}>•</span> CERTIFICATIONS
+          </div>
+          <div className={styles.certGrid}>
+            {CERTIFICATIONS_DATA.map((cert, idx) => (
+              <div 
+                key={cert.id}
+                className={`${styles.certBlock} ${selectedCert?.id === cert.id ? styles.active : ''}`}
+                style={{ animationDelay: `${(idx + SKILLS_DATA.length) * 60}ms` }}
+                onClick={() => setSelectedCert(cert)}
+              >
+                <span className={styles.certName}>{cert.name}</span>
+              </div>
+            ))}
+          </div>
+          {selectedCert && (
+            <div className={styles.certDetail} key={selectedCert.id}>
+              <span className={styles.prefix}>›</span>
+              <span className={styles.certProvider}>{selectedCert.provider}</span>
+              <span className={styles.certDetailText}> — {selectedCert.detail}</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

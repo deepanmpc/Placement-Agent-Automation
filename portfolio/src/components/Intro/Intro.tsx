@@ -2,6 +2,13 @@ import React from 'react';
 import { useStage } from '../../context/useStage';
 import styles from './Intro.module.css';
 
+const EDUCATION_DATA = {
+  degree: 'B.Tech Computer Science',
+  school: 'Vellore Institute of Technology',
+  years: '2022 — 2026',
+  year: '3rd Year',
+};
+
 const Intro: React.FC = () => {
   const { setStage, isTransitioning } = useStage();
 
@@ -31,7 +38,16 @@ const Intro: React.FC = () => {
           from low-cost therapy companions to spatial systems.
         </p>
 
-        {/* 5. Nav Pills */}
+        {/* 5. Education */}
+        <div className={styles.education}>
+          <span className={styles.eduDegree}>{EDUCATION_DATA.degree}</span>
+          <span className={styles.eduDot}>·</span>
+          <span className={styles.eduSchool}>{EDUCATION_DATA.school}</span>
+          <span className={styles.eduDot}>·</span>
+          <span className={styles.eduYear}>{EDUCATION_DATA.year}</span>
+        </div>
+        
+        {/* 6. Nav Pills */}
         <div className={styles.navPills}>
           <button className={styles.pill} onClick={() => setStage('skills')}>Skills</button>
           <button className={styles.pill} onClick={() => setStage('projects')}>Projects</button>
