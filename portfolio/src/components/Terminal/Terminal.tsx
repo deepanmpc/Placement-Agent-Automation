@@ -88,27 +88,25 @@ const Terminal: React.FC = () => {
         appendLine('output', '=== AVAILABLE COMMANDS ===');
         appendLine('output', '');
         appendLine('output', 'about        - Display profile summary');
-        appendLine('output', 'skills      - Navigate to Skills section');
-        appendLine('output', 'projects    - Navigate to Projects section');
-        appendLine('output', 'contact     - Navigate to Contact section');
-        appendLine('output', '');
-        appendLine('output', '=== NAVIGATION ===');
-        appendLine('output', 'goto <scene>  - Go to specific scene');
-        appendLine('output', '             Example: goto projects');
-        appendLine('output', '');
-        appendLine('output', '=== PROJECT ===');
-        appendLine('output', 'open <name>   - Open a project detail');
-        appendLine('output', '             Example: open lara');
-        appendLine('output', '');
-        appendLine('output', '=== SYSTEM ===');
-        appendLine('output', 'whoami      - Display who you are');
+        appendLine('output', 'whoami       - Display who you are');
         appendLine('output', 'clear       - Clear terminal');
         appendLine('output', '');
+        appendLine('output', '=== NAVIGATION (use goto) ===');
+        appendLine('output', 'goto intro    - Go to Intro section');
+        appendLine('output', 'goto skills   - Go to Skills section');
+        appendLine('output', 'goto projects - Go to Projects section');
+        appendLine('output', 'goto contact  - Go to Contact section');
+        appendLine('output', '              Example: goto projects');
+        appendLine('output', '');
+        appendLine('output', '=== LINKS (opens in new tab) ===');
+        appendLine('output', 'github       - Open GitHub profile');
+        appendLine('output', 'linkedin     - Open LinkedIn profile');
+        appendLine('output', '');
+        appendLine('output', '=== PROJECT ===');
+        appendLine('output', 'open <name>  - Open project detail');
+        appendLine('output', '             Examples: open lara, open signspeak');
+        appendLine('output', '');
         appendLine('output', 'Type command and press Enter.');
-        return;
-      case 'about':
-        appendLine('output', PROFILE.summary);
-        appendLine('output', 'Type "skills", "projects", or "contact" to explore.');
         return;
       case 'whoami':
         appendLine('output', PROFILE.tagline);
@@ -117,14 +115,31 @@ const Terminal: React.FC = () => {
         setLines(startupLines);
         appendLine('output', 'Terminal cleared.');
         return;
+      case 'github':
+        window.open('https://github.com/deepanmpc', '_blank');
+        appendLine('output', 'Opening GitHub profile in new tab...');
+        appendLine('output', 'GitHub opened.');
+        return;
+      case 'linkedin':
+        window.open('https://www.linkedin.com/in/deepanmpc/', '_blank');
+        appendLine('output', 'Opening LinkedIn profile in new tab...');
+        appendLine('output', 'LinkedIn opened.');
+        return;
       case 'skills':
-        navigateTo('skills');
+        appendLine('error', "Use 'goto skills' to navigate to Skills.");
+        appendLine('output', 'Example: goto skills');
         return;
       case 'projects':
-        navigateTo('projects');
+        appendLine('error', "Use 'goto projects' to navigate to Projects.");
+        appendLine('output', 'Example: goto projects');
         return;
       case 'contact':
-        navigateTo('contact');
+        appendLine('error', "Use 'goto contact' to navigate to Contact.");
+        appendLine('output', 'Example: goto contact');
+        return;
+      case 'intro':
+        appendLine('error', "Use 'goto intro' to navigate to Intro.");
+        appendLine('output', 'Example: goto intro');
         return;
     }
 
