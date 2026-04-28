@@ -27,7 +27,7 @@ const Boot: React.FC = () => {
     setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => {
-        setStage('intro');
+        setStage('hud');
       }, 500); // Transition duration
     }, 400);
   }, [isComplete, isExiting, setStage]);

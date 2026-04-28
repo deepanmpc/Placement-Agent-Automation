@@ -1,0 +1,105 @@
+.container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  padding: 32px;
+}
+
+.topHUD {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.topHUD.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.accentDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  box-shadow: 0 0 8px var(--accent-muted);
+}
+
+.sectionLabel {
+  font-size: 10px;
+  color: var(--text-primary);
+  letter-spacing: 0.15em;
+  font-weight: 500;
+}
+
+.bottomHUD {
+  position: absolute;
+  bottom: 32px;
+  left: 32px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.bottomHUD.active {
+  opacity: 1;
+}
+
+.coords {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.rightNav {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  pointer-events: auto;
+}
+
+.navDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--text-dim);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: 
+    opacity 0.3s ease, 
+    transform 0.3s ease, 
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.navDot:hover {
+  transform: scale(1.25);
+  background-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-muted);
+}
+
+.dotVisible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.dotActive {
+  background-color: var(--accent-color);
+  box-shadow: 0 0 8px var(--accent-muted);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
