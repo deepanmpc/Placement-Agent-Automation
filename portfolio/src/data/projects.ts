@@ -4,7 +4,7 @@ export const PROJECTS_DATA: Project[] = [
   {
     id: 'lar1a',
     displayId: '001',
-    title: 'NeuroDott_Neurodott',
+    title: 'NeuroDott',
     description: 'Real-time AI platform combining speech pipelines, RAG memory, and deterministic decision systems.',
     problem: 'Users need personalized AI that remembers context across sessions without privacy concerns.',
     solution: 'Built a modular AI system with speech pipelines, vector-based memory, and FSM-driven responses.',
