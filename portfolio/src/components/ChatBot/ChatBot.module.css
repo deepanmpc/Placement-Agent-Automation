@@ -145,6 +145,29 @@
   color: var(--text-primary);
 }
 
+.message p {
+  margin: 0;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--glow-color);
+  background: rgba(0, 229, 192, 0.1);
+  border: 1px solid var(--glow-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+  background: rgba(0, 229, 192, 0.2);
+  box-shadow: 0 0 12px rgba(0, 229, 192, 0.25);
+}
+
 .typing {
   display: flex;
   gap: 4px;

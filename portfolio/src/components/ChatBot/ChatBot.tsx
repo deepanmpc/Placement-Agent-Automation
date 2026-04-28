@@ -7,21 +7,27 @@ type Message = {
   id: number;
   role: 'bot' | 'user';
   text: string;
+  action?: QuickAction;
 };
 
 type QuickAction = {
   label: string;
-  prompt: string;
+  text: string;
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { label: 'Specialties?', prompt: 'specialties' },
-  { label: 'Best work?', prompt: 'best work' },
-  { label: 'Available for hire?', prompt: 'available for hire' },
-  { label: 'Contact', prompt: 'contact' }
+  { label: 'Specialties?', text: 'specialties' },
+  { label: 'Best work?', text: 'best work' },
+  { label: 'Available for hire?', text: 'available for hire' },
+  { label: 'Contact', text: 'contact' }
 ];
 
-const FIRST_MESSAGE = "I'm basically Deepan's clone. Ask me anything about me 😄";
+const FIRST_MESSAGE: Message = {
+  id: 0,
+  role: 'bot',
+  text: "I'm basically Deepan's clone. Ask me anything about me 😄",
+  action: { label: 'View Projects', text: 'projects' }
+};
 
 const ChatBot: React.FC = () => {
   const { currentStage, setStage, isChatOpen, closeChat } = useStage();
@@ -36,17 +42,20 @@ const ChatBot: React.FC = () => {
   const chatAvailable = currentStage !== 'landing' && currentStage !== 'boot';
 
   useEffect(() => {
-    if (isChatOpen && !hasSentFirstMsg.current) {
-      hasSentFirstMsg.current = true;
-      setIsTyping(true);
-      const timer = setTimeout(() => {
-        setMessages([{ id: messageIdRef.current++, role: 'bot', text: FIRST_MESSAGE }]);
-        setIsTyping(false);
-        inputRef.current?.focus();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-    if (!isChatOpen) {
+    if (isChatOpen) {
+      document.body.style.overflow = 'hidden';
+      if (!hasSentFirstMsg.current) {
+        hasSentFirstMsg.current = true;
+        setIsTyping(true);
+        const timer = setTimeout(() => {
+          setMessages([FIRST_MESSAGE]);
+          setIsTyping(false);
+          inputRef.current?.focus();
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      document.body.style.overflow = '';
       hasSentFirstMsg.current = false;
       setMessages([]);
     }
@@ -132,7 +141,12 @@ const ChatBot: React.FC = () => {
             <div className={styles.messages} ref={scrollRef}>
               {messages.map((message) => (
                 <div key={message.id} className={`${styles.message} ${styles[message.role]}`}>
-                  {message.text}
+                  <p>{message.text}</p>
+                  {message.action && (
+                    <button className={styles.actionBtn} onClick={() => sendMessage(message.action!.text)}>
+                      {'> '}{message.action.label}
+                    </button>
+                  )}
                 </div>
               ))}
               {isTyping && (
@@ -149,7 +163,7 @@ const ChatBot: React.FC = () => {
                 <button
                   key={action.label}
                   className={styles.quickBtn}
-                  onClick={() => sendMessage(action.prompt)}
+                  onClick={() => sendMessage(action.text)}
                 >
                   {action.label}
                 </button>
