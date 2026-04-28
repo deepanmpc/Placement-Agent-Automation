@@ -15,16 +15,16 @@ type QuickAction = {
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { label: 'Specialties?', text: 'specialties' },
-  { label: 'Best work?', text: 'best work' },
-  { label: 'Available for hire?', text: 'available for hire' },
+  { label: 'Skills', text: 'skills' },
+  { label: 'Projects', text: 'projects' },
+  { label: 'Available?', text: 'available' },
   { label: 'Contact', text: 'contact' }
 ];
 
 const FIRST_MESSAGE: Message = {
   id: 0,
   role: 'bot',
-  text: "I'm basically Deepan's clone. Ask me anything about me 😄",
+  text: "SYSTEM ACTIVE. Query my build profile.",
   action: { label: 'View Projects', text: 'projects' }
 };
 
@@ -70,31 +70,31 @@ const ChatBot: React.FC = () => {
   const getResponse = (rawInput: string): string => {
     const text = rawInput.toLowerCase().trim();
 
-    if (text.includes('project') || text.includes('portfolio')) {
-      return "I've built: LLM fine-tuning pipeline, semantic search engine, real-time sentiment analyzer, AI therapy companion, RAG system, and more. Check 'Projects' for the full list.";
+    if (text.includes('project') || text.includes('work')) {
+      return "LaRa combines speech, memory, and real-time AI. SignSpeak hits 45 FPS. Check projects.";
     }
 
-    if (text.includes('skill') || text.includes('stack') || text.includes('special') || text.includes('specialties')) {
-      return "My toolkit: React, TypeScript, Python, LangChain, RAG, Vector DBs, FastAPI. I build AI systems that actually work in production.";
+    if (text.includes('skill') || text.includes('stack') || text.includes('special')) {
+      return "React, TypeScript, Python, PyTorch, RAG, FastAPI, FAISS. I build AI systems that ship.";
     }
 
     if (text.includes('contact') || text.includes('email') || text.includes('reach')) {
-      return "Email: 2300032731cse3@gmail.com | LinkedIn: linkedin.com/in/deepanmpc/ • Always open to interesting conversations.";
+      return "2300032731cse3@gmail.com | linkedin.com/in/deepanmpc/";
     }
 
-    if (text.includes('hire') || text.includes('available') || text.includes('freelance')) {
-      return "Open to serious builds. If you have a problem worth solving, let's talk.";
+    if (text.includes('hire') || text.includes('available')) {
+      return "Yes. Got a problem worth solving? Let's talk.";
     }
 
     if (text.includes('who') || text.includes('about')) {
-      return "Building the interface between AI and humans. Low-cost therapy companions, semantic search, systems that make sense.";
+      return "AI Systems Engineer. RAG pipelines, semantic search, edge inference.";
     }
 
     if (text.includes('best')) {
-      return "The RAG pipeline with hybrid search was my best work - reduced latency by 40% while improving relevance. But honestly, the next one will be better.";
+      return "LaRa. RAG + speech + microservices. Real-time, memory-backed, scalable.";
     }
 
-    return 'Try the quick action buttons or ask me anything.';
+    return "Ask about skills, projects, or availability.";
   };
 
   const sendMessage = (value: string) => {
