@@ -3,98 +3,127 @@
   height: 100%;
   display: flex;
   align-items: center;
-  padding-left: 80px; /* Aligned with design */
-  animation: introEnter 0.5s var(--transition-easing) forwards;
+  padding-left: 10%; /* Center-left alignment */
+  background: transparent;
   position: relative;
   z-index: 10;
 }
 
-@keyframes introEnter {
+.content {
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Base Reveal Animation */
+@keyframes revealUp {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.98);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
-.content {
-  max-width: 600px;
+/* 1. Status Line */
+.statusLine {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-color);
+  opacity: 0;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  animation: revealUp 0.4s ease forwards;
+  animation-delay: 0.1s;
 }
 
-.availability {
-  font-size: 11px;
+.accentText {
+  opacity: 0.4;
+  margin-right: 8px;
+}
+
+/* 2. Name */
+.name {
+  font-size: clamp(48px, 8vw, 110px);
+  color: var(--text-primary);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: revealUp 0.5s ease forwards;
+  animation-delay: 0.2s;
+}
+
+/* 3. Role Line */
+.roleLine {
+  font-size: clamp(14px, 2vw, 18px);
   color: var(--accent-color);
   letter-spacing: 0.05em;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.dim {
-  opacity: 0.3;
-}
-
-.typingCursor {
-  width: 6px;
-  height: 12px;
-  background-color: var(--accent-color);
-  animation: blink 1s step-end infinite;
-}
-
-.name {
-  font-size: 96px;
-  color: var(--text-primary);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  margin-bottom: 16px;
-}
-
-.role {
-  font-size: 11px;
-  color: var(--accent-color);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   margin-bottom: 20px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  opacity: 0;
+  animation: revealUp 0.4s ease forwards;
+  animation-delay: 0.35s;
 }
 
 .dot {
+  opacity: 0.3;
   margin: 0 4px;
-  opacity: 0.5;
 }
 
-.tagline {
-  font-size: 14px;
-  color: #666;
+.cursor {
+  width: 8px;
+  height: 16px;
+  background-color: var(--accent-color);
+  margin-left: 10px;
+  animation: blink 1s step-end infinite;
+}
+
+/* 4. Description */
+.description {
+  font-size: 16px;
+  color: #777;
   line-height: 1.6;
-  max-width: 400px;
-  margin-bottom: 32px;
+  max-width: 500px;
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: revealUp 0.4s ease forwards;
+  animation-delay: 0.5s;
 }
 
-.actions {
+/* 5. Nav Pills */
+.navPills {
   display: flex;
-  gap: 12px;
+  gap: 16px;
+  opacity: 0;
+  animation: revealUp 0.4s ease forwards;
+  animation-delay: 0.65s;
 }
 
-.btn {
+.pill {
   background: transparent;
   border: 1px solid #1c1c1c;
   color: #444;
-  padding: 10px 24px;
+  padding: 8px 24px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  user-select: none;
 }
 
-.btn:hover {
+.pill:hover {
   border-color: var(--accent-color);
   color: var(--text-primary);
+  box-shadow: 0 0 15px var(--accent-muted);
 }
 
 @keyframes blink {

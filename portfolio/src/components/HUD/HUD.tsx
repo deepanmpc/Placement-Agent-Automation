@@ -74,6 +74,7 @@ const HUD: React.FC = () => {
               ${displaySection === section ? styles.dotActive : ''}
             `}
             title={section}
+            onClick={() => setStage(section.toLowerCase() as any)}
           />
         ))}
       </div>
