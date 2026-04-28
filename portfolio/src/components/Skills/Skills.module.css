@@ -30,11 +30,18 @@
 
 .label {
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--accent-color);
+  font-size: 11px;
+  color: var(--text-secondary);
   letter-spacing: 0.15em;
   margin-bottom: 32px;
-  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.accentDot {
+  color: var(--accent-color);
+  font-size: 18px;
 }
 
 .skillsGrid {

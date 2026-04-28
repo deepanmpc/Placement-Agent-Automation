@@ -7,6 +7,12 @@
   background: transparent;
   position: relative;
   z-index: 10;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.exiting {
+  opacity: 0 !important;
+  transform: translateY(-10px) !important;
 }
 
 .content {

@@ -22,7 +22,9 @@ const Skills: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <div className={styles.label}>// SKILLS_INIT</div>
+        <div className={styles.label}>
+          <span className={styles.accentDot}>•</span> SKILLS
+        </div>
         
         <div className={styles.skillsGrid}>
           {SKILLS_DATA.map((skill, idx) => (

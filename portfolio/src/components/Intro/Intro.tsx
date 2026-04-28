@@ -3,10 +3,10 @@ import { useStage } from '../../context/useStage';
 import styles from './Intro.module.css';
 
 const Intro: React.FC = () => {
-  const { setStage } = useStage();
+  const { setStage, isTransitioning } = useStage();
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
       <div className={styles.content}>
         {/* 1. Status Line */}
         <div className={styles.statusLine}>
