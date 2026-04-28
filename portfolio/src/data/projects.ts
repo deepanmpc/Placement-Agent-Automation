@@ -14,16 +14,17 @@ export const PROJECTS_DATA: Project[] = [
     repo: 'https://github.com/deepanmpc/LaRa'
   },
   {
-    id: 'sis2gn',
+    id: 'sea4rch',
     displayId: '002',
-    title: 'SignSpeak AI',
-    description: 'Real-time sign language recognition system with edge inference at 45 FPS.',
-    problem: 'Communication barriers between hearing-impaired and general public.',
-    solution: 'Optimized CNN models for edge devices achieving real-time inference.',
-    impact: '45 FPS on edge devices, helping real-time communication.',
-    tech: ['PyTorch', 'CNN', 'OpenCV', 'NVIDIA GPUs'],
+    title: 'Search Wizard',
+    description: 'Multi-modal semantic search engine over 50K+ files with sub-400ms retrieval.',
+    problem: 'Finding files across large repositories takes too long.',
+    solution: 'FAISS-indexed embeddings with Gemini for multi-modal queries.',
+    impact: 'Sub-400ms retrieval across 50K+ files.',
+    tech: ['FAISS', 'Gemini Embeddings', 'Electron', 'FastAPI'],
     year: '2024',
-    repo: 'https://github.com/deepanmpc/ISL_SIGNLANG_CNN'
+    repo: 'https://github.com/deepanmpc/SMART-SEARCH',
+    link: 'https://deepanmpc.github.io/SMART-SEARCH'
   },
   {
     id: 'res3ume',
@@ -38,34 +39,20 @@ export const PROJECTS_DATA: Project[] = [
     repo: 'https://github.com/deepanmpc/ResumeAnalyse_RAG-Architecture'
   },
   {
-    id: 'sea4rch',
+    id: 'sis2gn',
     displayId: '004',
-    title: 'Search Wizard',
-    description: 'Multi-modal semantic search engine over 50K+ files with sub-400ms retrieval.',
-    problem: 'Finding files across large repositories takes too long.',
-    solution: 'FAISS-indexed embeddings with Gemini for multi-modal queries.',
-    impact: 'Sub-400ms retrieval across 50K+ files.',
-    tech: ['FAISS', 'Gemini Embeddings', 'Electron', 'FastAPI'],
+    title: 'SignSpeak AI',
+    description: 'Real-time sign language recognition system with edge inference at 45 FPS.',
+    problem: 'Communication barriers between hearing-impaired and general public.',
+    solution: 'Optimized CNN models for edge devices achieving real-time inference.',
+    impact: '45 FPS on edge devices, helping real-time communication.',
+    tech: ['PyTorch', 'CNN', 'OpenCV', 'NVIDIA GPUs'],
     year: '2024',
-    repo: 'https://github.com/deepanmpc/SMART-SEARCH',
-    link: 'https://deepanmpc.github.io/SMART-SEARCH'
-  },
-  {
-    id: 'aio5era',
-    displayId: '005',
-    title: 'AI Therapy System',
-    description: 'AI system for neurodiverse users with offline speech processing.',
-    problem: 'Professional therapy tools costly and require constant internet.',
-    solution: 'WebRTC VAD with offline LLM and contextual memory.',
-    impact: 'Offline-capable system for underserved communities.',
-    tech: ['WebRTC VAD', 'LLM Integration', 'FSM Engine'],
-    year: '2023',
-    repo: 'https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL',
-    link: 'https://deepanmpc.github.io/LOVE_PREDICT_ML_MODEL/'
+    repo: 'https://github.com/deepanmpc/ISL_SIGNLANG_CNN'
   },
   {
     id: 'app6arel',
-    displayId: '006',
+    displayId: '005',
     title: '3D Apparel Customizer',
     description: 'Full-stack platform with real-time 3D product preview.',
     problem: 'Customers cannot visualize custom apparel before purchase.',
@@ -77,7 +64,7 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: 'love1',
-    displayId: '007',
+    displayId: '006',
     title: 'LOVE PREDICT',
     description: 'ML model to predict relationship compatibility based on behavioral, emotional, and psychological features.',
     problem: 'Understanding relationship dynamics requires insights beyond surface-level factors.',
@@ -89,7 +76,6 @@ export const PROJECTS_DATA: Project[] = [
     link: 'https://deepanmpc.github.io/LOVE_PREDICT_ML_MODEL/'
   }
 ];
-
 export const findProject = (query: string): Project | undefined => {
   const normalized = query.trim().toLowerCase().replace(/[\s_-]+/g, '');
 
