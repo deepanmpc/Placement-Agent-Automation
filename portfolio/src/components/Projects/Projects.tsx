@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStage } from '../../context/useStage';
 import { PROJECTS_DATA, ACHIEVEMENTS } from '../../data/projects';
+import type { Project } from '../../types';
 import styles from './Projects.module.css';
 
 const Projects: React.FC = () => {
@@ -8,6 +9,19 @@ const Projects: React.FC = () => {
   const [showAll, setShowAll] = useState(false);
 
   const displayedProjects = showAll ? PROJECTS_DATA : PROJECTS_DATA.slice(0, 3);
+
+  const getProjectForAchievement = (achievementText: string): Project | undefined => {
+    const text = achievementText.toLowerCase();
+    if (text.includes('rampage') || text.includes('neurodott')) return PROJECTS_DATA.find(p => p.title === 'NeuroDott');
+    if (text.includes('3d') || text.includes('apparel')) return PROJECTS_DATA.find(p => p.title === '3D Apparel Customizer');
+    if (text.includes('search') || text.includes('wizard')) return PROJECTS_DATA.find(p => p.title === 'Search Wizard');
+    return undefined;
+  };
+
+  const handleAchievementClick = (achievementText: string) => {
+    const project = getProjectForAchievement(achievementText);
+    if (project) openModal(project);
+  };
 
   return (
     <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
@@ -61,18 +75,25 @@ const Projects: React.FC = () => {
           <div className={styles.achievementsLabel}>
             <span className={styles.accentDot}>•</span> ACHIEVEMENTS
           </div>
-          <ul className={styles.achievementsList}>
-            {ACHIEVEMENTS.map((achievement, idx) => (
-              <li 
-                key={achievement.id} 
-                className={styles.achievementItem}
-                style={{ animationDelay: `${(PROJECTS_DATA.length + idx) * 80}ms` }}
-              >
-                <span className={styles.achievementPrefix}>›</span>
-                <span className={styles.achievementText}>{achievement.text}</span>
-              </li>
-            ))}
-          </ul>
+          <div className={styles.achievementsGrid}>
+            {ACHIEVEMENTS.map((achievement, idx) => {
+              const linkedProject = getProjectForAchievement(achievement.text);
+              return (
+                <div 
+                  key={achievement.id} 
+                  className={`${styles.achievementCard} ${linkedProject ? styles.clickable : ''}`}
+                  style={{ animationDelay: `${(PROJECTS_DATA.length + idx) * 80}ms` }}
+                  onClick={() => linkedProject && handleAchievementClick(achievement.text)}
+                >
+                  <div className={styles.achievementCardHeader}>
+                    <span className={styles.achievementIcon}>★</span>
+                    <span className={styles.achievementProject}>{linkedProject?.title || '���'}</span>
+                  </div>
+                  <p className={styles.achievementCardText}>{achievement.text}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
