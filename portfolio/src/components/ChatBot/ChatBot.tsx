@@ -75,7 +75,7 @@ const ChatBot: React.FC = () => {
     }
 
     if (text.includes('skill') || text.includes('stack') || text.includes('special')) {
-      return "React, TypeScript, Python, PyTorch, RAG, FastAPI, FAISS. I build AI systems that ship.";
+      return "React, TypeScript, Python, PyTorch, RAG, FastAPI, FAISS, Docker, CV, LangChain, Vector DBs, AWS. I build AI systems that ship.";
     }
 
     if (text.includes('contact') || text.includes('email') || text.includes('reach')) {
