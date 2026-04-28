@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useStage } from '../../context/useStage';
 import styles from './Projects.module.css';
 
 interface Project {
   id: string;
+  displayId: string;
   title: string;
   description: string;
   tech: string[];
@@ -11,51 +13,58 @@ interface Project {
 
 const PROJECTS_DATA: Project[] = [
   {
-    id: '01',
-    title: 'Flux OS',
-    description: 'A fully functional browser-based OS interface with drag-and-drop window manager and virtual filesystem.',
-    tech: ['React', 'TypeScript', 'Canvas API'],
-    year: '2024'
-  },
-  {
-    id: '02',
+    id: 'bkw1f8',
+    displayId: '001',
     title: 'SMART-SEARCH',
-    description: 'Natural language file system search tool with zero-configuration semantic understanding.',
+    description: 'Semantic file system search tool with zero-configuration natural language understanding.',
     tech: ['Python', 'RAG', 'Vector DB'],
     year: '2024'
   },
   {
-    id: '03',
+    id: 'nj2m9x',
+    displayId: '002',
     title: 'LaRa',
-    description: 'Low-cost AI therapy companion for specially-abled children with an offline-capable pipeline.',
+    description: 'Low-cost AI therapy companion for specially-abled children with an offline 4-layer pipeline.',
     tech: ['PyTorch', 'Robotics', 'CV'],
     year: '2023'
   },
   {
-    id: '04',
+    id: 'x8y9z0',
+    displayId: '003',
     title: 'ISL Recognition',
-    description: 'Real-time Indian Sign Language recognition using CNNs with 99.8% accuracy at 45 FPS.',
+    description: 'Real-time Indian Sign Language recognition system achieving 99.8% accuracy for accessibility.',
     tech: ['TensorFlow', 'OpenCV', 'CNN'],
     year: '2023'
   },
   {
-    id: '05',
+    id: 'p1q2r3',
+    displayId: '004',
+    title: 'Flux OS',
+    description: 'Browser-based operating system interface with a custom window manager and virtual filesystem.',
+    tech: ['React', 'TypeScript', 'Canvas API'],
+    year: '2024'
+  },
+  {
+    id: 's4t5u6',
+    displayId: '005',
     title: 'Signal',
-    description: 'Real-time analytics dashboard with high-density data visualization and predictive modeling.',
+    description: 'High-density real-time analytics dashboard with predictive modeling and D3 visualization.',
     tech: ['D3.js', 'Next.js', 'Node.js'],
     year: '2023'
   }
 ];
 
 const Projects: React.FC = () => {
+  const { isTransitioning } = useStage();
   const [showAll, setShowAll] = useState(false);
 
   const displayedProjects = showAll ? PROJECTS_DATA : PROJECTS_DATA.slice(0, 3);
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
       <div className={styles.content}>
         <div className={styles.label}>
+          <span className={styles.systemId}>id="x2b31z"</span>
           <span className={styles.accentDot}>•</span> PROJECTS
         </div>
 
@@ -65,17 +74,17 @@ const Projects: React.FC = () => {
               key={project.id} 
               className={styles.card}
               style={{ animationDelay: `${idx * 120}ms` }}
-              onClick={() => {
-                // Future: Open Modal (Stage 7)
-                console.log(`Open ${project.title}`);
-              }}
+              onClick={() => console.log(`Open ${project.title}`)}
             >
               <div className={styles.cardHeader}>
-                <span className={styles.projectId}>{project.id}</span>
+                <span className={styles.projectId}>id="{project.id}"</span>
                 <span className={styles.projectYear}>{project.year}</span>
               </div>
               
-              <h3 className={`${styles.projectTitle} syne`}>{project.title}</h3>
+              <h3 className={`${styles.projectTitle} syne`}>
+                <span className={styles.num}>{project.displayId} — </span>
+                {project.title}
+              </h3>
               <p className={styles.projectDesc}>{project.description}</p>
               
               <div className={styles.techStack}>
@@ -95,7 +104,8 @@ const Projects: React.FC = () => {
               className={styles.expandBtn}
               onClick={() => setShowAll(true)}
             >
-              <span className={styles.plus}>+</span> EXPAND PROJECTS
+              <span className={styles.systemId}>id="1xj5fx"</span>
+              <span className={styles.plus}>+</span> EXPLORE MORE SYSTEMS
             </button>
           </div>
         )}

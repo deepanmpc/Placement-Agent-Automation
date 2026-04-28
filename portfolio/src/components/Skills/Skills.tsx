@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useStage } from '../../context/useStage';
 import styles from './Skills.module.css';
 
 interface Skill {
@@ -17,10 +18,11 @@ const SKILLS_DATA: Skill[] = [
 ];
 
 const Skills: React.FC = () => {
+  const { isTransitioning } = useStage();
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
       <div className={styles.content}>
         <div className={styles.label}>
           <span className={styles.accentDot}>•</span> SKILLS
