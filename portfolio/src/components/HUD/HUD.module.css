@@ -134,6 +134,13 @@
     background-color 0.3s ease,
     box-shadow 0.3s ease;
   cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 229, 192, 0.1);
+}
+
+.navDot:hover {
+  transform: scale(1.25);
+  background-color: var(--accent-color);
+  box-shadow: 0 0 8px rgba(0, 229, 192, 0.3), 0 0 16px rgba(0, 229, 192, 0.15);
 }
 
 .navDot:hover {

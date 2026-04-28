@@ -161,8 +161,8 @@
 
 .pill {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15); /* Refined border */
-  color: var(--text-secondary); /* Refined text color */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
   padding: 8px 24px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -171,12 +171,13 @@
   cursor: pointer;
   transition: all 0.3s ease;
   user-select: none;
+  box-shadow: 0 0 6px rgba(0, 229, 192, 0.08);
 }
 
 .pill:hover {
   border-color: var(--accent-color);
-  color: var(--accent-color); /* Hover accent */
-  box-shadow: 0 0 15px var(--accent-muted);
+  color: var(--accent-color);
+  box-shadow: 0 0 12px rgba(0, 229, 192, 0.25), 0 0 24px rgba(0, 229, 192, 0.1);
 }
 
 @keyframes blink {

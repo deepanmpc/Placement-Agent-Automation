@@ -78,6 +78,7 @@
   transition: all 0.4s var(--transition-easing);
   opacity: 0;
   animation: cardEnter 0.6s ease forwards;
+  box-shadow: 0 0 8px rgba(0, 229, 192, 0.05);
 }
 
 @keyframes cardEnter {
@@ -95,7 +96,7 @@
   background: rgba(255, 255, 255, 0.04);
   transform: translateY(-4px);
   border-color: rgba(0, 229, 192, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 229, 192, 0.15);
 }
 
 .card:hover .cardBorder {
@@ -196,12 +197,13 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  box-shadow: 0 0 6px rgba(0, 229, 192, 0.06);
 }
 
 .expandBtn:hover {
   border-color: var(--accent-color);
   color: var(--text-primary);
-  box-shadow: 0 0 20px var(--accent-muted);
+  box-shadow: 0 0 20px var(--accent-muted), 0 0 40px rgba(0, 229, 192, 0.1);
 }
 
 .plus {
