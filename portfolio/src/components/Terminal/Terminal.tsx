@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { findProject, NAV_STAGES, TERMINAL_COMMANDS, PROFILE } from '../../data/projects';
+import { findProject, NAV_STAGES, PROFILE } from '../../data/projects';
 import { useStage } from '../../context/useStage';
 import type { Stage } from '../../types';
 import styles from './Terminal.module.css';
@@ -85,7 +85,26 @@ const Terminal: React.FC = () => {
 
     switch (base) {
       case 'help':
-        appendLine('output', TERMINAL_COMMANDS.join(' ') + ' goto <scene> open <project>');
+        appendLine('output', '=== AVAILABLE COMMANDS ===');
+        appendLine('output', '');
+        appendLine('output', 'about        - Display profile summary');
+        appendLine('output', 'skills      - Navigate to Skills section');
+        appendLine('output', 'projects    - Navigate to Projects section');
+        appendLine('output', 'contact     - Navigate to Contact section');
+        appendLine('output', '');
+        appendLine('output', '=== NAVIGATION ===');
+        appendLine('output', 'goto <scene>  - Go to specific scene');
+        appendLine('output', '             Example: goto projects');
+        appendLine('output', '');
+        appendLine('output', '=== PROJECT ===');
+        appendLine('output', 'open <name>   - Open a project detail');
+        appendLine('output', '             Example: open lara');
+        appendLine('output', '');
+        appendLine('output', '=== SYSTEM ===');
+        appendLine('output', 'whoami      - Display who you are');
+        appendLine('output', 'clear       - Clear terminal');
+        appendLine('output', '');
+        appendLine('output', 'Type command and press Enter.');
         return;
       case 'about':
         appendLine('output', PROFILE.summary);
