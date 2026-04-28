@@ -21,7 +21,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { label: 'Contact', prompt: 'contact' }
 ];
 
-const FIRST_MESSAGE = "You’re in. What do you want to explore?";
+const FIRST_MESSAGE = "I'm basically Deepan's clone. Ask me anything about me 😄";
 
 const ChatBot: React.FC = () => {
   const { currentStage, setStage, isChatOpen, closeChat } = useStage();
@@ -53,11 +53,11 @@ const ChatBot: React.FC = () => {
     const text = rawInput.toLowerCase().trim();
 
     if (text.includes('project') || text.includes('work') || text.includes('portfolio')) {
-      return navigateTo('projects', 'Here’s what I’ve built. Take a look.');
+      return navigateTo('projects', "Here's what I've built. Take a look.");
     }
 
     if (text.includes('skill') || text.includes('stack') || text.includes('special')) {
-      return navigateTo('skills', 'My toolkit: React, AI/ML, TypeScript, CV. But really I just solve problems.');
+      return navigateTo('skills', "My toolkit: React, AI/ML, TypeScript, CV. But really I just solve problems.");
     }
 
     if (text.includes('contact') || text.includes('email') || text.includes('reach')) {
@@ -65,14 +65,14 @@ const ChatBot: React.FC = () => {
     }
 
     if (text.includes('hire') || text.includes('available') || text.includes('freelance')) {
-      return navigateTo('contact', 'Open to serious builds. If you have a problem worth solving, let’s talk.');
+      return navigateTo('contact', "Open to serious builds. If you have a problem worth solving, let's talk.");
     }
 
     if (text.includes('about') || text.includes('who')) {
-      return 'Building the interface between AI and humans. Low-cost therapy companions, semantic search, systems that make sense.';
+      return "Building the interface between AI and humans. Low-cost therapy companions, semantic search, systems that make sense.";
     }
 
-    return 'Try: skills, projects, contact. Or just ask me whatever.';
+    return 'Try: goto skills, goto projects, goto contact. Or just ask me whatever.';
   };
 
   const sendMessage = (value: string) => {
@@ -122,7 +122,7 @@ const ChatBot: React.FC = () => {
           <section className={styles.panel} role="dialog" aria-label="System chat" aria-modal="true">
             <header className={styles.header}>
               <div>
-                <span className={styles.status}>SYS://CHAT</span>
+                <span className={styles.status}>SYS::CHAT</span>
                 <h2 className={styles.title}>System Assistant</h2>
               </div>
               <button className={styles.closeBtn} onClick={closeChat} aria-label="Close chat">x</button>
