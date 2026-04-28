@@ -70,7 +70,8 @@ export const PROJECTS_DATA: Project[] = [
     solution: 'Three.js-based real-time 3D preview integrated with backend.',
     impact: '8–10% increase in sales conversion.',
     tech: ['React', 'Three.js', 'Spring Boot'],
-    year: '2023'
+    year: '2023',
+    link: 'https://client-plum-ten.vercel.app'
   }
 ];
 
