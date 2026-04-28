@@ -41,7 +41,7 @@ const Terminal: React.FC = () => {
   const startupLines: TerminalLine[] = [
     { id: 1, kind: 'output', text: 'Terminal v1.0.0 initialized.' },
     { id: 2, kind: 'output', text: "Type 'help' for available commands." },
-    { id: 3, kind: 'output', text: "Try 'skills', 'projects', or 'contact' to navigate." },
+    { id: 3, kind: 'output', text: "Try 'goto skills', 'goto projects', or 'goto contact' to navigate." },
     { id: 4, kind: 'output', text: '' }
   ];
 
