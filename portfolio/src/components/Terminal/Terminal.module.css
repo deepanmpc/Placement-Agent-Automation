@@ -151,7 +151,8 @@
   align-items: center;
   gap: 8px;
   padding: 14px 18px 18px;
-  border-top: 1px solid var(--glow-color);
+  border-top: 1px solid rgba(0, 229, 192, 0.15);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 229, 192, 0.03) 100%);
 }
 
 .prompt {
@@ -179,7 +180,16 @@
   background: transparent;
   font-family: var(--font-mono);
   font-size: 13px;
-  caret-color: transparent;
+  caret-color: #00e5c0;
+  text-shadow: 0 0 8px rgba(0, 229, 192, 0.8);
+}
+
+.inputRow .input::placeholder {
+  color: rgba(0, 229, 192, 0.4);
+}
+
+.inputRow .input:focus {
+  caret-color: #00e5c0;
 }
 
 .cursor {

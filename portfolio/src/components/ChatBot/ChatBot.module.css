@@ -212,23 +212,31 @@
   display: flex;
   gap: 8px;
   padding: 14px 18px 18px;
-  border-top: 1px solid var(--glow-color);
+  border-top: 1px solid rgba(0, 229, 192, 0.15);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 229, 192, 0.03) 100%);
 }
 
 .input {
   flex: 1 1 auto;
   min-width: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 229, 192, 0.2);
   outline: 0;
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(0, 229, 192, 0.05);
   color: var(--text-primary);
   padding: 10px 11px;
   font: inherit;
   font-size: 13px;
+  caret-color: #00e5c0;
 }
 
 .input:focus {
-  border-color: rgba(0, 229, 192, 0.3);
+  border-color: rgba(0, 229, 192, 0.4);
+  background: rgba(0, 229, 192, 0.08);
+  box-shadow: 0 0 10px rgba(0, 229, 192, 0.15);
+}
+
+.input::placeholder {
+  color: rgba(0, 229, 192, 0.4);
 }
 
 .sendBtn {
