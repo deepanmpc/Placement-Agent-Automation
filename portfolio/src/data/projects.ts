@@ -131,8 +131,8 @@ export interface ContactInfo {
 
 export const PROFILE: ProfileInfo = {
   name: 'Deepan Chandrasekaran',
-  tagline: 'AI Engineer · Full-Stack Developer · Systems Architect',
-  roles: ['AI Engineer', 'Full-Stack Developer', 'Systems Architect'],
+  tagline: 'AI Engineer · LLM Researcher · Systems Architect',
+  roles: ['AI Engineer', 'LLM Researcher', 'Systems Architect'],
   summary: 'Building the interface between AI and humans. Real-time systems, semantic search, and architectures that scale.',
   location: {
     lat: 12.3401,
