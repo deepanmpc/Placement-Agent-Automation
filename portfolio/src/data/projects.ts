@@ -121,7 +121,7 @@ export const PROFILE: ProfileInfo = {
   name: 'Deepan Chandrasekaran',
   tagline: 'AI Engineer · Full-Stack Developer · Researcher',
   roles: ['AI Engineer', 'Full-Stack Developer', 'Researcher'],
-  summary: 'I build semantic systems and AI-human interfaces, from low-cost therapy companions to spatial systems.',
+  summary: 'Building the interface between AI and humans. Low-cost therapy companions, semantic search, and systems that actually make sense.',
   location: {
     lat: 12.3401,
     lng: 77.2901,
@@ -143,12 +143,12 @@ export const CERTIFICATIONS: Certification[] = [
 ];
 
 export const SKILLS: Skill[] = [
-  { id: '1', name: 'React / Next.js', detail: 'Building production-grade systems with focus on performance, DX, and scalable architectures.' },
-  { id: '2', name: 'AI / ML Engineering', detail: 'Developing RAG architectures, CV pipelines (99.8% ISL accuracy), and offline AI therapy companions.' },
-  { id: '3', name: 'TypeScript / Node.js', detail: 'Architecting type-safe full-stack applications and high-performance backend APIs.' },
-  { id: '4', name: 'Robotic-AI / CV', detail: 'Researching low-cost human-machine interfaces and real-time computer vision processing.' },
-  { id: '5', name: 'Systems Design', detail: 'Engineering semantic file systems and modular software architectures for the next computing era.' },
-  { id: '6', name: 'Python / Data Science', detail: 'Leveraging data-driven insights and advanced ML models for complex problem solving.' }
+  { id: '1', name: 'React / Next.js', detail: 'Fast UIs, full-stack apps, and performance tuning for real-world use.' },
+  { id: '2', name: 'AI / ML Engineering', detail: 'RAG pipelines, offline AI that runs without WiFi, and 99.8% ISL accuracy.' },
+  { id: '3', name: 'TypeScript / Node.js', detail: 'Type-safe backends that don\'t break at 2am.' },
+  { id: '4', name: 'Robotic-AI / CV', detail: 'Real-time vision on edge devices. No cloud required.' },
+  { id: '5', name: 'Systems Design', detail: 'Modular architectures that actually scale.' },
+  { id: '6', name: 'Python / Data Science', detail: 'ML models and data pipelines that deliver insights.' }
 ];
 
 export const ACHIEVEMENTS: Achievement[] = [

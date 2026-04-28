@@ -21,7 +21,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { label: 'Contact', prompt: 'contact' }
 ];
 
-const FIRST_MESSAGE = "You're inside my portfolio. What do you want to explore?";
+const FIRST_MESSAGE = "You’re in. What do you want to explore?";
 
 const ChatBot: React.FC = () => {
   const { currentStage, setStage, isChatOpen, closeChat } = useStage();
@@ -53,26 +53,26 @@ const ChatBot: React.FC = () => {
     const text = rawInput.toLowerCase().trim();
 
     if (text.includes('project') || text.includes('work') || text.includes('portfolio')) {
-      return navigateTo('projects', 'Alright. Opening projects.');
+      return navigateTo('projects', 'Here’s what I’ve built. Take a look.');
     }
 
     if (text.includes('skill') || text.includes('stack') || text.includes('special')) {
-      return navigateTo('skills', 'Most of my work is AI systems, real-time interfaces, and full-stack products.');
+      return navigateTo('skills', 'My toolkit: React, AI/ML, TypeScript, CV. But really I just solve problems.');
     }
 
     if (text.includes('contact') || text.includes('email') || text.includes('reach')) {
-      return navigateTo('contact', 'Opening contact. That is the cleanest path.');
+      return navigateTo('contact', 'Direct path. No middleman.');
     }
 
     if (text.includes('hire') || text.includes('available') || text.includes('freelance')) {
-      return navigateTo('contact', 'Yes. I am open to serious builds. Contact is the fastest route.');
+      return navigateTo('contact', 'Open to serious builds. If you have a problem worth solving, let’s talk.');
     }
 
     if (text.includes('about') || text.includes('who')) {
-      return 'I build AI systems and interfaces that feel alive. Less static portfolio, more operating layer.';
+      return 'Building the interface between AI and humans. Low-cost therapy companions, semantic search, systems that make sense.';
     }
 
-    return 'Not sure what you mean. Ask about skills, projects, or availability.';
+    return 'Try: skills, projects, contact. Or just ask me whatever.';
   };
 
   const sendMessage = (value: string) => {
