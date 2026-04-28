@@ -75,62 +75,7 @@ const ChatBot: React.FC = () => {
     ]);
   };
 
-const SKILL_DETAILS: Record<string, string> = {
-  react: "ResumeAnalyse, 3D configurator. Component architecture, state flow, performance.",
-  typescript: "All frontend systems. Type safety, reduced bugs, maintainability.",
-  fastapi: "RAG pipelines, real-time AI APIs. Async design, low-latency endpoints.",
-  pytorch: "SignSpeak AI, vision systems. Model optimization, real-time inference.",
-  computervision: "Sign language detection, gesture systems. Frame processing, latency trade-offs.",
-  rag: "ResumeAnalyse, LaRa memory. LLM + vector search for context.",
-  faiss: "50K+ file search. Indexing strategies, retrieval speed.",
-  vectordb: "ChromaDB for semantic search. Efficient structuring for accuracy.",
-  docker: "AI services, microservices. Environment consistency, orchestration.",
-  microservices: "LaRa AI platform. Decoupling, communication patterns, scalability.",
-  threejs: "3D apparel visualization. Rendering pipelines, WebGL performance.",
-  nodejs: "Backend utilities, API handling. Event-driven architecture.",
-  semanticsearch: "Multi-modal search over large datasets. Embedding retrieval, relevance ranking.",
-  webrtc: "Real-time voice processing. Stream handling, low-latency constraints.",
-  llm: "RAG pipelines, chatbots. Prompt control, response shaping, integration.",
-  langchain: "RAG systems, agent design. Chain composition, memory management.",
-  aws: "Cloud deployment, serverless. Scalability, managed services.",
-};
-
-const getResponse = (rawInput: string): string => {
-  const text = rawInput.toLowerCase().trim();
-
-  if (text.includes('project') || text.includes('work')) {
-    return "LaRa combines speech, memory, and real-time AI. SignSpeak hits 45 FPS. Check projects.";
-  }
-
-  if (text === 'skills') {
-    return "React, TypeScript, Python, PyTorch, RAG, FastAPI, FAISS, Docker, CV, LangChain, Vector DBs, AWS.";
-  }
-
-  const matchedSkill = Object.keys(SKILL_DETAILS).find(skill => text.includes(skill));
-  if (matchedSkill) {
-    return SKILL_DETAILS[matchedSkill];
-  }
-
-  if (text.includes('contact') || text.includes('email') || text.includes('reach')) {
-    return "2300032731cse3@gmail.com | linkedin.com/in/deepanmpc/";
-  }
-
-  if (text.includes('hire') || text.includes('available')) {
-    return "Yes. Got a problem worth solving? Let's talk.";
-  }
-
-  if (text.includes('who') || text.includes('about')) {
-    return "AI Systems Engineer. RAG pipelines, semantic search, edge inference.";
-  }
-
-  if (text.includes('best')) {
-    return "LaRa. RAG + speech + microservices. Real-time, memory-backed, scalable.";
-  }
-
-  return "Ask about skills, projects, or availability.";
-};
-
-  const sendMessage = (value: string) => {
+  const sendMessage = async (value: string) => {
     const trimmedValue = value.trim();
     if (!trimmedValue || isTyping) return;
 
@@ -138,10 +83,19 @@ const getResponse = (rawInput: string): string => {
     setInput('');
     setIsTyping(true);
 
-    window.setTimeout(() => {
-      appendMessage('bot', getResponse(trimmedValue));
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: trimmedValue }),
+      });
+      const data = await res.json();
+      appendMessage('bot', data.reply || 'System unavailable.');
+    } catch {
+      appendMessage('bot', 'System error. Try again.');
+    } finally {
       setIsTyping(false);
-    }, 420);
+    }
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
