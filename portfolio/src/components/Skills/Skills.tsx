@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { useStage } from '../../context/useStage';
-import { SKILLS, CERTIFICATIONS } from '../../data/projects';
+import { PROJECTS_DATA, SKILLS, CERTIFICATIONS } from '../../data/projects';
 import styles from './Skills.module.css';
 
 const Skills: React.FC = () => {
-  const { isTransitioning } = useStage();
-  const [selectedSkill, setSelectedSkill] = useState<{ id: string; name: string; detail: string } | null>(null);
+  const { isTransitioning, openModal } = useStage();
+  const [selectedSkill, setSelectedSkill] = useState<{ id: string; name: string; detail: string; projects: string[] } | null>(null);
   const [selectedCert, setSelectedCert] = useState<{ id: string; name: string; provider: string; year: string } | null>(null);
+
+  const handleProjectClick = (projectTitle: string) => {
+    const project = PROJECTS_DATA.find(p => p.title === projectTitle);
+    if (project) {
+      openModal(project);
+    }
+  };
 
   return (
     <div className={`${styles.container} ${isTransitioning ? styles.exiting : ''}`}>
@@ -32,6 +39,18 @@ const Skills: React.FC = () => {
           <div className={styles.detailPanel} key={selectedSkill.id}>
             <span className={styles.prefix}>›</span>
             <p className={styles.detailText}>{selectedSkill.detail}</p>
+            <div className={styles.usedIn}>
+              <span className={styles.usedInLabel}>Used in:</span>
+              {selectedSkill.projects.map((proj, idx) => (
+                <button
+                  key={proj}
+                  className={styles.projectLink}
+                  onClick={(e) => { e.stopPropagation(); handleProjectClick(proj); }}
+                >
+                  {proj}{idx < selectedSkill.projects.length - 1 ? ', ' : ''}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
