@@ -80,6 +80,11 @@ const SKILL_DETAILS: Record<string, string> = {
   microservices: "LaRa AI platform. Decoupling, communication patterns, scalability.",
   threejs: "3D apparel visualization. Rendering pipelines, WebGL performance.",
   nodejs: "Backend utilities, API handling. Event-driven architecture.",
+  semanticsearch: "Multi-modal search over large datasets. Embedding retrieval, relevance ranking.",
+  webrtc: "Real-time voice processing. Stream handling, low-latency constraints.",
+  llm: "RAG pipelines, chatbots. Prompt control, response shaping, integration.",
+  langchain: "RAG systems, agent design. Chain composition, memory management.",
+  aws: "Cloud deployment, serverless. Scalability, managed services.",
 };
 
 const getResponse = (rawInput: string): string => {
@@ -93,10 +98,9 @@ const getResponse = (rawInput: string): string => {
     return "React, TypeScript, Python, PyTorch, RAG, FastAPI, FAISS, Docker, CV, LangChain, Vector DBs, AWS.";
   }
 
-  for (const [skill, detail] of Object.entries(SKILL_DETAILS)) {
-    if (text.includes(skill)) {
-      return detail;
-    }
+  const matchedSkill = Object.keys(SKILL_DETAILS).find(skill => text.includes(skill));
+  if (matchedSkill) {
+    return SKILL_DETAILS[matchedSkill];
   }
 
   if (text.includes('contact') || text.includes('email') || text.includes('reach')) {
