@@ -10,6 +10,6 @@
   --font-mono: 'JetBrains Mono', monospace;
   --font-syne: 'Syne', sans-serif;
   
-  --transition-speed: 0.5s;
+  --transition-speed: 0.4s;
   --transition-easing: ease-in-out;
 }

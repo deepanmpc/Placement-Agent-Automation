@@ -12,7 +12,7 @@ export const StageProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setTimeout(() => {
       setCurrentStage(newStage);
       setIsTransitioning(false);
-    }, 500);
+    }, 400);
   };
 
   return (

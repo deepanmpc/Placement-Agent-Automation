@@ -1,0 +1,102 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.exiting {
+  opacity: 0;
+}
+
+.bootBox {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.logs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  opacity: 0;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.lineVisible {
+  opacity: 1;
+}
+
+.lineActive .text {
+  color: var(--accent-color);
+}
+
+.lineActive .prefix {
+  color: var(--accent-color);
+}
+
+.prefix {
+  font-size: 14px;
+  color: var(--accent-muted);
+  transition: color 0.2s ease;
+}
+
+.text {
+  letter-spacing: 0.02em;
+  transition: color 0.2s ease;
+}
+
+.cursor, .cursorSmall {
+  width: 6px;
+  height: 12px;
+  background-color: var(--accent-color);
+  margin-left: 8px;
+  animation: blink 1s step-end infinite;
+}
+
+.cursorSmall {
+  height: 10px;
+  width: 4px;
+}
+
+.progressContainer {
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-dim);
+  position: relative;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: var(--accent-color);
+  transition: width 0.4s linear;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Optional: Typewriter-like fade for lines */
+.lineVisible {
+  animation: lineIn 0.1s ease-out forwards;
+}
+
+@keyframes lineIn {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
