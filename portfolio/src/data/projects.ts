@@ -150,7 +150,7 @@ export const EDUCATION: EducationInfo = {
 };
 
 export const CERTIFICATIONS: Certification[] = [
-  { id: 'nv1', name: 'NVIDIA DLI Deep Learning Fundamentals', provider: 'NVIDIA DLI', year: '2024' },
+  { id: 'nv1', name: 'NVIDIA DLI Deep Learning Fundamentals', provider: 'NVIDIA DLI', year: '2025' },
   { id: 'orc2', name: 'Generative AI Professional', provider: 'Oracle', year: '2025' },
   { id: 'orc3', name: 'AI Vector Search Professional', provider: 'Oracle', year: '2025' }
 ];
