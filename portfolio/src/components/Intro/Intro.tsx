@@ -1,7 +1,10 @@
 import React from 'react';
+import { useStage } from '../../context/useStage';
 import styles from './Intro.module.css';
 
 const Intro: React.FC = () => {
+  const { setStage } = useStage();
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -18,20 +21,21 @@ const Intro: React.FC = () => {
         
         {/* 3. Role Line + Cursor */}
         <div className={styles.roleLine}>
-          CS + AI Engineer <span className={styles.dot}>·</span> Full-Stack Developer <span className={styles.dot}>·</span> Robotic-AI Researcher
+          AI Engineer <span className={styles.dot}>·</span> Full-Stack Developer <span className={styles.dot}>·</span> Researcher
           <div className={styles.cursor} />
         </div>
         
         {/* 4. Description */}
         <p className={styles.description}>
-          I engineer semantic systems and AI-human interfaces — from low-cost therapy companions to spatial file systems.
+          I build semantic systems and AI-human interfaces,<br />
+          from low-cost therapy companions to spatial systems.
         </p>
 
         {/* 5. Nav Pills */}
         <div className={styles.navPills}>
-          <button className={styles.pill}>Skills</button>
-          <button className={styles.pill}>Projects</button>
-          <button className={styles.pill}>Contact</button>
+          <button className={styles.pill} onClick={() => setStage('skills')}>Skills</button>
+          <button className={styles.pill} onClick={() => setStage('projects')}>Projects</button>
+          <button className={styles.pill} onClick={() => setStage('contact')}>Contact</button>
         </div>
       </div>
     </div>

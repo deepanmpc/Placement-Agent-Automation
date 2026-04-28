@@ -3,8 +3,11 @@
   --bg-grid: rgba(255, 255, 255, 0.018);
   --accent-color: #00e5c0;
   --accent-muted: rgba(0, 229, 192, 0.2);
+  
+  /* Text Contrast System */
   --text-primary: #e8e8e8;
-  --text-muted: #555;
+  --text-secondary: #9a9a9a;
+  --text-muted: #5c5c5c;
   --text-dim: #2a2a2a;
   
   --font-mono: 'JetBrains Mono', monospace;

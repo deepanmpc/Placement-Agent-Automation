@@ -48,14 +48,14 @@ const HUD: React.FC = () => {
   // Don't render HUD before Stage 3
   if (currentStage === 'landing' || currentStage === 'boot') return null;
 
-  const displaySection = currentStage === 'hud' ? 'INTRO' : currentStage.toUpperCase();
+  const displaySection = currentStage === 'hud' || currentStage === 'intro' ? 'INTRO' : currentStage.toUpperCase();
 
   return (
     <div className={styles.container}>
       {/* Top HUD Label */}
       <div className={`${styles.topHUD} ${showLabel ? styles.active : ''}`}>
         <div className={styles.accentDot} />
-        <span className={styles.sectionLabel}>SYS://{displaySection}_DEEPAN</span>
+        <span className={styles.sectionLabel}>SYS://{displaySection}</span>
       </div>
 
       {/* Bottom Coordinates */}

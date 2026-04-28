@@ -48,7 +48,7 @@
 .name {
   font-size: clamp(40px, 7vw, 82px); /* Reduced size significantly for long names */
   color: var(--text-primary);
-  line-height: 0.85;
+  line-height: 0.8; /* Reduced line gap */
   letter-spacing: -0.04em;
   margin-bottom: 24px;
   opacity: 0;
@@ -58,7 +58,7 @@
 
 /* 3. Role Line */
 .roleLine {
-  font-size: clamp(14px, 2vw, 18px);
+  font-size: clamp(14px, 1.8vw, 16px);
   color: var(--accent-color);
   letter-spacing: 0.05em;
   margin-bottom: 20px;
@@ -88,7 +88,7 @@
 /* 4. Description */
 .description {
   font-size: 16px;
-  color: #777;
+  color: var(--text-secondary); /* Fixed contrast */
   line-height: 1.6;
   max-width: 500px;
   margin-bottom: 40px;
@@ -108,8 +108,8 @@
 
 .pill {
   background: transparent;
-  border: 1px solid #1c1c1c;
-  color: #444;
+  border: 1px solid rgba(255, 255, 255, 0.15); /* Refined border */
+  color: var(--text-secondary); /* Refined text color */
   padding: 8px 24px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -122,7 +122,7 @@
 
 .pill:hover {
   border-color: var(--accent-color);
-  color: var(--text-primary);
+  color: var(--accent-color); /* Hover accent */
   box-shadow: 0 0 15px var(--accent-muted);
 }
 
