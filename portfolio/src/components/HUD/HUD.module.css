@@ -189,10 +189,10 @@
 }
 
 .terminalControl {
-  border-color: rgba(245, 197, 107, 0.24);
-  background: rgba(245, 197, 107, 0.035);
+  border-color: rgba(245, 197, 107, 0.35);
+  background: rgba(245, 197, 107, 0.06);
   color: #f5c56b;
-  box-shadow: 0 0 6px rgba(245, 197, 107, 0.15), 0 0 12px rgba(245, 197, 107, 0.08);
+  box-shadow: 0 0 10px rgba(245, 197, 107, 0.25), 0 0 20px rgba(245, 197, 107, 0.12), 0 0 30px rgba(245, 197, 107, 0.06);
   animation: alwaysOnGlow 4s ease-in-out infinite;
 }
 
@@ -200,15 +200,15 @@
   border-color: #f5c56b;
   color: #ffe0a1;
   opacity: 1;
-  background: rgba(245, 197, 107, 0.07);
-  box-shadow: 0 0 10px rgba(245, 197, 107, 0.35), 0 0 20px rgba(245, 197, 107, 0.15);
+  background: rgba(245, 197, 107, 0.1);
+  box-shadow: 0 0 14px rgba(245, 197, 107, 0.45), 0 0 28px rgba(245, 197, 107, 0.25), 0 0 42px rgba(245, 197, 107, 0.12);
 }
 
 .chatControl {
-  border-color: rgba(0, 229, 192, 0.24);
-  background: rgba(0, 229, 192, 0.035);
-  color: rgba(0, 229, 192, 0.8);
-  box-shadow: 0 0 6px rgba(0, 229, 192, 0.15), 0 0 12px rgba(0, 229, 192, 0.08);
+  border-color: rgba(0, 229, 192, 0.35);
+  background: rgba(0, 229, 192, 0.06);
+  color: rgba(0, 229, 192, 0.9);
+  box-shadow: 0 0 10px rgba(0, 229, 192, 0.25), 0 0 20px rgba(0, 229, 192, 0.12), 0 0 30px rgba(0, 229, 192, 0.06);
   animation: alwaysOnGlow 4s ease-in-out infinite;
 }
 
@@ -216,8 +216,8 @@
   border-color: var(--accent-color);
   color: var(--accent-color);
   opacity: 1;
-  background: rgba(0, 229, 192, 0.06);
-  box-shadow: 0 0 10px rgba(0, 229, 192, 0.35), 0 0 20px rgba(0, 229, 192, 0.15);
+  background: rgba(0, 229, 192, 0.1);
+  box-shadow: 0 0 14px rgba(0, 229, 192, 0.45), 0 0 28px rgba(0, 229, 192, 0.25), 0 0 42px rgba(0, 229, 192, 0.12);
 }
 
 @keyframes alwaysOnGlow {
@@ -230,11 +230,11 @@
 }
 
 .terminalControl.toolActive {
-  box-shadow: 0 0 14px rgba(245, 197, 107, 0.6), 0 0 28px rgba(245, 197, 107, 0.25);
+  box-shadow: 0 0 18px rgba(245, 197, 107, 0.7), 0 0 36px rgba(245, 197, 107, 0.4), 0 0 54px rgba(245, 197, 107, 0.2);
 }
 
 .chatControl.toolActive {
-  box-shadow: 0 0 14px rgba(0, 229, 192, 0.6), 0 0 28px rgba(0, 229, 192, 0.25);
+  box-shadow: 0 0 18px rgba(0, 229, 192, 0.7), 0 0 36px rgba(0, 229, 192, 0.4), 0 0 54px rgba(0, 229, 192, 0.2);
 }
 
 .terminalHint {

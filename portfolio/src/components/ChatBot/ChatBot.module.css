@@ -41,7 +41,12 @@
 .open .panel {
   opacity: 1;
   transform: translate(0, -50%) scale(1);
-  animation: chatColorCycle 8s linear infinite;
+  animation: chatColorCycle 8s linear infinite, chatPanelGlow 4s ease-in-out infinite;
+}
+
+@keyframes chatPanelGlow {
+  0%, 100% { box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 24px rgba(0, 229, 192, 0.15), 0 0 48px rgba(0, 229, 192, 0.08); }
+  50% { box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52), 0 0 32px rgba(0, 229, 192, 0.2), 0 0 64px rgba(0, 229, 192, 0.1); }
 }
 
 @keyframes chatColorCycle {

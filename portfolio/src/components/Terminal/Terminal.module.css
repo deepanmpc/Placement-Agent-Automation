@@ -43,7 +43,12 @@
 .open .panel {
   opacity: 1;
   transform: translate(-50%, 0);
-  animation: colorCycle 8s linear infinite;
+  animation: colorCycle 8s linear infinite, panelGlow 4s ease-in-out infinite;
+}
+
+@keyframes panelGlow {
+  0%, 100% { box-shadow: 0 28px 90px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 229, 192, 0.2), 0 0 60px rgba(0, 229, 192, 0.1); }
+  50% { box-shadow: 0 28px 90px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 229, 192, 0.25), 0 0 80px rgba(0, 229, 192, 0.12); }
 }
 
 @keyframes colorCycle {
