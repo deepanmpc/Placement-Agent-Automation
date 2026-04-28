@@ -4,6 +4,7 @@ import Boot from './components/Boot/Boot'
 import HUD from './components/HUD/HUD'
 import Intro from './components/Intro/Intro'
 import Skills from './components/Skills/Skills'
+import Projects from './components/Projects/Projects'
 
 function App() {
   const { currentStage } = useStage()
@@ -21,7 +22,9 @@ function App() {
       case 'skills':
         return <Skills />
       case 'projects':
-        return <div style={{ padding: '80px', color: '#00e5c0', fontSize: '24px' }} className="syne">STAGE 6: PROJECTS LOADING...</div>
+        return <Projects />
+      case 'contact':
+        return <div style={{ padding: '80px', color: '#00e5c0', fontSize: '24px' }} className="syne">STAGE 9: CONTACT LOADING...</div>
       default:
         return <Landing />
     }
