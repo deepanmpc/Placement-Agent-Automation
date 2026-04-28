@@ -47,7 +47,8 @@ export const PROJECTS_DATA: Project[] = [
     impact: 'Sub-400ms retrieval across 50K+ files.',
     tech: ['FAISS', 'Gemini Embeddings', 'Electron', 'FastAPI'],
     year: '2024',
-    repo: 'https://github.com/deepanmpc/SMART-SEARCH'
+    repo: 'https://github.com/deepanmpc/SMART-SEARCH',
+    link: 'https://deepanmpc.github.io/SMART-SEARCH'
   },
   {
     id: 'aio5era',

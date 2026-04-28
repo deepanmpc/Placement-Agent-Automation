@@ -80,7 +80,7 @@ const ProjectModal: React.FC = () => {
           )}
           {modalProject.link && (
             <button className={styles.secondaryBtn} onClick={() => window.open(modalProject.link, '_blank')}>
-              [ Live Demo ]
+              [ Try Project ]
             </button>
           )}
           <button className={styles.secondaryBtn} onClick={closeModal}>
