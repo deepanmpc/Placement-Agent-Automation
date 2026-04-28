@@ -50,3 +50,10 @@ body {
 .ac {
   color: var(--accent-color);
 }
+
+.dimmed-focus {
+  filter: blur(2px) grayscale(0.5);
+  opacity: 0.4;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}

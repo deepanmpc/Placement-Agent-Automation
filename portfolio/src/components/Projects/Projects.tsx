@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { useStage } from '../../context/useStage';
+import type { Project } from '../../types';
 import styles from './Projects.module.css';
-
-interface Project {
-  id: string;
-  displayId: string;
-  title: string;
-  description: string;
-  tech: string[];
-  year: string;
-}
 
 const PROJECTS_DATA: Project[] = [
   {
@@ -17,7 +9,10 @@ const PROJECTS_DATA: Project[] = [
     displayId: '001',
     title: 'SMART-SEARCH',
     description: 'Semantic file system search tool with zero-configuration natural language understanding.',
-    tech: ['Python', 'RAG', 'Vector DB'],
+    problem: 'Traditional file search is limited to exact keywords, making it difficult to find files based on concepts or context.',
+    solution: 'Engineered a RAG-based search tool using vector embeddings and LLMs to enable semantic retrieval without any pre-configuration.',
+    impact: 'Significantly reduced time spent searching for internal documentation and unstructured project files.',
+    tech: ['Python', 'RAG', 'Vector DB', 'LLMs'],
     year: '2024'
   },
   {
@@ -25,7 +20,10 @@ const PROJECTS_DATA: Project[] = [
     displayId: '002',
     title: 'LaRa',
     description: 'Low-cost AI therapy companion for specially-abled children with an offline 4-layer pipeline.',
-    tech: ['PyTorch', 'Robotics', 'CV'],
+    problem: 'Professional therapy tools are often prohibitively expensive and require constant high-speed internet access.',
+    solution: 'Developed a modular AI companion with a custom 4-layer offline-capable pipeline, blending computer vision and natural language processing.',
+    impact: 'Created an accessible, locally-operable therapeutic tool prototype for underserved communities.',
+    tech: ['PyTorch', 'Robotics', 'CV', 'NLP'],
     year: '2023'
   },
   {
@@ -33,7 +31,10 @@ const PROJECTS_DATA: Project[] = [
     displayId: '003',
     title: 'ISL Recognition',
     description: 'Real-time Indian Sign Language recognition system achieving 99.8% accuracy for accessibility.',
-    tech: ['TensorFlow', 'OpenCV', 'CNN'],
+    problem: 'Communication barriers between the hearing-impaired and the general public due to lack of real-time translation tools.',
+    solution: 'Built a real-time ISL recognition system using CNNs and OpenCV, optimized for high FPS and accuracy in varying light conditions.',
+    impact: 'Achieved 99.8% accuracy at 45 FPS, demonstrating the viability of real-time sign language translation on edge devices.',
+    tech: ['TensorFlow', 'OpenCV', 'CNN', 'Python'],
     year: '2023'
   },
   {
@@ -41,7 +42,10 @@ const PROJECTS_DATA: Project[] = [
     displayId: '004',
     title: 'Flux OS',
     description: 'Browser-based operating system interface with a custom window manager and virtual filesystem.',
-    tech: ['React', 'TypeScript', 'Canvas API'],
+    problem: 'Web applications often lack the organizational power and multi-tasking capabilities of native desktop environments.',
+    solution: 'Designed a fully functional web-based OS interface with a custom drag-and-drop window manager and a virtualized filesystem.',
+    impact: 'Showcased a modular architecture for complex browser-based productivity tools.',
+    tech: ['React', 'TypeScript', 'Canvas API', 'Framer Motion'],
     year: '2024'
   },
   {
@@ -49,13 +53,16 @@ const PROJECTS_DATA: Project[] = [
     displayId: '005',
     title: 'Signal',
     description: 'High-density real-time analytics dashboard with predictive modeling and D3 visualization.',
-    tech: ['D3.js', 'Next.js', 'Node.js'],
+    problem: 'Large-scale real-time data streams are often difficult to visualize and analyze effectively for immediate decision-making.',
+    solution: 'Developed a high-density dashboard featuring real-time D3 visualizations and integrated predictive ML models.',
+    impact: 'Provided a centralized platform for monitoring complex system metrics with real-time alerting capabilities.',
+    tech: ['D3.js', 'Next.js', 'Node.js', 'MLOps'],
     year: '2023'
   }
 ];
 
 const Projects: React.FC = () => {
-  const { isTransitioning } = useStage();
+  const { isTransitioning, openModal } = useStage();
   const [showAll, setShowAll] = useState(false);
 
   const displayedProjects = showAll ? PROJECTS_DATA : PROJECTS_DATA.slice(0, 3);
@@ -74,7 +81,7 @@ const Projects: React.FC = () => {
               key={project.id} 
               className={styles.card}
               style={{ animationDelay: `${idx * 120}ms` }}
-              onClick={() => console.log(`Open ${project.title}`)}
+              onClick={() => openModal(project)}
             >
               <div className={styles.cardHeader}>
                 <span className={styles.projectId}>id="{project.id}"</span>

@@ -5,9 +5,10 @@ import HUD from './components/HUD/HUD'
 import Intro from './components/Intro/Intro'
 import Skills from './components/Skills/Skills'
 import Projects from './components/Projects/Projects'
+import ProjectModal from './components/ProjectModal/ProjectModal'
 
 function App() {
-  const { currentStage } = useStage()
+  const { currentStage, modalProject } = useStage()
 
   const renderStage = () => {
     switch (currentStage) {
@@ -34,8 +35,11 @@ function App() {
     <>
       <div className="grid-overlay" />
       <div className="noise-overlay" />
-      <HUD />
-      {renderStage()}
+      <div className={modalProject ? 'dimmed-focus' : ''}>
+        <HUD />
+        {renderStage()}
+      </div>
+      <ProjectModal />
     </>
   )
 }
