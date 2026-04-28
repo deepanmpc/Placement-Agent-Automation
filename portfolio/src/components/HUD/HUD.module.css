@@ -176,7 +176,8 @@
     border-color 0.2s ease,
     color 0.2s ease,
     opacity 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .toolControl:hover {
@@ -184,12 +185,14 @@
   color: var(--accent-color);
   opacity: 1;
   background: rgba(0, 229, 192, 0.035);
+  box-shadow: 0 0 10px rgba(0, 229, 192, 0.35), 0 0 20px rgba(0, 229, 192, 0.15);
 }
 
 .terminalControl {
   border-color: rgba(245, 197, 107, 0.24);
   background: rgba(245, 197, 107, 0.035);
   color: #f5c56b;
+  box-shadow: 0 0 6px rgba(245, 197, 107, 0.15), 0 0 12px rgba(245, 197, 107, 0.08);
 }
 
 .terminalControl:hover {
@@ -197,14 +200,41 @@
   color: #ffe0a1;
   opacity: 1;
   background: rgba(245, 197, 107, 0.07);
+  box-shadow: 0 0 10px rgba(245, 197, 107, 0.35), 0 0 20px rgba(245, 197, 107, 0.15);
 }
 
 .chatControl {
-  border-color: rgba(0, 229, 192, 0.14);
+  border-color: rgba(0, 229, 192, 0.24);
+  background: rgba(0, 229, 192, 0.035);
+  color: rgba(0, 229, 192, 0.8);
+  box-shadow: 0 0 6px rgba(0, 229, 192, 0.15), 0 0 12px rgba(0, 229, 192, 0.08);
+}
+
+.chatControl:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  opacity: 1;
+  background: rgba(0, 229, 192, 0.06);
+  box-shadow: 0 0 10px rgba(0, 229, 192, 0.35), 0 0 20px rgba(0, 229, 192, 0.15);
 }
 
 .toolActive {
   opacity: 0.48;
+}
+
+.terminalControl.toolActive {
+  box-shadow: 0 0 14px rgba(245, 197, 107, 0.6), 0 0 28px rgba(245, 197, 107, 0.25);
+  animation: softPulse 6s ease-in-out infinite;
+}
+
+.chatControl.toolActive {
+  box-shadow: 0 0 14px rgba(0, 229, 192, 0.6), 0 0 28px rgba(0, 229, 192, 0.25);
+  animation: softPulse 6s ease-in-out infinite;
+}
+
+@keyframes softPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
 }
 
 .terminalHint {
