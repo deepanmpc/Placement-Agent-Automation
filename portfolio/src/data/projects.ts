@@ -59,7 +59,9 @@ export const PROJECTS_DATA: Project[] = [
     solution: 'WebRTC VAD with offline LLM and contextual memory.',
     impact: 'Offline-capable system for underserved communities.',
     tech: ['WebRTC VAD', 'LLM Integration', 'FSM Engine'],
-    year: '2023'
+    year: '2023',
+    repo: 'https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL',
+    link: 'https://deepanmpc.github.io/LOVE_PREDICT_ML_MODEL/'
   },
   {
     id: 'app6arel',
@@ -72,6 +74,19 @@ export const PROJECTS_DATA: Project[] = [
     tech: ['React', 'Three.js', 'Spring Boot'],
     year: '2023',
     link: 'https://client-plum-ten.vercel.app'
+  },
+  {
+    id: 'love1',
+    displayId: '007',
+    title: 'LOVE PREDICT',
+    description: 'ML model to predict relationship compatibility based on behavioral, emotional, and psychological features.',
+    problem: 'Understanding relationship dynamics requires insights beyond surface-level factors.',
+    solution: 'ML classification system analyzing features from two individuals.',
+    impact: 'Classifies connections into relationship compatibility categories.',
+    tech: ['Python', 'Scikit-learn', 'Jupyter'],
+    year: '2026',
+    repo: 'https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL',
+    link: 'https://deepanmpc.github.io/LOVE_PREDICT_ML_MODEL/'
   }
 ];
 
