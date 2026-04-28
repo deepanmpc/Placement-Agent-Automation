@@ -4,7 +4,7 @@ export const PROJECTS_DATA: Project[] = [
   {
     id: 'lar1a',
     displayId: '001',
-    title: 'LaRa',
+    title: 'Anaavi',
     description: 'Real-time AI platform combining speech pipelines, RAG memory, and deterministic decision systems.',
     problem: 'Users need personalized AI that remembers context across sessions without privacy concerns.',
     solution: 'Built a modular AI system with speech pipelines, vector-based memory, and FSM-driven responses.',
@@ -180,19 +180,19 @@ export const CERTIFICATIONS: Certification[] = [
 export const SKILLS: Skill[] = [
   { id: '1', name: 'React', detail: 'Used to build interactive UIs for ResumeAnalyse and 3D configurator platforms. Learned component architecture, state flow, and performance optimization.', projects: ['ResumeAnalyse', '3D Apparel Customizer'] },
   { id: '2', name: 'TypeScript', detail: 'Used across frontend systems to enforce type safety and scalability. Learned how strong typing reduces bugs and improves maintainability.', projects: ['ResumeAnalyse', '3D Apparel Customizer'] },
-  { id: '3', name: 'FastAPI', detail: 'Built backend services for RAG pipelines and real-time AI APIs. Learned async design and building low-latency, production-ready endpoints.', projects: ['LaRa', 'Search Wizard'] },
+  { id: '3', name: 'FastAPI', detail: 'Built backend services for RAG pipelines and real-time AI APIs. Learned async design and building low-latency, production-ready endpoints.', projects: ['Anaavi', 'Search Wizard'] },
   { id: '4', name: 'PyTorch', detail: 'Used to train CNN models for SignSpeak AI and vision systems. Learned model optimization and handling real-time inference pipelines.', projects: ['SignSpeak AI'] },
   { id: '5', name: 'Computer Vision', detail: 'Applied in sign language detection and real-time gesture systems. Learned frame processing, model accuracy tuning, and latency trade-offs.', projects: ['SignSpeak AI'] },
-  { id: '6', name: 'RAG Systems', detail: 'Built ResumeAnalyse and LaRa memory systems using retrieval pipelines. Learned how to combine LLMs with vector search for contextual responses.', projects: ['ResumeAnalyse', 'LaRa'] },
+  { id: '6', name: 'RAG Systems', detail: 'Built ResumeAnalyse and Anaavi memory systems using retrieval pipelines. Learned how to combine LLMs with vector search for contextual responses.', projects: ['ResumeAnalyse', 'Anaavi'] },
   { id: '7', name: 'FAISS', detail: 'Used for fast similarity search in large embedding datasets (50K+ files). Learned indexing strategies and optimizing retrieval speed.', projects: ['Search Wizard'] },
-  { id: '8', name: 'Vector Databases', detail: 'Stored embeddings for semantic search and AI retrieval systems. Learned efficient data structuring for high-accuracy retrieval.', projects: ['ResumeAnalyse', 'LaRa'] },
-  { id: '9', name: 'Docker', detail: 'Containerized AI services and microservices for deployment. Learned environment consistency and scalable service orchestration.', projects: ['LaRa'] },
-  { id: '10', name: 'Microservices Architecture', detail: 'Designed modular backend systems for LaRa AI platform. Learned decoupling, communication patterns, and system scalability.', projects: ['LaRa'] },
+  { id: '8', name: 'Vector Databases', detail: 'Stored embeddings for semantic search and AI retrieval systems. Learned efficient data structuring for high-accuracy retrieval.', projects: ['ResumeAnalyse', 'Anaavi'] },
+  { id: '9', name: 'Docker', detail: 'Containerized AI services and microservices for deployment. Learned environment consistency and scalable service orchestration.', projects: ['Anaavi'] },
+  { id: '10', name: 'Microservices Architecture', detail: 'Designed modular backend systems for LaRa AI platform. Learned decoupling, communication patterns, and system scalability.', projects: ['Anaavi'] },
   { id: '11', name: 'Three.js', detail: 'Built real-time 3D product visualization for apparel customization. Learned rendering pipelines and performance optimization in WebGL.', projects: ['3D Apparel Customizer'] },
-  { id: '12', name: 'Node.js', detail: 'Handled backend utilities and integration logic across systems. Learned event-driven architecture and API handling.', projects: ['LaRa', 'Search Wizard'] },
+  { id: '12', name: 'Node.js', detail: 'Handled backend utilities and integration logic across systems. Learned event-driven architecture and API handling.', projects: ['Anaavi', 'Search Wizard'] },
   { id: '13', name: 'Semantic Search', detail: 'Implemented multi-modal search engine over large datasets. Learned embedding-based retrieval and relevance ranking.', projects: ['ResumeAnalyse', 'Search Wizard'] },
   { id: '14', name: 'WebRTC / Streaming', detail: 'Used for real-time voice processing and low-latency communication. Learned stream handling and real-time system constraints.', projects: ['AI Therapy System'] },
-  { id: '15', name: 'LLM Integration', detail: 'Integrated LLMs into RAG pipelines and chatbot systems. Learned prompt control, response shaping, and system-level integration.', projects: ['ResumeAnalyse', 'AI Therapy System', 'LaRa'] }
+  { id: '15', name: 'LLM Integration', detail: 'Integrated LLMs into RAG pipelines and chatbot systems. Learned prompt control, response shaping, and system-level integration.', projects: ['ResumeAnalyse', 'AI Therapy System', 'Anaavi'] }
 ];
 
 export const ACHIEVEMENTS: Achievement[] = [
