@@ -2,6 +2,7 @@ import { useStage } from './context/useStage'
 import Landing from './components/Landing/Landing'
 import Boot from './components/Boot/Boot'
 import HUD from './components/HUD/HUD'
+import Intro from './components/Intro/Intro'
 
 function App() {
   const { currentStage } = useStage()
@@ -15,7 +16,7 @@ function App() {
       case 'hud':
         return null // HUD handles its own reveal animation
       case 'intro':
-        return <div style={{ padding: '80px', color: '#00e5c0', fontSize: '24px' }} className="syne">STAGE 4: INTRO CONTENT LOADING...</div>
+        return <Intro />
       default:
         return <Landing />
     }
