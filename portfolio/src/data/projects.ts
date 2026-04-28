@@ -156,21 +156,21 @@ export const CERTIFICATIONS: Certification[] = [
 ];
 
 export const SKILLS: Skill[] = [
-  { id: '1', name: 'React / Next.js', detail: 'Fast UIs, full-stack apps, and performance tuning for real-world use.' },
-  { id: '2', name: 'AI / ML Engineering', detail: 'RAG pipelines, offline AI that runs without WiFi, and real-time CV systems.' },
-  { id: '3', name: 'TypeScript / Node.js', detail: 'Type-safe backends that don\'t break at 2am.' },
-  { id: '4', name: 'Computer Vision', detail: 'Real-time vision on edge devices. No cloud required.' },
-  { id: '5', name: 'Systems Design', detail: 'Modular architectures that actually scale.' },
-  { id: '6', name: 'Python / Data Science', detail: 'ML models and data pipelines that deliver insights.' },
-  { id: '7', name: 'FastAPI', detail: 'Low-latency APIs with async design for production systems.' },
-  { id: '8', name: 'RAG Systems', detail: 'Retrieval-augmented generation with vector databases.' },
-  { id: '9', name: 'FAISS', detail: 'Fast similarity search for large embedding datasets.' },
-  { id: '10', name: 'Vector Databases', detail: 'Efficient storage and retrieval of embeddings.' },
-  { id: '11', name: 'Docker', detail: 'Containerized services for consistent deployment.' },
-  { id: '12', name: 'Three.js', detail: 'Real-time 3D visualization for web applications.' },
-  { id: '13', name: 'WebRTC', detail: 'Real-time voice and video streaming.' },
-  { id: '14', name: 'LLM Integration', detail: 'Prompt engineering and LLM pipeline integration.' },
-  { id: '15', name: 'AWS / Cloud', detail: 'Cloud deployment and serverless architecture.' }
+  { id: '1', name: 'React', detail: 'Used to build interactive UIs for ResumeAnalyse and 3D configurator platforms. Learned component architecture, state flow, and performance optimization.' },
+  { id: '2', name: 'TypeScript', detail: 'Used across frontend systems to enforce type safety and scalability. Learned how strong typing reduces bugs and improves maintainability.' },
+  { id: '3', name: 'FastAPI', detail: 'Built backend services for RAG pipelines and real-time AI APIs. Learned async design and building low-latency, production-ready endpoints.' },
+  { id: '4', name: 'PyTorch', detail: 'Used to train CNN models for SignSpeak AI and vision systems. Learned model optimization and handling real-time inference pipelines.' },
+  { id: '5', name: 'Computer Vision', detail: 'Applied in sign language detection and real-time gesture systems. Learned frame processing, model accuracy tuning, and latency trade-offs.' },
+  { id: '6', name: 'RAG Systems', detail: 'Built ResumeAnalyse and LaRa memory systems using retrieval pipelines. Learned how to combine LLMs with vector search for contextual responses.' },
+  { id: '7', name: 'FAISS', detail: 'Used for fast similarity search in large embedding datasets (50K+ files). Learned indexing strategies and optimizing retrieval speed.' },
+  { id: '8', name: 'Vector Databases', detail: 'Stored embeddings for semantic search and AI retrieval systems. Learned efficient data structuring for high-accuracy retrieval.' },
+  { id: '9', name: 'Docker', detail: 'Containerized AI services and microservices for deployment. Learned environment consistency and scalable service orchestration.' },
+  { id: '10', name: 'Microservices Architecture', detail: 'Designed modular backend systems for LaRa AI platform. Learned decoupling, communication patterns, and system scalability.' },
+  { id: '11', name: 'Three.js', detail: 'Built real-time 3D product visualization for apparel customization. Learned rendering pipelines and performance optimization in WebGL.' },
+  { id: '12', name: 'Node.js', detail: 'Handled backend utilities and integration logic across systems. Learned event-driven architecture and API handling.' },
+  { id: '13', name: 'Semantic Search', detail: 'Implemented multi-modal search engine over large datasets. Learned embedding-based retrieval and relevance ranking.' },
+  { id: '14', name: 'WebRTC / Streaming', detail: 'Used for real-time voice processing and low-latency communication. Learned stream handling and real-time system constraints.' },
+  { id: '15', name: 'LLM Integration', detail: 'Integrated LLMs into RAG pipelines and chatbot systems. Learned prompt control, response shaping, and system-level integration.' }
 ];
 
 export const ACHIEVEMENTS: Achievement[] = [
