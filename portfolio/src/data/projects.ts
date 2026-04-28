@@ -161,7 +161,16 @@ export const SKILLS: Skill[] = [
   { id: '3', name: 'TypeScript / Node.js', detail: 'Type-safe backends that don\'t break at 2am.' },
   { id: '4', name: 'Computer Vision', detail: 'Real-time vision on edge devices. No cloud required.' },
   { id: '5', name: 'Systems Design', detail: 'Modular architectures that actually scale.' },
-  { id: '6', name: 'Python / Data Science', detail: 'ML models and data pipelines that deliver insights.' }
+  { id: '6', name: 'Python / Data Science', detail: 'ML models and data pipelines that deliver insights.' },
+  { id: '7', name: 'FastAPI', detail: 'Low-latency APIs with async design for production systems.' },
+  { id: '8', name: 'RAG Systems', detail: 'Retrieval-augmented generation with vector databases.' },
+  { id: '9', name: 'FAISS', detail: 'Fast similarity search for large embedding datasets.' },
+  { id: '10', name: 'Vector Databases', detail: 'Efficient storage and retrieval of embeddings.' },
+  { id: '11', name: 'Docker', detail: 'Containerized services for consistent deployment.' },
+  { id: '12', name: 'Three.js', detail: 'Real-time 3D visualization for web applications.' },
+  { id: '13', name: 'WebRTC', detail: 'Real-time voice and video streaming.' },
+  { id: '14', name: 'LLM Integration', detail: 'Prompt engineering and LLM pipeline integration.' },
+  { id: '15', name: 'AWS / Cloud', detail: 'Cloud deployment and serverless architecture.' }
 ];
 
 export const ACHIEVEMENTS: Achievement[] = [

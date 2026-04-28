@@ -15,15 +15,6 @@ type QuickAction = {
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { label: 'React', text: 'react' },
-  { label: 'TypeScript', text: 'typescript' },
-  { label: 'FastAPI', text: 'fastapi' },
-  { label: 'PyTorch', text: 'pytorch' },
-  { label: 'RAG', text: 'rag' },
-  { label: 'FAISS', text: 'faiss' },
-  { label: 'Docker', text: 'docker' },
-  { label: 'Computer Vision', text: 'computervision' },
-  { label: 'Three.js', text: 'threejs' },
   { label: 'Projects', text: 'projects' },
   { label: 'Available?', text: 'available' },
   { label: 'Contact', text: 'contact' }
