@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import { useStage } from '../../context/useStage';
-import { PROJECTS_DATA } from '../../data/projects';
+import { PROJECTS_DATA, ACHIEVEMENTS } from '../../data/projects';
 import styles from './Projects.module.css';
-
-const ACHIEVEMENTS_DATA = [
-  { id: '9m2zlr', text: '3rd Place — Rampage v2.6 Hackathon' },
-  { id: 'j7x2qp', text: '500+ Active Users for AI Therapy System' },
-  { id: 'c8k3w1', text: 'Top 5% — Kaggle ML Competition' },
-];
 
 const Projects: React.FC = () => {
   const { isTransitioning, openModal } = useStage();
@@ -68,7 +62,7 @@ const Projects: React.FC = () => {
             <span className={styles.accentDot}>•</span> ACHIEVEMENTS
           </div>
           <ul className={styles.achievementsList}>
-            {ACHIEVEMENTS_DATA.map((achievement, idx) => (
+            {ACHIEVEMENTS.map((achievement, idx) => (
               <li 
                 key={achievement.id} 
                 className={styles.achievementItem}

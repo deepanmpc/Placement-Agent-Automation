@@ -16,8 +16,19 @@ export interface Project {
 export interface StageContextType {
   currentStage: Stage;
   setStage: (stage: Stage) => void;
+  canGoBack: boolean;
+  goBack: () => void;
   isTransitioning: boolean;
   modalProject: Project | null;
   openModal: (project: Project) => void;
   closeModal: () => void;
+  isTerminalOpen: boolean;
+  openTerminal: () => void;
+  closeTerminal: () => void;
+  toggleTerminal: () => void;
+  isChatOpen: boolean;
+  openChat: () => void;
+  closeChat: () => void;
+  closeAll: () => void;
+  isAnyOverlayOpen: boolean;
 }

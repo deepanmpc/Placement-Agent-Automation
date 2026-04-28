@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useStage } from './context/useStage'
 import Landing from './components/Landing/Landing'
 import Boot from './components/Boot/Boot'
@@ -6,9 +7,48 @@ import Intro from './components/Intro/Intro'
 import Skills from './components/Skills/Skills'
 import Projects from './components/Projects/Projects'
 import ProjectModal from './components/ProjectModal/ProjectModal'
+import Terminal from './components/Terminal/Terminal'
+import Contact from './components/Contact/Contact'
+import ChatBot from './components/ChatBot/ChatBot'
 
 function App() {
-  const { currentStage, modalProject } = useStage()
+  const { currentStage, modalProject, isTerminalOpen, isChatOpen, closeModal, closeTerminal, closeChat, toggleTerminal, openChat, isAnyOverlayOpen } = useStage()
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null
+      const isEditable = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable
+
+      if (e.key === 'Escape') {
+        if (modalProject) {
+          e.preventDefault()
+          closeModal()
+        } else if (isTerminalOpen) {
+          e.preventDefault()
+          closeTerminal()
+        } else if (isChatOpen) {
+          e.preventDefault()
+          closeChat()
+        }
+        return
+      }
+
+      if (!isAnyOverlayOpen && e.key === '~') {
+        e.preventDefault()
+        toggleTerminal()
+        return
+      }
+
+      if (!isAnyOverlayOpen && e.key.toLowerCase() === 'c' && !isEditable) {
+        e.preventDefault()
+        openChat()
+        return
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [modalProject, isTerminalOpen, isChatOpen, closeModal, closeTerminal, closeChat, toggleTerminal, openChat, isAnyOverlayOpen])
 
   const renderStage = () => {
     switch (currentStage) {
@@ -17,7 +57,7 @@ function App() {
       case 'boot':
         return <Boot />
       case 'hud':
-        return null // HUD handles its own reveal animation
+        return null
       case 'intro':
         return <Intro />
       case 'skills':
@@ -25,7 +65,7 @@ function App() {
       case 'projects':
         return <Projects />
       case 'contact':
-        return <div style={{ padding: '80px', color: '#00e5c0', fontSize: '24px' }} className="syne">STAGE 9: CONTACT LOADING...</div>
+        return <Contact />
       default:
         return <Landing />
     }
@@ -35,11 +75,13 @@ function App() {
     <>
       <div className="grid-overlay" />
       <div className="noise-overlay" />
-      <div className={`${modalProject ? 'dimmed-focus' : ''} stage-wrapper`}>
+      <div className={`${isAnyOverlayOpen ? 'dimmed-focus' : ''} stage-wrapper`}>
         <HUD />
         {renderStage()}
       </div>
       <ProjectModal />
+      <Terminal />
+      <ChatBot />
     </>
   )
 }

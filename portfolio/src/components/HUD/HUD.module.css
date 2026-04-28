@@ -38,6 +38,47 @@
   font-weight: 500;
 }
 
+.backBtn {
+  position: absolute;
+  top: 62px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 8, 8, 0.56);
+  color: var(--text-muted);
+  padding: 7px 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.backVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.backBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.backBtn:disabled {
+  cursor: default;
+}
+
+.backIcon {
+  color: var(--accent-color);
+  font-size: 12px;
+}
+
 .bottomHUD {
   position: absolute;
   bottom: 32px;
@@ -63,8 +104,21 @@
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 22px;
   pointer-events: auto;
+  transition: opacity 0.2s ease;
+}
+
+.navFocus {
+  opacity: 0.62;
+}
+
+.dotStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .navDot {
@@ -99,7 +153,114 @@
   animation: pulse 2s infinite ease-in-out;
 }
 
+.toolGroup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.toolControl {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(8, 8, 8, 0.42);
+  color: var(--text-muted);
+  padding: 7px 11px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.72;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+
+.toolControl:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  opacity: 1;
+  background: rgba(0, 229, 192, 0.035);
+}
+
+.terminalControl {
+  border-color: rgba(245, 197, 107, 0.24);
+  background: rgba(245, 197, 107, 0.035);
+  color: #f5c56b;
+}
+
+.terminalControl:hover {
+  border-color: #f5c56b;
+  color: #ffe0a1;
+  opacity: 1;
+  background: rgba(245, 197, 107, 0.07);
+}
+
+.chatControl {
+  border-color: rgba(0, 229, 192, 0.14);
+}
+
+.toolActive {
+  opacity: 0.48;
+}
+
+.terminalHint {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  width: max-content;
+  color: var(--text-muted);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  pointer-events: none;
+  animation: terminalHint 5.6s ease 3s 1;
+}
+
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes terminalHint {
+  0%, 100% { opacity: 0; transform: translateY(-2px); }
+  18%, 70% { opacity: 0.42; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .topHUD {
+    top: 16px;
+    left: 16px;
+  }
+
+  .backBtn {
+    top: 48px;
+    left: 16px;
+    padding: 6px 10px;
+    font-size: 9px;
+  }
+
+  .bottomHUD {
+    bottom: 16px;
+    left: 16px;
+  }
+
+  .rightNav {
+    right: 16px;
+  }
+
+  .sectionLabel {
+    font-size: 9px;
+  }
+
+  .toolGroup {
+    display: none;
+  }
 }
