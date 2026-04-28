@@ -193,6 +193,7 @@
   background: rgba(245, 197, 107, 0.035);
   color: #f5c56b;
   box-shadow: 0 0 6px rgba(245, 197, 107, 0.15), 0 0 12px rgba(245, 197, 107, 0.08);
+  animation: alwaysOnGlow 4s ease-in-out infinite;
 }
 
 .terminalControl:hover {
@@ -208,6 +209,7 @@
   background: rgba(0, 229, 192, 0.035);
   color: rgba(0, 229, 192, 0.8);
   box-shadow: 0 0 6px rgba(0, 229, 192, 0.15), 0 0 12px rgba(0, 229, 192, 0.08);
+  animation: alwaysOnGlow 4s ease-in-out infinite;
 }
 
 .chatControl:hover {
@@ -218,23 +220,21 @@
   box-shadow: 0 0 10px rgba(0, 229, 192, 0.35), 0 0 20px rgba(0, 229, 192, 0.15);
 }
 
+@keyframes alwaysOnGlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
+}
+
 .toolActive {
   opacity: 0.48;
 }
 
 .terminalControl.toolActive {
   box-shadow: 0 0 14px rgba(245, 197, 107, 0.6), 0 0 28px rgba(245, 197, 107, 0.25);
-  animation: softPulse 6s ease-in-out infinite;
 }
 
 .chatControl.toolActive {
   box-shadow: 0 0 14px rgba(0, 229, 192, 0.6), 0 0 28px rgba(0, 229, 192, 0.25);
-  animation: softPulse 6s ease-in-out infinite;
-}
-
-@keyframes softPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.92; }
 }
 
 .terminalHint {
