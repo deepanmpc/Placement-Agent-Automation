@@ -182,10 +182,10 @@ export const SKILLS: Skill[] = [
 ];
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'ach1', text: '3rd Place — RAMPAGE V26 National Hackathon' },
-  { id: 'ach2', text: 'Built real-time AI systems with 45 FPS inference' },
-  { id: 'ach3', text: 'Developed RAG pipelines with 90%+ retrieval accuracy' },
-  { id: 'ach4', text: 'Engineered systems used for real-world applications' }
+  { id: 'ach1', text: '3rd Place — RAMPAGE V26 National Hackathon (KLH)' },
+  { id: 'ach2', text: 'Presented in prefinal round for NeuroDott to IEEE members' },
+  { id: 'ach3', text: '3D Apparel Customizer delivered to local shirt manufacturer — increased sales by 8-10%' },
+  { id: 'ach4', text: 'Search Wizard: 8 stars, 2 forks, multiple downloads across macOS, Windows, Linux' }
 ];
 
 export const CONTACT: ContactInfo = {
