@@ -172,9 +172,9 @@ export const ACHIEVEMENTS: Achievement[] = [
 ];
 
 export const CONTACT: ContactInfo = {
-  email: 'deepan@example.com',
-  github: 'https://github.com/deepan',
-  linkedin: 'https://linkedin.com/in/deepan'
+  email: '2300032731cse3@gmail.com',
+  github: 'https://github.com/deepanmpc',
+  linkedin: 'https://www.linkedin.com/in/deepanmpc/'
 };
 
 export const TERMINAL_COMMANDS = [
