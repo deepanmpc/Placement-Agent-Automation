@@ -12,7 +12,7 @@ function App() {
       case 'boot':
         return <Boot />
       case 'intro':
-        return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#00e5c0' }}>STAGE 3: INTRO SCENE</div>
+        return <div style={{ padding: '40px', color: '#00e5c0' }}>STAGE 3: INTRO SCENE</div>
       default:
         return <Landing />
     }

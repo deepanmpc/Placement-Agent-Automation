@@ -9,130 +9,110 @@ const BOOT_LINES = [
   "System ready."
 ];
 
-const TypewriterLine: React.FC<{ 
-  text: string, 
-  isActive: boolean, 
-  isSkipped: boolean, 
-  isLast: boolean,
-  onComplete?: () => void 
-}> = ({ text, isActive, isSkipped, isLast, onComplete }) => {
-  const [displayedText, setDisplayedText] = useState(isSkipped ? text : '');
-  const [isTyping, setIsTyping] = useState(false);
-  const timerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (isSkipped) {
-      setDisplayedText(text);
-      return;
-    }
-
-    if (isActive && !isTyping && displayedText.length < text.length) {
-      setIsTyping(true);
-      let i = displayedText.length;
-      const charDelay = 20;
-      
-      const type = () => {
-        if (i < text.length) {
-          setDisplayedText(text.substring(0, i + 1));
-          i++;
-          timerRef.current = window.setTimeout(type, charDelay);
-        } else {
-          setIsTyping(false);
-          if (onComplete) onComplete();
-        }
-      };
-      
-      type();
-    }
-
-    return () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-    };
-  }, [isActive, text, isSkipped, isTyping, onComplete]);
-
-  const showCursor = isActive || (isLast && isSkipped);
-
-  return (
-    <div className={`${styles.line} ${isActive || displayedText.length > 0 ? styles.lineVisible : ''} ${isActive ? styles.lineActive : ''}`}>
-      <span className={styles.prefix}>›</span>
-      <span className={styles.text}>{displayedText}</span>
-      {showCursor && <div className={isLast ? styles.cursor : styles.cursorSmall} />}
-    </div>
-  );
-};
-
 const Boot: React.FC = () => {
   const { setStage } = useStage();
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [lineIndex, setLineIndex] = useState(0);
+  const [displayedLines, setDisplayedLines] = useState<string[]>([]);
+  const [currentText, setCurrentText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
-  const [isSkipped, setIsSkipped] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const exitTimeoutRef = useRef<number | null>(null);
+  
+  const skipRef = useRef(false);
 
-  const completeBoot = useCallback(() => {
-    if (isComplete) return;
+  const finishBoot = useCallback(() => {
+    if (isComplete || isExiting) return;
     setIsComplete(true);
     
-    exitTimeoutRef.current = window.setTimeout(() => {
+    // Slight pause after completion before transitioning
+    setTimeout(() => {
       setIsExiting(true);
-      window.setTimeout(() => {
+      setTimeout(() => {
         setStage('intro');
-      }, 400);
-    }, 200);
-  }, [isComplete, setStage]);
+      }, 500); // Transition duration
+    }, 400);
+  }, [isComplete, isExiting, setStage]);
 
   const handleSkip = useCallback(() => {
-    if (isComplete) return;
-    setIsSkipped(true);
-    setActiveIndex(BOOT_LINES.length - 1);
-    completeBoot();
-  }, [isComplete, completeBoot]);
+    if (isComplete || isExiting) return;
+    skipRef.current = true;
+    setDisplayedLines(BOOT_LINES.slice(0, -1));
+    setCurrentText(BOOT_LINES[BOOT_LINES.length - 1]);
+    setLineIndex(BOOT_LINES.length - 1);
+    finishBoot();
+  }, [isComplete, isExiting, finishBoot]);
 
   useEffect(() => {
-    window.addEventListener('keydown', handleSkip);
-    window.addEventListener('click', handleSkip);
+    if (isComplete || isExiting) return;
 
+    const currentLineGoal = BOOT_LINES[lineIndex];
+    
+    if (currentText.length < currentLineGoal.length) {
+      const timeout = setTimeout(() => {
+        setCurrentText(currentLineGoal.slice(0, currentText.length + 1));
+      }, 25); // Fast typing speed
+      return () => clearTimeout(timeout);
+    } else {
+      // Line finished
+      if (lineIndex < BOOT_LINES.length - 1) {
+        const timeout = setTimeout(() => {
+          setDisplayedLines(prev => [...prev, currentLineGoal]);
+          setLineIndex(prev => prev + 1);
+          setCurrentText("");
+        }, 100); // Short pause between lines
+        return () => clearTimeout(timeout);
+      } else {
+        finishBoot();
+      }
+    }
+  }, [lineIndex, currentText, isComplete, isExiting, finishBoot]);
+
+  useEffect(() => {
+    const handleEvents = () => handleSkip();
+    window.addEventListener('keydown', handleEvents);
+    window.addEventListener('mousedown', handleEvents);
+    
     return () => {
-      window.removeEventListener('keydown', handleSkip);
-      window.removeEventListener('click', handleSkip);
-      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+      window.removeEventListener('keydown', handleEvents);
+      window.removeEventListener('mousedown', handleEvents);
     };
   }, [handleSkip]);
 
-  const onLineComplete = () => {
-    if (activeIndex < BOOT_LINES.length - 1) {
-      setTimeout(() => {
-        setActiveIndex(prev => prev + 1);
-      }, 100);
-    } else {
-      completeBoot();
-    }
-  };
+  const progress = isComplete ? 100 : ((lineIndex + (currentText.length / BOOT_LINES[lineIndex].length)) / BOOT_LINES.length) * 100;
 
   return (
     <div className={`${styles.container} ${isExiting ? styles.exiting : ''}`}>
-      <div className={styles.bootBox}>
+      <div className={styles.content}>
         <div className={styles.logs}>
-          {BOOT_LINES.map((line, index) => (
-            <TypewriterLine 
-              key={index}
-              text={line}
-              isActive={index === activeIndex && !isComplete}
-              isSkipped={isSkipped || (isComplete && index <= activeIndex)}
-              isLast={index === BOOT_LINES.length - 1}
-              onComplete={index === activeIndex ? onLineComplete : undefined}
-            />
+          {displayedLines.map((line, idx) => (
+            <div key={idx} className={styles.line}>
+              <span className={styles.prompt}>›</span>
+              <span className={styles.text}>{line}</span>
+              <span className={styles.check}>✓</span>
+            </div>
           ))}
+          {!isComplete || lineIndex === BOOT_LINES.length - 1 ? (
+            <div className={`${styles.line} ${lineIndex === BOOT_LINES.length - 1 ? styles.finalLine : ''}`}>
+              <span className={styles.prompt}>›</span>
+              <span className={lineIndex === BOOT_LINES.length - 1 ? styles.activeText : styles.text}>
+                {currentText}
+              </span>
+              {lineIndex === BOOT_LINES.length - 1 && (
+                <div className={styles.cursor} />
+              )}
+            </div>
+          ) : null}
         </div>
         
-        <div className={styles.progressContainer}>
+        <div className={styles.progressTrack}>
           <div 
             className={styles.progressBar} 
-            style={{ 
-              width: isComplete ? '100%' : `${((activeIndex + 1) / BOOT_LINES.length) * 100}%`,
-              transition: isSkipped ? 'none' : `width 0.3s ease-out`
-            }}
+            style={{ width: `${progress}%` }} 
           />
+        </div>
+
+        <div className={styles.footer}>
+          <span className={styles.meta}>SYS_INITIALIZE_v2.4.1</span>
+          <span className={styles.meta}>EST_LOAD: ~2.0s</span>
         </div>
       </div>
     </div>
