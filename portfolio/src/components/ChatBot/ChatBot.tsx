@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStage } from '../../context/useStage';
-import type { Stage } from '../../types';
 import styles from './ChatBot.module.css';
 
 type Message = {
@@ -30,7 +29,7 @@ const FIRST_MESSAGE: Message = {
 };
 
 const ChatBot: React.FC = () => {
-  const { currentStage, setStage, isChatOpen, closeChat } = useStage();
+  const { currentStage, isChatOpen, closeChat } = useStage();
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -68,35 +67,34 @@ const ChatBot: React.FC = () => {
     ]);
   };
 
-  const navigateTo = (stage: Stage, text: string) => {
-    setStage(stage);
-    return text;
-  };
-
   const getResponse = (rawInput: string): string => {
     const text = rawInput.toLowerCase().trim();
 
-    if (text.includes('project') || text.includes('work') || text.includes('portfolio')) {
-      return navigateTo('projects', "Here's what I've built. Take a look.");
+    if (text.includes('project') || text.includes('portfolio')) {
+      return "I've built: LLM fine-tuning pipeline, semantic search engine, real-time sentiment analyzer, AI therapy companion, RAG system, and more. Check 'Projects' for the full list.";
     }
 
-    if (text.includes('skill') || text.includes('stack') || text.includes('special')) {
-      return navigateTo('skills', "My toolkit: React, AI/ML, TypeScript, CV. But really I just solve problems.");
+    if (text.includes('skill') || text.includes('stack') || text.includes('special') || text.includes('specialties')) {
+      return "My toolkit: React, TypeScript, Python, LangChain, RAG, Vector DBs, FastAPI. I build AI systems that actually work in production.";
     }
 
     if (text.includes('contact') || text.includes('email') || text.includes('reach')) {
-      return navigateTo('contact', 'Direct path. No middleman.');
+      return "Email: 2300032731cse3@gmail.com | LinkedIn: linkedin.com/in/deepanmpc/ • Always open to interesting conversations.";
     }
 
     if (text.includes('hire') || text.includes('available') || text.includes('freelance')) {
-      return navigateTo('contact', "Open to serious builds. If you have a problem worth solving, let's talk.");
+      return "Open to serious builds. If you have a problem worth solving, let's talk.";
     }
 
-    if (text.includes('about') || text.includes('who')) {
+    if (text.includes('who') || text.includes('about')) {
       return "Building the interface between AI and humans. Low-cost therapy companions, semantic search, systems that make sense.";
     }
 
-    return 'Try: goto skills, goto projects, goto contact. Or just ask me whatever.';
+    if (text.includes('best')) {
+      return "The RAG pipeline with hybrid search was my best work - reduced latency by 40% while improving relevance. But honestly, the next one will be better.";
+    }
+
+    return 'Try the quick action buttons or ask me anything.';
   };
 
   const sendMessage = (value: string) => {
