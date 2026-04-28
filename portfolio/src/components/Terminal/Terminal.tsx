@@ -31,20 +31,26 @@ const Terminal: React.FC = () => {
   } = useStage();
   const [input, setInput] = useState('');
   const [isRendered, setIsRendered] = useState(false);
-  const [lines, setLines] = useState<TerminalLine[]>([
-    { id: 1, kind: 'output', text: "System control ready. Type 'help'." }
-  ]);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const lineIdRef = useRef(2);
 
   const terminalAvailable = currentStage !== 'landing' && currentStage !== 'boot';
 
+  const startupLines: TerminalLine[] = [
+    { id: 1, kind: 'output', text: 'Terminal v1.0.0 initialized.' },
+    { id: 2, kind: 'output', text: "Type 'help' for available commands." },
+    { id: 3, kind: 'output', text: "Try 'skills', 'projects', or 'contact' to navigate." },
+    { id: 4, kind: 'output', text: '' }
+  ];
+
+  const [lines, setLines] = useState<TerminalLine[]>(startupLines);
+  const lineIdRef = useRef(5);
+
   const appendLine = (kind: TerminalLine['kind'], text: string) => {
-    setLines((currentLines) => [
-      ...currentLines,
+    setLines((prev) => [
+      ...prev,
       { id: lineIdRef.current++, kind, text }
     ]);
   };
@@ -52,6 +58,9 @@ const Terminal: React.FC = () => {
   const navigateTo = (scene: Stage) => {
     setStage(scene);
     appendLine('output', `Opening ${scene[0].toUpperCase()}${scene.slice(1)} Scene...`);
+    setTimeout(() => {
+      appendLine('output', `${scene[0].toUpperCase()}${scene.slice(1)} Scene Opened.`);
+    }, 600);
   };
 
   const executeCommand = (rawCommand: string) => {
@@ -63,7 +72,7 @@ const Terminal: React.FC = () => {
       return;
     }
 
-    setCommandHistory((history) => [...history, command]);
+    setCommandHistory((prev) => [...prev, command]);
     setHistoryIndex(null);
 
     const normalizedCommand = command.toLowerCase();
@@ -80,12 +89,14 @@ const Terminal: React.FC = () => {
         return;
       case 'about':
         appendLine('output', PROFILE.summary);
+        appendLine('output', 'Type "skills", "projects", or "contact" to explore.');
         return;
       case 'whoami':
         appendLine('output', PROFILE.tagline);
         return;
       case 'clear':
-        setLines([]);
+        setLines(startupLines);
+        appendLine('output', 'Terminal cleared.');
         return;
       case 'skills':
         navigateTo('skills');
@@ -105,6 +116,7 @@ const Terminal: React.FC = () => {
         return;
       }
 
+      appendLine('output', `Navigating to ${target[0].toUpperCase()}${target.slice(1)}...`);
       navigateTo(target);
       return;
     }
@@ -114,13 +126,16 @@ const Terminal: React.FC = () => {
       const project = findProject(projectQuery);
 
       if (!project) {
-        appendLine('error', "Project not found. Try 'open smart-search'");
+        appendLine('error', 'Project not found. Try "open lara"');
         return;
       }
 
-      appendLine('output', `Opening ${project.title}...`);
+      appendLine('output', `Loading ${project.title}...`);
       setStage('projects');
-      window.setTimeout(() => openModal(project), currentStage === 'projects' ? 80 : 520);
+      window.setTimeout(() => {
+        openModal(project);
+        appendLine('output', `${project.title} opened.`);
+      }, currentStage === 'projects' ? 80 : 520);
       return;
     }
 
@@ -187,7 +202,7 @@ const Terminal: React.FC = () => {
           <div className={styles.backdrop} onClick={closeTerminal} />
           <section className={styles.panel} role="dialog" aria-label="System terminal" aria-modal="true">
             <div className={styles.header}>
-              <span className={styles.status}>SYS://TERMINAL</span>
+              <span className={styles.status}>SYS::TERMINAL</span>
               <button className={styles.closeBtn} onClick={closeTerminal} aria-label="Close terminal">x</button>
             </div>
 
