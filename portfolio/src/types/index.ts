@@ -11,6 +11,7 @@ export interface Project {
   tech: string[];
   year: string;
   link?: string;
+  repo?: string;
 }
 
 export interface StageContextType {

@@ -10,7 +10,8 @@ export const PROJECTS_DATA: Project[] = [
     solution: 'Built a modular AI system with speech pipelines, vector-based memory, and FSM-driven responses.',
     impact: 'Deployed for neurodiverse users with offline capabilities.',
     tech: ['FastAPI', 'Docker', 'Faster-Whisper', 'RAG', 'Microservices'],
-    year: '2024'
+    year: '2024',
+    repo: 'https://github.com/deepanmpc/LaRa'
   },
   {
     id: 'sis2gn',
@@ -21,7 +22,8 @@ export const PROJECTS_DATA: Project[] = [
     solution: 'Optimized CNN models for edge devices achieving real-time inference.',
     impact: '45 FPS on edge devices, helping real-time communication.',
     tech: ['PyTorch', 'CNN', 'OpenCV', 'NVIDIA GPUs'],
-    year: '2024'
+    year: '2024',
+    repo: 'https://github.com/deepanmpc/ISL_SIGNLANG_CNN'
   },
   {
     id: 'res3ume',
@@ -32,7 +34,8 @@ export const PROJECTS_DATA: Project[] = [
     solution: 'Semantic matching with sentence embeddings and vector search.',
     impact: '50% reduction in recruiter screening time.',
     tech: ['Sentence Transformers', 'ChromaDB', 'Mistral', 'React'],
-    year: '2024'
+    year: '2024',
+    repo: 'https://github.com/deepanmpc/ResumeAnalyse_RAG-Architecture'
   },
   {
     id: 'sea4rch',
@@ -43,7 +46,8 @@ export const PROJECTS_DATA: Project[] = [
     solution: 'FAISS-indexed embeddings with Gemini for multi-modal queries.',
     impact: 'Sub-400ms retrieval across 50K+ files.',
     tech: ['FAISS', 'Gemini Embeddings', 'Electron', 'FastAPI'],
-    year: '2024'
+    year: '2024',
+    repo: 'https://github.com/deepanmpc/SMART-SEARCH'
   },
   {
     id: 'aio5era',

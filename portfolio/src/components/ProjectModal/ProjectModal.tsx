@@ -30,16 +30,15 @@ const ProjectModal: React.FC = () => {
     <div className={styles.overlay} onClick={closeModal}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button className={styles.backBtn} onClick={closeModal}>
-          <span className={styles.dimId}>id="h5t3lo"</span> ← Back
+          ← Back
         </button>
         
         <button className={styles.closeBtn} onClick={closeModal}>
-          <span className={styles.dimId}>id="3gk9ht"</span> [ ESC ]
+          [ ESC ]
         </button>
 
         <header className={styles.header}>
           <div className={styles.headerTop}>
-            <span className={styles.dimId}>id="z6g9p2"</span>
             <h2 className={`${styles.title} syne`}>{modalProject.title}</h2>
           </div>
           <div className={styles.meta}>
@@ -74,9 +73,16 @@ const ProjectModal: React.FC = () => {
         </div>
 
         <footer className={styles.actions}>
-          <button className={styles.primaryBtn} onClick={() => modalProject.link && window.open(modalProject.link, '_blank')}>
-            <span className={styles.dimId}>id="c7x5bd"</span> [ View Project ]
-          </button>
+          {modalProject.repo && (
+            <button className={styles.primaryBtn} onClick={() => window.open(modalProject.repo, '_blank')}>
+              [ View Code ]
+            </button>
+          )}
+          {modalProject.link && (
+            <button className={styles.secondaryBtn} onClick={() => window.open(modalProject.link, '_blank')}>
+              [ Live Demo ]
+            </button>
+          )}
           <button className={styles.secondaryBtn} onClick={closeModal}>
             [ Close ]
           </button>
