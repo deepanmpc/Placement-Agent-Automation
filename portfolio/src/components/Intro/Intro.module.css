@@ -180,6 +180,64 @@
   box-shadow: 0 0 12px rgba(0, 229, 192, 0.25), 0 0 24px rgba(0, 229, 192, 0.1);
 }
 
+.achievementsSection {
+  margin-top: 24px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.achievementCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+  animation: revealUp 0.4s ease forwards;
+  opacity: 0;
+}
+
+.achievementCard.clickable {
+  cursor: pointer;
+}
+
+.achievementCard.clickable:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 12px rgba(0, 229, 192, 0.15);
+  transform: translateY(-2px);
+}
+
+.achievementCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.achievementIcon {
+  color: var(--accent-color);
+  font-size: 12px;
+}
+
+.achievementProject {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-color);
+  letter-spacing: 0.1em;
+}
+
+.achievementCardText {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
