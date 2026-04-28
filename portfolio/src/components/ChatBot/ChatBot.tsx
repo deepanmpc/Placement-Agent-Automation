@@ -25,17 +25,32 @@ const FIRST_MESSAGE = "I'm basically Deepan's clone. Ask me anything about me ðŸ
 
 const ChatBot: React.FC = () => {
   const { currentStage, setStage, isChatOpen, closeChat } = useStage();
-  const [isRendered, setIsRendered] = useState(false);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, role: 'bot', text: FIRST_MESSAGE }
-  ]);
-  const messageIdRef = useRef(2);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const messageIdRef = useRef(1);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasSentFirstMsg = useRef(false);
 
   const chatAvailable = currentStage !== 'landing' && currentStage !== 'boot';
+
+  useEffect(() => {
+    if (isChatOpen && !hasSentFirstMsg.current) {
+      hasSentFirstMsg.current = true;
+      setIsTyping(true);
+      const timer = setTimeout(() => {
+        setMessages([{ id: messageIdRef.current++, role: 'bot', text: FIRST_MESSAGE }]);
+        setIsTyping(false);
+        inputRef.current?.focus();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    if (!isChatOpen) {
+      hasSentFirstMsg.current = false;
+      setMessages([]);
+    }
+  }, [isChatOpen]);
 
   const appendMessage = (role: Message['role'], text: string) => {
     setMessages((currentMessages) => [
@@ -95,20 +110,6 @@ const ChatBot: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isChatOpen) {
-      const timeout = window.setTimeout(() => {
-        setIsRendered(true);
-        inputRef.current?.focus();
-      }, 0);
-      return () => window.clearTimeout(timeout);
-    }
-
-    inputRef.current?.blur();
-    const timeout = window.setTimeout(() => setIsRendered(false), 300);
-    return () => window.clearTimeout(timeout);
-  }, [isChatOpen]);
-
-  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages, isTyping]);
 
@@ -116,8 +117,8 @@ const ChatBot: React.FC = () => {
 
   return (
     <>
-      {isRendered && (
-        <div className={`${styles.overlay} ${isChatOpen ? styles.open : ''}`}>
+      {isChatOpen && (
+        <div className={`${styles.overlay} ${styles.open}`}>
           <div className={styles.backdrop} onClick={closeChat} />
           <section className={styles.panel} role="dialog" aria-label="System chat" aria-modal="true">
             <header className={styles.header}>
