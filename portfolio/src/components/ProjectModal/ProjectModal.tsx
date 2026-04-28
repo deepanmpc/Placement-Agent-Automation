@@ -29,6 +29,10 @@ const ProjectModal: React.FC = () => {
   return (
     <div className={styles.overlay} onClick={closeModal}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.backBtn} onClick={closeModal}>
+          <span className={styles.dimId}>id="h5t3lo"</span> ← Back
+        </button>
+        
         <button className={styles.closeBtn} onClick={closeModal}>
           <span className={styles.dimId}>id="3gk9ht"</span> [ ESC ]
         </button>
