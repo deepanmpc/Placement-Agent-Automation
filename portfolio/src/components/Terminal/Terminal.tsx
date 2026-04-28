@@ -41,8 +41,7 @@ const Terminal: React.FC = () => {
   const startupLines: TerminalLine[] = [
     { id: 1, kind: 'output', text: 'Terminal v1.0.0 initialized.' },
     { id: 2, kind: 'output', text: "Type 'help' for available commands." },
-    { id: 3, kind: 'output', text: "Try 'goto skills', 'goto projects', or 'goto contact' to navigate." },
-    { id: 4, kind: 'output', text: '' }
+    { id: 3, kind: 'output', text: "Try 'goto skills', 'goto projects', or 'goto contact' to navigate." }
   ];
 
   const [lines, setLines] = useState<TerminalLine[]>(startupLines);
@@ -83,22 +82,21 @@ const Terminal: React.FC = () => {
       return;
     }
 
-    switch (base) {
+switch (base) {
       case 'help':
         appendLine('output', '=== AVAILABLE COMMANDS ===');
-        appendLine('output', '');
         appendLine('output', '  about      - Display profile summary');
         appendLine('output', '  whoami     - Display who you are');
         appendLine('output', '  clear      - Clear terminal');
         appendLine('output', '');
-        appendLine('output', '=== NAVIGATION (use goto) ===');
+        appendLine('output', '=== NAVIGATION ===');
         appendLine('output', '  goto intro    - Go to Intro section');
         appendLine('output', '  goto skills  - Go to Skills section');
         appendLine('output', '  goto projects - Go to Projects section');
         appendLine('output', '  goto contact - Go to Contact section');
         appendLine('output', '  Example: goto projects');
         appendLine('output', '');
-        appendLine('output', '=== LINKS (opens new tab) ===');
+        appendLine('output', '=== LINKS ===');
         appendLine('output', '  github     - Open GitHub profile');
         appendLine('output', '  linkedin   - Open LinkedIn profile');
         appendLine('output', '');
