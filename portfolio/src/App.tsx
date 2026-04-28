@@ -35,7 +35,7 @@ function App() {
     <>
       <div className="grid-overlay" />
       <div className="noise-overlay" />
-      <div className={modalProject ? 'dimmed-focus' : ''}>
+      <div className={`${modalProject ? 'dimmed-focus' : ''} stage-wrapper`}>
         <HUD />
         {renderStage()}
       </div>
