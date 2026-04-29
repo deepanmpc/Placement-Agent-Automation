@@ -1,0 +1,285 @@
+.container {
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 60px;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  overflow-y: auto;
+  scrollbar-width: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.exiting {
+  opacity: 0 !important;
+  transform: translateY(-10px) !important;
+}
+
+.container:not(.exiting) {
+  animation: projectsEnter 0.4s var(--transition-easing) forwards;
+}
+
+@keyframes projectsEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.15em;
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.accentDot {
+  color: var(--accent-color);
+  font-size: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 32px;
+  margin-bottom: 48px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 40px 32px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.4s var(--transition-easing);
+  opacity: 0;
+  animation: cardEnter 0.6s ease forwards;
+  box-shadow: 0 0 8px rgba(0, 229, 192, 0.05);
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-4px);
+  border-color: rgba(0, 229, 192, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 229, 192, 0.15);
+}
+
+.card:hover .cardBorder {
+  opacity: 1;
+  width: 100%;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.projectId {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.projectYear {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.projectTitle {
+  font-size: 26px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent-color);
+  opacity: 0.6;
+}
+
+.projectDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 32px;
+  min-height: 48px;
+}
+
+.techStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.techTag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 4px 12px;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.card:hover .techTag {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
+}
+
+.cardBorder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 0;
+  background-color: var(--accent-color);
+  transition: width 0.4s ease;
+  opacity: 0;
+}
+
+.expandWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.expandBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  padding: 14px 40px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 0 6px rgba(0, 229, 192, 0.06);
+}
+
+.expandBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+  box-shadow: 0 0 20px var(--accent-muted), 0 0 40px rgba(0, 229, 192, 0.1);
+}
+
+.plus {
+  color: var(--accent-color);
+  font-size: 16px;
+}
+
+/* Achievements Section */
+.achievements {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.achievementsLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.achievementCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.3s ease;
+  animation: revealUp 0.4s ease forwards;
+  opacity: 0;
+}
+
+.achievementCard.clickable {
+  cursor: pointer;
+}
+
+.achievementCard.clickable:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 12px rgba(0, 229, 192, 0.15);
+  transform: translateY(-2px);
+}
+
+.achievementCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.achievementIcon {
+  color: var(--accent-color);
+  font-size: 14px;
+}
+
+.achievementProject {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-color);
+  letter-spacing: 0.1em;
+}
+
+.achievementCardText {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}

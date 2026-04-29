@@ -1,4 +1,4 @@
-export type Stage = 'landing' | 'boot' | 'hud' | 'intro' | 'skills' | 'projects' | 'modal' | 'terminal' | 'chat' | 'contact';
+export type Stage = 'landing' | 'boot' | 'hud' | 'intro' | 'skills' | 'projects' | 'achievements' | 'modal' | 'terminal' | 'chat' | 'contact';
 
 export interface Project {
   id: string;

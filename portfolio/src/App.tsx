@@ -6,6 +6,7 @@ import HUD from './components/HUD/HUD'
 import Intro from './components/Intro/Intro'
 import Skills from './components/Skills/Skills'
 import Projects from './components/Projects/Projects'
+import Achievements from './components/Achievements/Achievements'
 import ProjectModal from './components/ProjectModal/ProjectModal'
 import Terminal from './components/Terminal/Terminal'
 import Contact from './components/Contact/Contact'
@@ -64,6 +65,8 @@ function App() {
         return <Skills />
       case 'projects':
         return <Projects />
+      case 'achievements':
+        return <Achievements />
       case 'contact':
         return <Contact />
       default:

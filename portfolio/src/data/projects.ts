@@ -198,4 +198,4 @@ export const TERMINAL_COMMANDS = [
   'help', 'about', 'skills', 'projects', 'contact', 'clear', 'goto', 'nav', 'open', 'whoami'
 ] as const;
 
-export const NAV_STAGES: Stage[] = ['intro', 'skills', 'projects', 'contact'];
+export const NAV_STAGES: Stage[] = ['intro', 'skills', 'projects', 'achievements', 'contact'];
