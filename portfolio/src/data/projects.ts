@@ -63,17 +63,28 @@ export const PROJECTS_DATA: Project[] = [
     link: 'https://client-plum-ten.vercel.app'
   },
   {
-    id: 'love1',
-    displayId: '006',
-    title: 'LOVE PREDICT',
-    description: 'ML model to predict relationship compatibility based on behavioral, emotional, and psychological features.',
-    problem: 'Understanding relationship dynamics requires insights beyond surface-level factors.',
-    solution: 'ML classification system analyzing features from two individuals.',
-    impact: 'Classifies connections into relationship compatibility categories.',
-    tech: ['Python', 'Scikit-learn', 'Jupyter'],
+    id: 'career',
+    displayId: 'OSS-01',
+    title: 'career-ops',
+    description: 'AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF generation, batch processing.',
+    problem: 'Job seeking requires managing multiple platforms and screening many listings.',
+    solution: 'Automated job search with AI analysis, application tracking, and resume generation.',
+    impact: 'Streamlines job search with AI-augmented screening.',
+    tech: ['TypeScript', 'Claude Code', 'React', 'Node.js'],
     year: '2026',
-    repo: 'https://github.com/deepanmpc/LOVE_PREDICT_ML_MODEL',
-    link: 'https://deepanmpc.github.io/LOVE_PREDICT_ML_MODEL/'
+    repo: 'https://github.com/deepanmpc/career-ops'
+  },
+  {
+    id: 'mcp1',
+    displayId: 'OSS-02',
+    title: 'mcp-linkedin',
+    description: 'Model Context Protocol server for LinkedIn Feeds and Job API integration.',
+    problem: 'Limited programmatic access to LinkedIn data for automation.',
+    solution: 'MCP server providing tools to interact with LinkedIn programmatically.',
+    impact: 'Enables AI-driven LinkedIn automation.',
+    tech: ['Python', 'MCP', 'LinkedIn API'],
+    year: '2026',
+    repo: 'https://github.com/deepanmpc/mcp-linkedin'
   }
 ];
 export const findProject = (query: string): Project | undefined => {

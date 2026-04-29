@@ -185,6 +185,12 @@
   margin-top: 24px;
 }
 
+.openSourceSection {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .expandBtn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
