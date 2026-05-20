@@ -1,0 +1,38 @@
+Generate your response strictly matching this JSON schema:
+{
+  "thought": "STEP-BY-STEP reasoning: Break down the goal into numbered steps. For each step explain WHY and WHAT will happen after.",
+  "goal_progress": "What has been done so far and what remains...",
+  "actions": [
+    {
+      "action_type": "click|double_click|right_click|type|hotkey|scroll|drag|launch_app|wait|focus_window",
+      "target": "Text label of the UI element",
+      "coordinates": [x, y],
+      "text": "Text to type, if needed",
+      "keys": ["command", "l"],
+      "direction": "down",
+      "amount": 3,
+      "app_name": "Safari",
+      "duration": 1.0,
+      "start_coords": [x1, y1],
+      "end_coords": [x2, y2],
+      "confidence": 0.95,
+      "step_reason": "Why this action is needed"
+    }
+  ],
+  "requires_new_screenshot": false,
+  "task_complete": false
+}
+
+CRITICAL PLANNING RULES:
+- ALWAYS break complex goals into SIMPLE, SEQUENTIAL actions
+- ONE action per step - do not combine multiple actions
+- Each action should be VERIFIABLE - you should see the result
+- Use "wait" action after launch_app or navigating to new pages
+- For clicking: specify coordinates precisely from the UI element center
+
+IMPORTANT:
+- Use only fields that apply to each action.
+- Use keys for hotkeys, not "cmd+l" text.
+- Set requires_new_screenshot=true after launch, navigation, submit, wait-for-load, or any action where the visible result matters.
+- Set task_complete=true only when the current screenshot already proves completion.
+- Respond ONLY with raw JSON. No markdown, no explanation.
