@@ -9,6 +9,7 @@ from vision_service.schemas import UIElement, ScreenState, Relationship
 from vision_service.config import Config
 
 _nvidia_vision_service = None
+_som_detector = None
 
 
 def _get_nvidia_vision_service():
@@ -18,6 +19,18 @@ def _get_nvidia_vision_service():
 
         _nvidia_vision_service = NvidiaVisionService()
     return _nvidia_vision_service
+
+
+def _get_som_detector():
+    """Get or create SoM (Set-of-Mark) detector for button detection."""
+    global _som_detector
+    if _som_detector is None:
+        try:
+            from vision_service.som_detector import SoMDetector
+            _som_detector = SoMDetector()
+        except Exception as e:
+            logger.warning(f"Failed to load SoM detector: {e}")
+    return _som_detector
 
 def parse_ui(
     img_pil: Image.Image,
@@ -51,6 +64,8 @@ def parse_ui(
         
         # For Phase 1 without OmniParser running inline, we treat OCR texts as basic UI elements
         raw_elements = []
+        
+        # 1. First add OCR text elements
         for text_item in ocr_data.get("texts", []):
             bbox = text_item.get("bbox")
             center = text_item.get("center")
@@ -78,6 +93,52 @@ def parse_ui(
                 source="ocr"
             )
             raw_elements.append(elem)
+        
+        # 2. Add SoM (Set-of-Mark) button detections
+        som_detector = _get_som_detector()
+        if som_detector and som_detector.model:
+            try:
+                som_buttons = som_detector.detect_buttons(img_pil)
+                for btn in som_buttons:
+                    btn_center = btn.get("center", [])
+                    matched = False
+                    for existing in raw_elements:
+                        existing_center = existing.center
+                        if existing_center:
+                            dist = ((btn_center[0] - existing_center[0])**2 + 
+                                   (btn_center[1] - existing_center[1])**2)**0.5
+                            if dist < 30:
+                                existing.clickable = True
+                                existing.confidence = max(existing.confidence, btn.get("confidence", 0.5))
+                                matched = True
+                                break
+                    if not matched:
+                        elem = UIElement(
+                            id=f"elem_{uuid.uuid4().hex[:8]}",
+                            type="button",
+                            text=btn.get("label", ""),
+                            bbox=btn.get("bbox", []),
+                            center=btn_center,
+                            clickable=True,
+                            confidence=btn.get("confidence", 0.5),
+                            source="som"
+                        )
+                        raw_elements.append(elem)
+            except Exception as e:
+                logger.warning(f"SoM detection failed: {e}")
+        
+        # 3. Create element hash map for LLM reference (like SOC)
+        element_hash_map = {}
+        for i, elem in enumerate(raw_elements):
+            label = str(i + 1)
+            element_hash_map[label] = {
+                "id": elem.id,
+                "text": elem.text,
+                "type": elem.type,
+                "clickable": elem.clickable,
+                "center": list(elem.center) if elem.center else [],
+                "bbox": list(elem.bbox) if elem.bbox else []
+            }
 
         enrichment_metadata: Dict[str, Any] = {}
         if Config.ENABLE_NEMOTRON_PARSER:
@@ -112,9 +173,23 @@ def parse_ui(
         elements = normalize_elements(raw_elements)
         relationships = build_ui_graph(elements)
         
+        # Rebuild hash map with normalized elements
+        element_hash_map = {}
+        for i, elem in enumerate(elements):
+            label = str(i + 1)
+            element_hash_map[label] = {
+                "id": elem.id,
+                "text": elem.text,
+                "type": elem.type,
+                "clickable": elem.clickable,
+                "center": list(elem.center) if elem.center else [],
+                "bbox": list(elem.bbox) if elem.bbox else []
+            }
+        
         parsed_state = {
             "screen": screen_state.model_dump(),
             "elements": [e.model_dump() for e in elements],
+            "element_map": element_hash_map,  # Hash map for LLM to reference
             "relationships": [r.model_dump() for r in relationships],
             "metadata": {
                 **ocr_data.get("metadata", {}),

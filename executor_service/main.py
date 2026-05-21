@@ -78,14 +78,24 @@ def show_terminal():
 
 # ─── Action Conversion ───
 
-def plan_to_executor_actions(plan: PlannerOutput, cache: ElementCache) -> list[ExecutorActionInput]:
-    """Convert plan to executor actions, using cached coordinates when available."""
+def plan_to_executor_actions(plan: PlannerOutput, cache: ElementCache, element_map: dict = None) -> list[ExecutorActionInput]:
+    """Convert plan to executor actions, using cached coordinates or element labels when available."""
     actions = []
     for a in plan.actions:
         coords = a.coordinates
 
-        # Try to resolve coordinates from cache if missing or [0,0]
-        if (not coords or coords == [0, 0]) and a.target:
+        # Priority 1: Use label (SOC style) - look up in element map
+        if a.label and element_map:
+            label_key = str(a.label).strip()
+            if label_key in element_map:
+                elem = element_map[label_key]
+                if elem.get("center"):
+                    coords = elem["center"]
+                    a.target = a.target or elem.get("text", "")
+                    console.print(f"  [dim]  🔗 Label '{a.label}' → coords {coords}[/dim]")
+        
+        # Priority 2: Use cached coordinates if missing or [0,0]
+        elif (not coords or coords == [0, 0]) and a.target:
             cached_coords = cache.get_coordinates(a.target)
             if cached_coords:
                 coords = list(cached_coords)
@@ -114,6 +124,8 @@ def plan_to_executor_actions(plan: PlannerOutput, cache: ElementCache) -> list[E
             ea.keys = [a.text]
         if a.action_type in ("launch_app", "focus_window"):
             ea.app_name = a.app_name or a.target or a.text
+        if a.action_type == "done":
+            ea.text = a.summary or "Task completed"
 
         actions.append(ea)
     return actions
@@ -216,7 +228,8 @@ async def agent_loop(
         ))
 
         # ─── 5. Execute batch ───
-        exec_actions = plan_to_executor_actions(plan, element_cache)
+        element_map = cached_ui.get("element_map", {}) if cached_ui else {}
+        exec_actions = plan_to_executor_actions(plan, element_cache, element_map)
         if not exec_actions:
             if plan.task_complete and await verify_goal_complete(goal, cached_ui, history, verifier):
                 break

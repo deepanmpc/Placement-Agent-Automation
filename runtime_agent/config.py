@@ -18,12 +18,6 @@ class Config:
     NVIDIA_API_BASE_URL = os.getenv("NVIDIA_API_BASE_URL", "https://integrate.api.nvidia.com/v1")
     NVIDIA_API_KEY = os.getenv("NVIDIA_REASONING_API_KEY") or os.getenv("NVIDIA_API_KEY")
 
-    if not NVIDIA_API_KEY:
-        import sys
-        print(f"DEBUG: NVIDIA_API_KEY not found in {ENV_PATH}", file=sys.stderr)
-    else:
-        import sys
-        print(f"DEBUG: NVIDIA_API_KEY loaded successfully (starts with {NVIDIA_API_KEY[:10]})", file=sys.stderr)
     NVIDIA_REASONING_MODEL = os.getenv("NVIDIA_REASONING_MODEL", "openai/gpt-oss-120b")
     NVIDIA_FALLBACK_MODEL = os.getenv("NVIDIA_FALLBACK_MODEL", "meta/llama-3.3-70b-instruct")
     NVIDIA_MAX_TOKENS = int(os.getenv("NVIDIA_MAX_TOKENS", "4096"))

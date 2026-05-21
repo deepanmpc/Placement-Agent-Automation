@@ -23,6 +23,20 @@ class PromptBuilder:
         visible_elements = compressed.get("elements", [])
         screen = ui_state.get("screen", {})
         metadata = ui_state.get("metadata", {})
+        
+        # Get element hash map for LLM reference (like SOC)
+        element_map = ui_state.get("element_map", {})
+        
+        # Build element map string for the prompt
+        element_map_str = ""
+        if element_map:
+            for label, elem in element_map.items():
+                text = elem.get("text", "")
+                coords = elem.get("center", [])
+                clickable = elem.get("clickable", False)
+                if text and coords:
+                    click_str = " (clickable)" if clickable else ""
+                    element_map_str += f"  {label}: '{text}' at {coords}{click_str}\n"
 
         # Build condensed element list (much smaller token footprint)
         condensed_ui = []
@@ -30,10 +44,12 @@ class PromptBuilder:
             text = el.get("text", "").strip()
             center = el.get("center", [])
             el_type = el.get("type", "element")
+            clickable = el.get("clickable", False)
+            click_mark = " [CLICKABLE]" if clickable else ""
             if center:
-                condensed_ui.append(f"[{el_type}] '{text}' center={center}")
+                condensed_ui.append(f"[{el_type}] '{text}' at {center}{click_mark}")
             else:
-                condensed_ui.append(f"[{el_type}] '{text}'")
+                condensed_ui.append(f"[{el_type}] '{text}'{click_mark}")
 
         # Only include last 5 history entries
         recent_history = history[-5:] if history else []
@@ -44,6 +60,10 @@ class PromptBuilder:
 
         prompt = f"{self.system_prompt}\n\n"
         prompt += f"GOAL: {goal}\n\n"
+        
+        if element_map_str:
+            prompt += f"ELEMENT MAP (use these labels to click):\n{element_map_str}\n"
+        
         prompt += (
             "SCREEN:\n"
             f"  coordinate_system={screen.get('coordinate_system', 'screen')}\n"
@@ -56,6 +76,9 @@ class PromptBuilder:
         prompt += "\n".join(condensed_ui) + "\n\n"
         if history_str:
             prompt += f"RECENT HISTORY:\n{history_str}\n\n"
-        prompt += self.action_prompt
+        
+        # Replace ELEMENT_MAP placeholder in action prompt
+        action_prompt = self.action_prompt.replace("{ELEMENT_MAP}", element_map_str or "No elements detected")
+        prompt += action_prompt
 
         return prompt

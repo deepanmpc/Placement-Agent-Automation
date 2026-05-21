@@ -1,12 +1,21 @@
 import asyncio
 import os
 import sys
-import uuid
+import time
+import logging
+
+# 1. SILENCE ALL NOISE (MUST BE FIRST)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['PADDLE_TF_LOG_LEVEL'] = '3'
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
+logging.getLogger("numba").setLevel(logging.ERROR)
+logging.getLogger("librosa").setLevel(logging.ERROR)
+
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Prompt
-from rich.live import Live
+from rich.text import Text
 from rich.table import Table
+from rich.box import ROUNDED, MINIMAL
 
 # Core Services
 from runtime_agent.services.vision_client import VisionClient
@@ -19,92 +28,150 @@ from planner_service.planner import ReasoningEngine
 from executor_service.executor import Executor
 from executor_service.element_cache import ElementCache
 from verifier_service.verifier import Verifier
-
-# Config
 from runtime_agent.config import Config as RuntimeConfig
 
-console = Console()
-
-class AgentCLI:
+class EdithCLI:
     def __init__(self):
-        self.vision = VisionClient()
-        self.llm = ConversationalLLMService()
-        self.tts = TTSService()
-        self.audio = AudioService()
-        self.mic = MicrophoneService()
-        self.stt = VoiceService()
-        self.planner = ReasoningEngine()
-        self.executor = Executor()
-        self.verifier = Verifier()
-        self.element_cache = ElementCache()
+        # 2. SILENCE STDOUT/STDERR DURING INIT
+        self.original_stdout = sys.stdout
+        self.original_stderr = sys.stderr
+        devnull = open(os.devnull, 'w')
+        sys.stdout = devnull
+        sys.stderr = devnull
+        
+        try:
+            self.console = Console()
+            self.vision = VisionClient()
+            self.llm = ConversationalLLMService()
+            self.tts = TTSService()
+            self.audio = AudioService()
+            self.mic = MicrophoneService()
+            self.stt = VoiceService()
+            self.planner = ReasoningEngine()
+            self.executor = Executor()
+            self.verifier = Verifier()
+            self.element_cache = ElementCache()
+        finally:
+            # 3. RESTORE STREAMS
+            sys.stdout = self.original_stdout
+            sys.stderr = self.original_stderr
+            devnull.close()
         
         self.mode = "chat" # chat or autonomous
         self.is_running = True
 
-    def display_welcome(self):
-        welcome_text = (
-            "[bold magenta]Gemini Desktop Agent CLI[/bold magenta]\n"
-            "-----------------------------------\n"
-            "Modes:\n"
-            "  - [bold cyan]Chat Mode[/bold cyan]: Talk to the agent about your screen.\n"
-            "  - [bold yellow]Autonomous Mode[/bold yellow]: Give a goal, and the agent executes it.\n\n"
-            "Commands:\n"
-            "  - [bold green]'v'[/bold green]: Trigger Voice Input\n"
-            "  - [bold green]'mode'[/bold green]: Toggle between Chat and Autonomous\n"
-            "  - [bold green]'exit'[/bold green]: Quit the CLI"
-        )
-        console.print(Panel(welcome_text, title="🤖 Welcome", border_style="magenta"))
+    def display_header(self):
+        # High-fidelity Card inspired by the screenshot
+        logo = Text()
+        logo.append("  ▄▀  \n", style="bold cyan")
+        logo.append(" █    \n", style="bold blue")
+        logo.append("  ▀▄  ", style="bold red")
+        
+        info = Text()
+        info.append("E.D.I.T.H. ", style="bold white")
+        info.append("v2.0.42\n", style="dim white")
+        info.append("Signed in as ", style="white")
+        info.append("OPERATOR /auth\n", style="bold green")
+        info.append("Plan: ", style="white")
+        info.append("LEVEL ALPHA /root", style="bold blue")
+
+        header_table = Table.grid(padding=(0, 2))
+        header_table.add_row(logo, info)
+
+        self.console.print("\n")
+        self.console.print(Panel(
+            header_table,
+            box=MINIMAL,
+            border_style="dim white",
+            padding=(1, 2)
+        ))
+        self.console.print("[dim]" + "─" * 50 + "[/dim]\n")
+
+    def print_system(self, text):
+        self.console.print(f"[dim cyan]⚙ SYSTEM:[/dim cyan] [dim]{text}[/dim]")
+
+    def print_agent(self, text):
+        self.console.print("\n")
+        self.console.print(Panel(
+            Text(text, style="white"),
+            title="[bold green]E.D.I.T.H.[/bold green]",
+            title_align="left",
+            border_style="green",
+            box=ROUNDED,
+            padding=(1, 2)
+        ))
+        self.console.print("\n")
 
     async def run(self):
-        self.display_welcome()
+        self.display_header()
+        self.print_system("All systems nominal. Secure link established.")
         
         while self.is_running:
             try:
-                mode_str = f"[bold cyan]CHAT[/bold cyan]" if self.mode == "chat" else f"[bold yellow]AUTO[/bold yellow]"
-                prompt_text = f"\n({mode_str}) [bold white]Enter query/goal[/bold white]"
-                user_input = Prompt.ask(prompt_text).strip()
-
-                if user_input.lower() == 'exit':
-                    self.is_running = False
-                    break
+                mode_color = "blue" if self.mode == "chat" else "yellow"
+                prompt = Text.assemble(
+                    ("\n( ", "white"),
+                    (self.mode.upper(), f"bold {mode_color}"),
+                    (" ) ", "white"),
+                    ("➤ ", "bold green")
+                )
                 
-                if user_input.lower() == 'mode':
-                    self.mode = "autonomous" if self.mode == "chat" else "chat"
-                    console.print(f"[dim]Switched to {self.mode} mode.[/dim]")
-                    continue
-
-                if user_input.lower() == 'v':
-                    user_input = await self._get_voice_input()
-                    if not user_input: continue
-                    console.print(f"[bold green]Voice Input:[/bold green] {user_input}")
+                user_input = self.console.input(prompt).strip()
 
                 if not user_input:
                     continue
+
+                cmd = user_input.lower()
+                if cmd == 'exit':
+                    self.print_system("Initiating shutdown sequence...")
+                    self.is_running = False
+                    break
+                
+                if cmd in ['chat', 'auto', 'mode']:
+                    if cmd == 'mode':
+                        self.mode = "autonomous" if self.mode == "chat" else "chat"
+                    else:
+                        self.mode = "chat" if cmd == 'chat' else "autonomous"
+                    self.print_system(f"Mode switched to {self.mode.upper()}")
+                    continue
+
+                if cmd == 'v':
+                    self.print_system("Listening...")
+                    user_input = await self._get_voice_input()
+                    if not user_input:
+                        self.print_system("Silence detected.")
+                        continue
+                    self.console.print(f"[bold white]Voice Input:[/bold white] {user_input}")
 
                 if self.mode == "chat":
                     await self._handle_chat(user_input)
                 else:
                     from executor_service.main import agent_loop
+                    self.print_system(f"Starting objective: {user_input}")
                     await agent_loop(user_input, self.vision, self.planner, self.executor, self.verifier, self.element_cache)
+                    self.print_system("Objective cycle complete.")
 
             except KeyboardInterrupt:
-                console.print("\n[bold red]Interrupted. Exiting...[/bold red]")
+                self.print_system("Interrupt received. Powering down.")
                 break
             except Exception as e:
-                console.print(f"[bold red]CLI Error: {e}[/bold red]")
+                self.console.print(f"[bold red]CRITICAL ERROR:[/bold red] {e}")
+                import traceback
+                self.console.print(traceback.format_exc())
 
     async def _get_voice_input(self) -> str:
-        console.print("[dim]🎙 Listening... (Press Ctrl+C to stop or wait for silence)[/dim]")
-        audio_path = self.mic.record_until_keypress()
-        if not audio_path: return ""
-        console.print("[dim]Transcribing...[/dim]")
-        stt_res = await asyncio.to_thread(self.stt.transcribe_audio, audio_path)
-        return stt_res.get("transcript", "")
+        try:
+            audio_path = self.mic.record_until_keypress()
+            if not audio_path: return ""
+            stt_res = await asyncio.to_thread(self.stt.transcribe_audio, audio_path)
+            return stt_res.get("transcript", "")
+        except Exception as e:
+            self.print_system(f"STT Error: {e}")
+            return ""
 
     async def _handle_chat(self, query: str):
-        console.print("[dim]🧠 Thinking...[/dim]")
+        self.print_system("Analyzing visual context...")
         
-        # Decide if we need visual context (reuse logic from AgentLoop)
         ui_state_str = "No visual context provided."
         keywords = ["screen", "see", "visible", "look", "page", "app", "window", "tab", "display", "what is on", "read"]
         if any(k in query.lower() for k in keywords):
@@ -113,21 +180,23 @@ class AgentCLI:
             condensed = [f"[{e.get('type')}] '{e.get('text')}'" for e in elements if e.get('text')]
             ui_state_str = "\n".join(condensed[:20])
 
-        # Load screen analysis prompt
         prompt_path = os.path.join(RuntimeConfig.BASE_DIR, "prompts", "screen_analysis.txt")
         with open(prompt_path, "r") as f:
             template = f.read()
         
         prompt = template.replace("{query}", query).replace("{ui_state}", ui_state_str)
+        self.print_system("Generating response...")
         response_text = await self.llm.generate_response(prompt)
         
-        console.print(Panel(response_text, title="[bold magenta]Agent[/bold magenta]"))
+        self.print_agent(response_text)
         
-        # TTS
-        audio_path = await asyncio.to_thread(self.tts.generate_audio, response_text)
-        if audio_path:
-            asyncio.create_task(self.audio.play_audio_async(audio_path))
+        try:
+            audio_path = await asyncio.to_thread(self.tts.generate_audio, response_text)
+            if audio_path:
+                asyncio.create_task(self.audio.play_audio_async(audio_path))
+        except Exception as e:
+            self.print_system(f"TTS Error: {e}")
 
 if __name__ == "__main__":
-    cli = AgentCLI()
+    cli = EdithCLI()
     asyncio.run(cli.run())

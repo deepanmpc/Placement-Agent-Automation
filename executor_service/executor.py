@@ -182,8 +182,17 @@ class Executor:
             self.action_count += 1
             console.print(f"  [dim][Verify] Capturing step {self.action_count} screenshot...[/dim]")
             try:
-                img_pil, capture_info = self.screenshot_capturer.capture()
-                verification_state = parse_ui(img_pil, {"texts": []}, capture_info)
+                np_img, img_pil, screenshot_path = self.screenshot_capturer.capture_active_window()
+                capture_info = {
+                    "capture_scope": "active_window",
+                    "screenshot_path": screenshot_path
+                }
+                # Run OCR on the verification screenshot
+                from vision_service.ocr import extract_text
+                import numpy as np
+                img_np = np.array(img_pil)
+                ocr_data = extract_text(img_np)
+                verification_state = parse_ui(img_pil, ocr_data, capture_info)
                 console.print(f"  [dim][Verify] Step {self.action_count}: {len(verification_state.get('elements', []))} elements detected[/dim]")
             except Exception as ve:
                 console.print(f"  [dim][Verify] Step {self.action_count} failed: {ve}[/dim]")
@@ -197,7 +206,7 @@ class Executor:
             )
         except Exception as e:
             elapsed = (time.time() - start) * 1000
-            console.print(f"  [bold red]✗ Failed: {e}[/bold red} ({elapsed:.0f}ms)")
+            console.print(f"  [bold red]✗ Failed: {str(e)}[/bold red] ({elapsed:.0f}ms)")
             return ExecutionResult(
                 action_type=action.action_type,
                 target=action.target,
@@ -205,18 +214,6 @@ class Executor:
                 message=str(e),
                 duration_ms=elapsed,
             )
-            elapsed = (time.time() - start) * 1000
-            console.print(f"  [bold green]✓[/bold green] {message} ({elapsed:.0f}ms)")
-            return ExecutionResult(
-                action_type=action.action_type,
-                target=action.target,
-                status=ActionStatus.SUCCESS,
-                message=message,
-                duration_ms=elapsed,
-            )
-        except Exception as e:
-            elapsed = (time.time() - start) * 1000
-            console.print(f"  [bold red]✗ Failed: {e}[/bold red] ({elapsed:.0f}ms)")
             return ExecutionResult(
                 action_type=action.action_type,
                 target=action.target,

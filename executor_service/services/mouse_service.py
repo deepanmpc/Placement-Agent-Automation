@@ -6,8 +6,8 @@ from executor_service.config import Config
 
 console = Console()
 
-# Safe margin from corners
-EDGE_MARGIN = 10
+# Safe margin from corners - reduced to avoid triggering fail-safe
+EDGE_MARGIN = 5
 
 
 class MouseService:
@@ -20,21 +20,19 @@ class MouseService:
 
     def _safe_clamp(self, x: int, y: int) -> Tuple[int, int]:
         """Clamp coordinates to safe zone (away from screen corners)."""
-        x = max(EDGE_MARGIN, min(x, self.screen_width - EDGE_MARGIN - 1))
-        y = max(EDGE_MARGIN, min(y, self.screen_height - EDGE_MARGIN - 1))
+        # Never clamp to exactly 0 to avoid fail-safe
+        x = max(10, min(x, self.screen_width - 10 - 1))
+        y = max(10, min(y, self.screen_height - 10 - 1))
         return x, y
 
     def _is_dangerous(self, x: int, y: int) -> bool:
         """Reject coordinates that would trigger PyAutoGUI fail-safe."""
-        if x == 0 and y == 0:
+        # Check if within 10 pixels of any corner (fail-safe trigger zone)
+        if x < 10 or y < 10:
             return True
-        corners = [
-            (x < EDGE_MARGIN and y < EDGE_MARGIN),
-            (x >= self.screen_width - EDGE_MARGIN and y < EDGE_MARGIN),
-            (x < EDGE_MARGIN and y >= self.screen_height - EDGE_MARGIN),
-            (x >= self.screen_width - EDGE_MARGIN and y >= self.screen_height - EDGE_MARGIN),
-        ]
-        return any(corners)
+        if x > self.screen_width - 10 or y > self.screen_height - 10:
+            return True
+        return False
 
     def move(self, x: int, y: int, duration: Optional[float] = None) -> str:
         """Move mouse instantly (or with minimal duration)."""

@@ -20,8 +20,9 @@ class VoiceIntent(BaseModel):
 class Action(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    action_type: str = Field(description="Types: click, double_click, right_click, type, hotkey, scroll, drag, wait, launch_app, focus_window, ask_user")
+    action_type: str = Field(description="Types: click, double_click, right_click, type, hotkey, scroll, drag, wait, launch_app, focus_window, ask_user, done")
     target: Optional[str] = Field(None, description="The logical target or UI text")
+    label: Optional[str] = Field(None, description="Element number from element map (e.g., '1', '2') - like SOC")
     coordinates: Optional[List[int]] = Field(None, description="[x, y] coordinates if applicable")
     text: Optional[str] = Field(None, description="Text to type if action_type is 'type'")
     keys: Optional[List[str]] = Field(None, description="Keys for hotkey actions, e.g. ['command', 'l']")
@@ -32,6 +33,7 @@ class Action(BaseModel):
     start_coords: Optional[List[int]] = Field(None, description="Drag start coordinates")
     end_coords: Optional[List[int]] = Field(None, description="Drag end coordinates")
     confidence: float = Field(default=1.0)
+    summary: Optional[str] = Field(None, description="Completion summary for 'done' action")
 
 class PlannerOutput(BaseModel):
     model_config = ConfigDict(extra="ignore")
