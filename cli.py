@@ -40,7 +40,8 @@ class EdithCLI:
         sys.stderr = devnull
         
         try:
-            self.console = Console()
+            # Force terminal colors in case the environment disables it by default
+            self.console = Console(force_terminal=True, color_system="256")
             self.vision = VisionClient()
             self.llm = ConversationalLLMService()
             self.tts = TTSService()
@@ -61,46 +62,39 @@ class EdithCLI:
         self.is_running = True
 
     def display_header(self):
-        # High-fidelity Card inspired by the screenshot
+        # Clear the terminal to "lock" it like Claude Code
+        self.console.clear()
+
+        # High-fidelity minimalist header with a unique neon cyberpunk palette
         logo = Text()
-        logo.append("  ▄▀  \n", style="bold cyan")
-        logo.append(" █    \n", style="bold blue")
-        logo.append("  ▀▄  ", style="bold red")
+        logo.append("   ■\n", style="bright_cyan")
+        logo.append("■\n", style="bright_red")
+        logo.append("   ■", style="bright_magenta")
         
         info = Text()
-        info.append("E.D.I.T.H. ", style="bold white")
+        info.append("E.D.I.T.H. ", style="bold bright_white")
         info.append("v2.0.42\n", style="dim white")
-        info.append("Signed in as ", style="white")
-        info.append("OPERATOR /auth\n", style="bold green")
-        info.append("Plan: ", style="white")
-        info.append("LEVEL ALPHA /root", style="bold blue")
+        info.append("Signed in as ", style="dim white")
+        info.append("OPERATOR /auth\n", style="bold bright_green")
+        info.append("Plan: ", style="dim white")
+        info.append("LEVEL ALPHA /root\n", style="bold bright_yellow")
+        
+        info.append("\n[Commands]\n", style="bold blue")
+        info.append("• Type 'mode' to toggle Chat/Auto\n", style="blue")
+        info.append("• Type 'v' for Voice Command", style="blue")
 
         header_table = Table.grid(padding=(0, 2))
         header_table.add_row(logo, info)
 
         self.console.print("\n")
-        self.console.print(Panel(
-            header_table,
-            box=MINIMAL,
-            border_style="dim white",
-            padding=(1, 2)
-        ))
-        self.console.print("[dim]" + "─" * 50 + "[/dim]\n")
+        self.console.print(header_table)
+        self.console.print("\n[dim]" + "─" * 60 + "[/dim]")
 
     def print_system(self, text):
-        self.console.print(f"[dim cyan]⚙ SYSTEM:[/dim cyan] [dim]{text}[/dim]")
+        self.console.print(f"\n[bold yellow]⚙ SYSTEM:[/bold yellow] [white]{text}[/white]")
 
     def print_agent(self, text):
-        self.console.print("\n")
-        self.console.print(Panel(
-            Text(text, style="white"),
-            title="[bold green]E.D.I.T.H.[/bold green]",
-            title_align="left",
-            border_style="green",
-            box=ROUNDED,
-            padding=(1, 2)
-        ))
-        self.console.print("\n")
+        self.console.print(f"\n[bright_cyan]{text}[/bright_cyan]\n")
 
     async def run(self):
         self.display_header()
@@ -108,12 +102,11 @@ class EdithCLI:
         
         while self.is_running:
             try:
-                mode_color = "blue" if self.mode == "chat" else "yellow"
+                mode_color = "bright_cyan" if self.mode == "chat" else "bright_red"
                 prompt = Text.assemble(
-                    ("\n( ", "white"),
+                    ("\n( ", "blue"),
                     (self.mode.upper(), f"bold {mode_color}"),
-                    (" ) ", "white"),
-                    ("➤ ", "bold green")
+                    (" ) ➤ ", "blue")
                 )
                 
                 user_input = self.console.input(prompt).strip()
