@@ -1,77 +1,42 @@
-/* ===== Theme Variables ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root,
-[data-theme="light"] {
-  --bg-primary: #f4f0fb;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #e9e5f5;
-  --bg-elevated: #ffffff;
-  --border: #e2def0;
-  --border-light: #f4f0fb;
-  --border-hover: #d1cbe5;
-  --text-primary: #18181b;
-  --text-secondary: #3f3f46;
-  --text-tertiary: #71717a;
-  --text-inverse: #ffffff;
-  --accent: #6d28d9;
-  --accent-hover: #5b21b6;
-  --accent-bg: #ede9fe;
-  --accent-border: #ddd6fe;
-  --color-success: #059669;
-  --color-success-bg: #d1fae5;
-  --color-warning: #d97706;
-  --color-warning-bg: #fef3c7;
-  --color-danger: #dc2626;
-  --color-danger-bg: #fee2e2;
-  --color-track: #e2def0;
-  --shadow-sm: 0 1px 2px 0 rgba(109, 40, 217, 0.05);
-  --shadow: 0 4px 6px -1px rgba(109, 40, 217, 0.08), 0 2px 4px -2px rgba(109, 40, 217, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(109, 40, 217, 0.1), 0 4px 6px -4px rgba(109, 40, 217, 0.05);
-  --sidebar-bg: #ffffff;
-  --sidebar-border: #e2def0;
-  --sidebar-link-hover: #f4f0fb;
-  --sidebar-link-active: #ffffff;
-  --sidebar-link-active-text: #6d28d9;
-  --card-bg: #ffffff;
-  --code-bg: #f4f0fb;
-  --skeleton: #e2def0;
-}
-
+[data-theme="light"],
 [data-theme="dark"] {
-  --bg-primary: #0b0914;
-  --bg-secondary: #141124;
-  --bg-tertiary: #1c1833;
-  --bg-elevated: #252042;
-  --border: #2d264f;
-  --border-light: #1c1833;
-  --border-hover: #3d346b;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #71717a;
-  --text-inverse: #0b0914;
-  --accent: #8b5cf6;
-  --accent-hover: #a78bfa;
-  --accent-bg: rgba(139, 92, 246, 0.15);
-  --accent-border: rgba(139, 92, 246, 0.3);
-  --color-success: #10b981;
-  --color-success-bg: rgba(16, 185, 129, 0.15);
-  --color-warning: #f59e0b;
-  --color-warning-bg: rgba(245, 158, 11, 0.15);
-  --color-danger: #ef4444;
-  --color-danger-bg: rgba(239, 68, 68, 0.15);
-  --color-track: #2d264f;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
-  --sidebar-bg: #0b0914;
-  --sidebar-border: #2d264f;
-  --sidebar-link-hover: #141124;
-  --sidebar-link-active: #141124;
-  --sidebar-link-active-text: #fafafa;
-  --card-bg: #141124;
-  --code-bg: #1c1833;
-  --skeleton: #2d264f;
+  --bg-primary: #191B21; /* Main background */
+  --bg-secondary: #13151A; /* Sidebar background */
+  --bg-tertiary: #191B21;
+  --bg-elevated: #21242D;
+  --border: #2C303D;
+  --border-light: #2C303D;
+  --border-hover: #3E4357;
+  --text-primary: #FFFFFF;
+  --text-secondary: #8A92A6;
+  --text-tertiary: #656C82;
+  --text-inverse: #13151A;
+  --accent: #AEC0FF; /* Periwinkle blue */
+  --accent-hover: #D4DFFF;
+  --accent-bg: rgba(174, 192, 255, 0.1);
+  --accent-border: #AEC0FF;
+  --accent-pink: #FFB1C8;
+  --color-success: #5BD99B;
+  --color-success-bg: rgba(91, 217, 155, 0.1);
+  --color-warning: #FFB1C8; /* Using the pink for warnings/secondary */
+  --color-warning-bg: rgba(255, 177, 200, 0.1);
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-track: #2C303D;
+  --shadow-sm: none;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --sidebar-bg: #13151A;
+  --sidebar-border: #2C303D;
+  --sidebar-link-hover: #21242D;
+  --sidebar-link-active: #21242D;
+  --sidebar-link-active-text: #FFFFFF;
+  --card-bg: #21242D;
+  --code-bg: #13151A;
+  --skeleton: #2C303D;
 }
 
 /* ===== Reset & Base ===== */
@@ -79,7 +44,7 @@
 html, body, #root { height: 100%; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -306,7 +271,7 @@ a:hover { color: var(--accent-hover); }
 
 .btn-primary {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--text-inverse);
   box-shadow: var(--shadow-sm);
 }
 
