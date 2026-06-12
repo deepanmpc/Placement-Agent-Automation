@@ -34,13 +34,21 @@ export default function Candidates({ onSelect, onNavigate }: Props) {
   const handleEnrich = async () => {
     setEnriching(true);
     try {
-      const response = await fetch('http://localhost:8000/profiles/batch-enrich?batch_size=10', { method: 'POST' });
+      const payload = selectedIds.size > 0 
+        ? { student_uuids: Array.from(selectedIds), batch_size: selectedIds.size }
+        : { batch_size: 10 };
+        
+      const response = await fetch('http://localhost:8000/profiles/batch-enrich', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
       const data = await response.json();
-      alert(`Enriched ${data.enriched} profiles! Errors: ${data.errors.length}`);
+      alert(`Successfully extracted data for ${data.enriched} profiles! Errors: ${data.errors.length}`);
       fetchProfiles();
     } catch (err) {
       console.error(err);
-      alert('Failed to enrich profiles.');
+      alert('Failed to extract profile data.');
     } finally {
       setEnriching(false);
     }

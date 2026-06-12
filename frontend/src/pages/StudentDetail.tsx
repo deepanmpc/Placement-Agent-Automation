@@ -44,10 +44,33 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
     if (!studentId) return;
     setEnriching(true);
     try {
-      const response = await fetch(`http://localhost:8000/profiles/${studentId}/enrich`, { method: 'POST' });
+      const response = await fetch(`http://localhost:8000/candidates/${studentId}/sync-platforms`, { method: 'POST' });
       if (!response.ok) throw new Error('Failed to enrich');
       const data = await response.json();
-      setProfile(data);
+      
+      // Merge the newly collected data into the existing profile state
+      setProfile(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          github: data.github_profile || prev.github,
+          leetcode: data.leetcode_profile || prev.leetcode,
+          codeforces: data.codeforces_profile || prev.codeforces,
+          codechef: data.codechef_profile || prev.codechef,
+          metadata: {
+            ...prev.metadata,
+            sources_collected: [
+              ...new Set([
+                ...prev.metadata.sources_collected,
+                ...(data.github_profile ? ['github'] : []),
+                ...(data.leetcode_profile ? ['leetcode'] : []),
+                ...(data.codeforces_profile ? ['codeforces'] : []),
+                ...(data.codechef_profile ? ['codechef'] : [])
+              ])
+            ]
+          }
+        };
+      });
       alert('Platform data extracted successfully!');
     } catch (err) {
       console.error(err);

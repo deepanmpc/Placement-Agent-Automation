@@ -188,16 +188,42 @@ async def delete_profile(
         raise HTTPException(404, "Profile not found")
     return {"status": "deleted", "student_uuid": student_uuid}
 
+from pydantic import BaseModel
+class BatchEnrichRequest(BaseModel):
+    student_uuids: Optional[List[str]] = None
+    batch_size: int = 10
+
 @app.post("/profiles/batch-enrich")
 async def batch_enrich(
-    batch_size: int = Query(default=10, ge=1, le=50),
+    req: BatchEnrichRequest,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
-    """Enrich up to `batch_size` profiles with external coding and github data."""
-    service = IngestionService(db_session=db, settings=settings)
-    result = await service.batch_enrich_profiles(batch_size=batch_size)
-    return result
+    """Enrich specific profiles or up to `batch_size` profiles using PlatformSyncService."""
+    from backend.database.models import StudentProfileRecord
+    from sqlalchemy.future import select
+    from backend.collection.service import PlatformSyncService
+    
+    if req.student_uuids:
+        stmt = select(StudentProfileRecord).where(StudentProfileRecord.student_uuid.in_(req.student_uuids))
+    else:
+        stmt = select(StudentProfileRecord).limit(req.batch_size)
+        
+    result = await db.execute(stmt)
+    records = result.scalars().all()
+    
+    success_count = 0
+    errors = []
+    
+    for record in records:
+        try:
+            res = await PlatformSyncService.sync_platforms(db, record.student_uuid)
+            if res:
+                success_count += 1
+        except Exception as e:
+            errors.append(str(e))
+            
+    return {"enriched": success_count, "errors": errors}
 
 @app.post("/profiles/{student_uuid}/enrich", response_model=StudentProfile)
 async def enrich_profile(
@@ -225,3 +251,23 @@ async def get_qdrant_docs(
         raise HTTPException(404, "Profile not found")
     preparer = QdrantPreparer()
     return preparer.prepare(profile)
+
+@app.post("/candidates/{student_uuid}/sync-platforms")
+async def sync_platforms(
+    student_uuid: str,
+    db: AsyncSession = Depends(get_db)
+):
+    from backend.collection.service import PlatformSyncService
+    
+    updated_record = await PlatformSyncService.sync_platforms(db, student_uuid)
+    if not updated_record:
+        raise HTTPException(404, "Student profile not found")
+        
+    return {
+        "status": "success",
+        "github_profile": updated_record.github_profile,
+        "leetcode_profile": updated_record.leetcode_profile,
+        "codeforces_profile": updated_record.codeforces_profile,
+        "codechef_profile": updated_record.codechef_profile,
+        "platform_sync_metadata": updated_record.platform_sync_metadata
+    }
