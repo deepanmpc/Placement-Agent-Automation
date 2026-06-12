@@ -92,7 +92,18 @@ class GitHubRepository(BaseModel):
     updated_at: Optional[str] = None
 
 
+class GitHubStrength(BaseModel):
+    activity_score: int = 0
+    repository_score: int = 0
+    collaboration_score: int = 0
+    documentation_score: int = 0
+    community_score: int = 0
+    engineering_score: int = 0
+
+
 class GitHubProfile(BaseModel):
+    """Aggregate profile metrics from GitHub."""
+    
     username: Optional[str] = None
     name: Optional[str] = None
     bio: Optional[str] = None
@@ -105,6 +116,7 @@ class GitHubProfile(BaseModel):
     language_distribution: Dict[str, int] = Field(default_factory=dict)
     languages: List[str] = Field(default_factory=list)
     repositories: List[GitHubRepository] = Field(default_factory=list)
+    github_strength: Optional[GitHubStrength] = None
     commit_frequency: float = 0.0
     activity_score: float = 0.0
     contribution_consistency: float = 0.0

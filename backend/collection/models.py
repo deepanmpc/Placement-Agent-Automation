@@ -12,6 +12,14 @@ class Repository(BaseModel):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
+class GitHubStrength(BaseModel):
+    activity_score: int = 0
+    repository_score: int = 0
+    collaboration_score: int = 0
+    documentation_score: int = 0
+    community_score: int = 0
+    engineering_score: int = 0
+
 class GitHubProfile(BaseModel):
     username: str
     name: Optional[str] = None
@@ -27,6 +35,7 @@ class GitHubProfile(BaseModel):
     contribution_consistency: float = 0.0
     repository_growth: float = 0.0
     repositories: List[Repository] = []
+    github_strength: Optional[GitHubStrength] = None
     snapshots: List[Dict[str, Any]] = Field(default_factory=list)
 
 class LeetCodeProfile(BaseModel):

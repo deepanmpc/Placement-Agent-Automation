@@ -151,17 +151,35 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
             <div className="detail-card">
               <h3>GitHub</h3>
               <div className="score-row">
-                <div className="score-stats">
-                  <div><strong>URL:</strong> {s.personal_info.github_url || 'Not provided'}</div>
+                <div className="score-stats" style={{ width: '100%' }}>
+                  <div style={{ marginBottom: '1rem' }}><strong>URL:</strong> {s.personal_info.github_url || 'Not provided'}</div>
                   {s.metadata.sources_collected.includes('github') ? (
                     <>
-                      <div>Repos: {s.github.public_repos}</div>
-                      <div>Stars: {s.github.total_stars}</div>
-                      <div>Followers: {s.github.followers}</div>
-                      <div>Consistency: {s.github.contribution_consistency.toFixed(1)}%</div>
+                      {s.github.github_strength ? (
+                        <div style={{ backgroundColor: '#111827', borderRadius: '8px', padding: '1rem', border: '1px solid #374151', overflowX: 'auto', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                          <div style={{ color: '#9CA3AF', marginBottom: '0.5rem' }}>// GitHub Intelligence Evaluation</div>
+                          <div style={{ color: '#E5E7EB' }}>{"{"}</div>
+                          <div style={{ color: '#E5E7EB', paddingLeft: '1rem' }}>"github_strength": {"{"}</div>
+                          <div style={{ color: '#A78BFA', paddingLeft: '2rem' }}>"activity_score": <span style={{ color: '#34D399' }}>{s.github.github_strength.activity_score}</span>,</div>
+                          <div style={{ color: '#A78BFA', paddingLeft: '2rem' }}>"repository_score": <span style={{ color: '#34D399' }}>{s.github.github_strength.repository_score}</span>,</div>
+                          <div style={{ color: '#A78BFA', paddingLeft: '2rem' }}>"collaboration_score": <span style={{ color: '#34D399' }}>{s.github.github_strength.collaboration_score}</span>,</div>
+                          <div style={{ color: '#A78BFA', paddingLeft: '2rem' }}>"documentation_score": <span style={{ color: '#34D399' }}>{s.github.github_strength.documentation_score}</span>,</div>
+                          <div style={{ color: '#A78BFA', paddingLeft: '2rem' }}>"community_score": <span style={{ color: '#34D399' }}>{s.github.github_strength.community_score}</span>,</div>
+                          <div style={{ color: '#A78BFA', paddingLeft: '2rem' }}>"engineering_score": <span style={{ color: '#FCD34D' }}>{s.github.github_strength.engineering_score}</span></div>
+                          <div style={{ color: '#E5E7EB', paddingLeft: '1rem' }}>{"}"}</div>
+                          <div style={{ color: '#E5E7EB' }}>{"}"}</div>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                          <div>Repos: {s.github.public_repos}</div>
+                          <div>Stars: {s.github.total_stars}</div>
+                          <div>Followers: {s.github.followers}</div>
+                          <div>Consistency: {s.github.contribution_consistency.toFixed(1)}%</div>
+                        </div>
+                      )}
                     </>
                   ) : (
-                    <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderLeft: '4px solid #f59e0b', borderRadius: '4px', color: '#fcd34d', fontSize: '0.85rem' }}>
+                    <div style={{ padding: '0.75rem', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderLeft: '4px solid #f59e0b', borderRadius: '4px', color: '#fcd34d', fontSize: '0.85rem' }}>
                       <strong>Pending Extraction:</strong> Click "Extract Recent Platform Data" above to sync live repositories, stars, and consistency scores.
                     </div>
                   )}

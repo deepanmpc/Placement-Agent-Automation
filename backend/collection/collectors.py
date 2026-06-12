@@ -60,18 +60,42 @@ class GitHubCollector:
                         updated_at=r.get("updated_at")
                     ))
                 
+                # Heuristic calculations for Intelligence Score
+                public_repos = user_data.get("public_repos", 0)
+                followers = user_data.get("followers", 0)
+                
+                activity_score = min(100, int((account_age_days / 365) * 10 + public_repos * 2))
+                repository_score = min(100, int(public_repos * 1.5 + total_stars * 3))
+                collaboration_score = min(100, int(total_forks * 4 + len(repositories) * 2))
+                docs_ratio = len([r for r in repositories if r.description]) / max(1, len(repositories))
+                documentation_score = min(100, int(docs_ratio * 100))
+                community_score = min(100, int(followers * 5 + total_stars * 2))
+                
+                engineering_score = int((activity_score + repository_score + collaboration_score + documentation_score + community_score) / 5)
+
+                from .models import GitHubStrength
+                strength = GitHubStrength(
+                    activity_score=activity_score,
+                    repository_score=repository_score,
+                    collaboration_score=collaboration_score,
+                    documentation_score=documentation_score,
+                    community_score=community_score,
+                    engineering_score=engineering_score
+                )
+
                 return GitHubProfile(
                     username=username,
                     name=user_data.get("name"),
                     bio=user_data.get("bio"),
-                    followers=user_data.get("followers", 0),
+                    followers=followers,
                     following=user_data.get("following", 0),
-                    public_repos=user_data.get("public_repos", 0),
+                    public_repos=public_repos,
                     account_age_days=account_age_days,
                     total_stars=total_stars,
                     total_forks=total_forks,
                     language_distribution=languages,
-                    repositories=repositories
+                    repositories=repositories,
+                    github_strength=strength
                 )
             except Exception as e:
                 logger.error(f"GitHubCollector failed for {username}: {e}")
