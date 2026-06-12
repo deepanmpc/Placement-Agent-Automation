@@ -1,5 +1,4 @@
-
-from .common import ExplainableScore
+from ..common import ExplainableScore
 
 class CodingAggregator:
     WEIGHTS = {

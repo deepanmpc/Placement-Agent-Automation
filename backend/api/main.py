@@ -160,11 +160,11 @@ async def ingest_resume(
         if os.path.exists(tmp_path):
             os.unlink(tmp_path)
 
-from ranking.weighted_ranker.coding_ranker.leetcode_score import LeetCodeRanker
-from ranking.weighted_ranker.coding_ranker.codeforces_score import CodeforcesRanker
-from ranking.weighted_ranker.coding_ranker.codechef_score import CodeChefRanker
-from ranking.weighted_ranker.coding_ranker.coding_aggregator import CodingAggregator
-from ranking.weighted_ranker.github_ranker.github_engineering import GitHubEngineeringRanker
+from backend.ranking.weighted_ranker.coding_ranker.leetcode_score import LeetCodeRanker
+from backend.ranking.weighted_ranker.coding_ranker.codeforces_score import CodeforcesRanker
+from backend.ranking.weighted_ranker.coding_ranker.codechef_score import CodeChefRanker
+from backend.ranking.weighted_ranker.coding_ranker.coding_aggregator import CodingAggregator
+from backend.ranking.weighted_ranker.github_ranker.github_engineering import GitHubEngineeringRanker
 
 def attach_ranking(profile: StudentProfile):
     lc = LeetCodeRanker.calculate(profile.leetcode.model_dump())
@@ -194,7 +194,12 @@ async def list_profiles(
     service = IngestionService(db_session=db, settings=settings)
     profiles = await service.get_all_profiles(limit=limit, offset=offset)
     for p in profiles:
-        attach_ranking(p)
+        try:
+            attach_ranking(p)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            logger.error(f"attach_ranking failed for {p.student_uuid}: {e}")
     return profiles
 
 @app.get("/profiles/{student_uuid}", response_model=StudentProfile)

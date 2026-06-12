@@ -1,5 +1,4 @@
-
-from .common import ScoreBreakdown, ExplainableScore
+from ..common import ScoreBreakdown, ExplainableScore
 
 class LeetCodeRanker:
     WEIGHTS = {
