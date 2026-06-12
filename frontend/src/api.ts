@@ -73,4 +73,5 @@ export interface Profile {
     sources_collected: string[];
     errors: string[];
   };
+  ranking?: any;
 }

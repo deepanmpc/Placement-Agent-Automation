@@ -160,6 +160,30 @@ async def ingest_resume(
         if os.path.exists(tmp_path):
             os.unlink(tmp_path)
 
+from ranking.weighted_ranker.coding_ranker.leetcode_score import LeetCodeRanker
+from ranking.weighted_ranker.coding_ranker.codeforces_score import CodeforcesRanker
+from ranking.weighted_ranker.coding_ranker.codechef_score import CodeChefRanker
+from ranking.weighted_ranker.coding_ranker.coding_aggregator import CodingAggregator
+from ranking.weighted_ranker.github_ranker.github_engineering import GitHubEngineeringRanker
+
+def attach_ranking(profile: StudentProfile):
+    lc = LeetCodeRanker.calculate(profile.leetcode.model_dump())
+    cf = CodeforcesRanker.calculate(profile.codeforces.model_dump())
+    cc = CodeChefRanker.calculate(profile.codechef.model_dump())
+    coding = CodingAggregator.calculate(lc, cf, cc)
+    
+    gh_data = profile.github.github_strength.model_dump() if profile.github.github_strength else {}
+    gh = GitHubEngineeringRanker.calculate(gh_data)
+    
+    profile.ranking = {
+        "leetcode_score": lc.to_dict(),
+        "codeforces_score": cf.to_dict(),
+        "codechef_score": cc.to_dict(),
+        "coding_score": coding.to_dict(),
+        "github_score": gh.to_dict(),
+        "total_technical_score": round(coding.total_score * 0.6 + gh.total_score * 0.4, 2)
+    }
+
 @app.get("/profiles", response_model=List[StudentProfile])
 async def list_profiles(
     limit: int = Query(default=100, ge=1, le=500),
@@ -168,7 +192,10 @@ async def list_profiles(
     settings: Settings = Depends(get_settings),
 ):
     service = IngestionService(db_session=db, settings=settings)
-    return await service.get_all_profiles(limit=limit, offset=offset)
+    profiles = await service.get_all_profiles(limit=limit, offset=offset)
+    for p in profiles:
+        attach_ranking(p)
+    return profiles
 
 @app.get("/profiles/{student_uuid}", response_model=StudentProfile)
 async def get_profile(
@@ -180,6 +207,7 @@ async def get_profile(
     profile = await service.get_profile(student_uuid)
     if not profile:
         raise HTTPException(404, "Profile not found")
+    attach_ranking(profile)
     return profile
 
 @app.delete("/profiles/{student_uuid}")

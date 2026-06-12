@@ -189,12 +189,29 @@ export default function Candidates({ onSelect, onNavigate }: Props) {
                   ))}
                 </div>
               </div>
-              <div className="candidate-scores">
-                <div className="score-mini">
-                  <span>GH Repos: {p.github.public_repos}</span>
-                  <span>LC Solved: {p.leetcode.total_solved}</span>
-                  <span>CF Rating: {p.codeforces.rating}</span>
-                </div>
+              <div className="candidate-scores" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
+                {p.ranking ? (
+                  <>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)', marginBottom: '0.2rem' }}>
+                      Score: {p.ranking.total_technical_score}/100
+                    </div>
+                    <div className="score-mini" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      {p.ranking.github_score.total_score > 0 && <span>GH: {p.ranking.github_score.total_score}</span>}
+                      {p.ranking.leetcode_score.total_score > 0 && <span>LC: {p.ranking.leetcode_score.total_score}</span>}
+                      {p.ranking.codeforces_score.total_score > 0 && <span>CF: {p.ranking.codeforces_score.total_score}</span>}
+                      {p.ranking.codechef_score.total_score > 0 && <span>CC: {p.ranking.codechef_score.total_score}</span>}
+                      {Object.keys(p.ranking.coding_score.breakdown).length === 0 && p.ranking.github_score.total_score === 0 && (
+                        <span>No extraction yet</span>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="score-mini">
+                    <span>GH Repos: {p.github.public_repos}</span>
+                    <span>LC Solved: {p.leetcode.total_solved}</span>
+                    <span>CF Rating: {p.codeforces.rating}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

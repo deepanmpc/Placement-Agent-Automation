@@ -228,3 +228,4 @@ class StudentProfile(BaseModel):
     codeforces: CodeforcesProfile = Field(default_factory=CodeforcesProfile)
     codechef: CodeChefProfile = Field(default_factory=CodeChefProfile)
     metadata: IngestionMetadata = Field(default_factory=IngestionMetadata)
+    ranking: Optional[Dict[str, Any]] = None
