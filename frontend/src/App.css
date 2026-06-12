@@ -1,7 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root,
-[data-theme="light"],
+[data-theme="light"] {
+  --bg-primary: #F8F9FB;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F8F9FB;
+  --bg-elevated: #FFFFFF;
+  --border: #E5E7EB;
+  --border-light: #F3F4F6;
+  --border-hover: #D1D5DB;
+  --text-primary: #191B21;
+  --text-secondary: #656C82;
+  --text-tertiary: #8A92A6;
+  --text-inverse: #FFFFFF;
+  --accent: #5C7BFF;
+  --accent-hover: #4865E6;
+  --accent-bg: rgba(92, 123, 255, 0.1);
+  --accent-border: #5C7BFF;
+  --accent-pink: #FF8BAE;
+  --color-success: #34D399;
+  --color-success-bg: rgba(52, 211, 153, 0.1);
+  --color-warning: #FFB1C8;
+  --color-warning-bg: rgba(255, 177, 200, 0.1);
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-track: #E5E7EB;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --sidebar-bg: #FFFFFF;
+  --sidebar-border: #E5E7EB;
+  --sidebar-link-hover: #F3F4F6;
+  --sidebar-link-active: #F3F4F6;
+  --sidebar-link-active-text: #191B21;
+  --card-bg: #FFFFFF;
+  --code-bg: #F8F9FB;
+  --skeleton: #E5E7EB;
+}
+
 [data-theme="dark"] {
   --bg-primary: #191B21; /* Main background */
   --bg-secondary: #13151A; /* Sidebar background */
