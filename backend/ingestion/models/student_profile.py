@@ -81,7 +81,8 @@ class ProjectInfo(BaseModel):
 class GitHubRepository(BaseModel):
     """Lightweight representation of a single GitHub repository."""
 
-    name: str
+    name: Optional[str] = None
+    repo_name: Optional[str] = None
     stars: int = 0
     forks: int = 0
     language: Optional[str] = None
