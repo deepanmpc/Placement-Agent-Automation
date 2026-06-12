@@ -74,8 +74,8 @@ export default function ResumeUpload() {
         </p>
       </div>
 
-      <div className="upload-card">
-        <div className="upload-zone" onClick={() => inputRef.current?.click()} style={{ padding: '2rem' }}>
+      <div className="upload-card" style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
+        <div className="upload-zone" onClick={() => inputRef.current?.click()} style={{ padding: '3rem 2rem', marginBottom: '2rem', borderStyle: 'dashed' }}>
           <input
             ref={inputRef}
             type="file"
@@ -85,39 +85,39 @@ export default function ResumeUpload() {
           />
           {file ? (
             <div className="upload-file-info">
-              <span className="upload-file-name">{file.name}</span>
+              <span className="upload-file-name" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--accent)' }}>{file.name}</span>
             </div>
           ) : (
-            <p className="upload-placeholder">
-              Click to choose resume file
+            <p className="upload-placeholder" style={{ fontSize: '1.05rem' }}>
+              Click or drag to choose resume file
             </p>
           )}
         </div>
 
-        <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>ID Number / Roll Number</label>
-            <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="e.g. 21BCE001" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
+          <div className="form-group">
+            <label className="form-label">ID Number / Roll Number</label>
+            <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="e.g. 21BCE001" />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>GitHub Profile URL</label>
-            <input type="text" className="form-input" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          <div className="form-group">
+            <label className="form-label">GitHub Profile URL</label>
+            <input type="text" className="form-input" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username" />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>LinkedIn URL</label>
-            <input type="text" className="form-input" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/username" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          <div className="form-group">
+            <label className="form-label">LinkedIn URL</label>
+            <input type="text" className="form-input" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/username" />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>LeetCode Username</label>
-            <input type="text" className="form-input" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} placeholder="e.g. jdoe123" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          <div className="form-group">
+            <label className="form-label">LeetCode Username</label>
+            <input type="text" className="form-input" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} placeholder="e.g. jdoe123" />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>Codeforces Handle</label>
-            <input type="text" className="form-input" value={codeforcesUsername} onChange={e => setCodeforcesUsername(e.target.value)} placeholder="e.g. tourist" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          <div className="form-group">
+            <label className="form-label">Codeforces Handle</label>
+            <input type="text" className="form-input" value={codeforcesUsername} onChange={e => setCodeforcesUsername(e.target.value)} placeholder="e.g. tourist" />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>CodeChef Username</label>
-            <input type="text" className="form-input" value={codechefUsername} onChange={e => setCodechefUsername(e.target.value)} placeholder="e.g. coder_123" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          <div className="form-group">
+            <label className="form-label">CodeChef Username</label>
+            <input type="text" className="form-input" value={codechefUsername} onChange={e => setCodechefUsername(e.target.value)} placeholder="e.g. coder_123" />
           </div>
         </div>
 
@@ -125,13 +125,14 @@ export default function ResumeUpload() {
           className="btn btn-primary"
           onClick={handleUpload}
           disabled={!file || loading}
-          style={{ marginTop: '1.5rem', width: '100%' }}
+          style={{ width: '100%', padding: '1rem', fontSize: '1rem', fontWeight: 600 }}
         >
           {loading ? 'Creating Profile...' : 'Upload & Create Candidate Profile'}
         </button>
+        
         {error && (
-          <div className="upload-error" style={{ textAlign: 'left', marginTop: '1rem' }}>
-            <p><strong>Error:</strong> {error}</p>
+          <div className="upload-error" style={{ textAlign: 'left', marginTop: '1rem', padding: '1rem', backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: '8px' }}>
+            <strong>Error:</strong> {error}
           </div>
         )}
       </div>
