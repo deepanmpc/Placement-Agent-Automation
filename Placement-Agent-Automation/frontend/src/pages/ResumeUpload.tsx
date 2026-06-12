@@ -97,7 +97,7 @@ export default function ResumeUpload() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
           <div className="form-group">
             <label className="form-label">ID Number / Roll Number</label>
-            <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="e.g. 21BCE001" />
+            <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="23000*****" />
           </div>
           <div className="form-group">
             <label className="form-label">GitHub Profile URL</label>
