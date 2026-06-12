@@ -39,15 +39,6 @@ export default function Sidebar({ active, onNavigate, selectedStudentId, theme, 
         ))}
       </nav>
 
-      {selectedStudentId && (
-        <button
-          className="sidebar-link sidebar-student-back"
-          onClick={() => onNavigate('student')}
-        >
-          {selectedStudentId}
-        </button>
-      )}
-
       <div className="sidebar-footer">
         <div className="theme-toggle-row">
           <span className="theme-toggle-label">Dark Mode</span>
