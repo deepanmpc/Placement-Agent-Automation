@@ -158,6 +158,19 @@ async def batch_enrich(
     result = await service.batch_enrich_profiles(batch_size=batch_size)
     return result
 
+@app.post("/profiles/{student_uuid}/enrich", response_model=StudentProfile)
+async def enrich_profile(
+    student_uuid: str,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    """Enrich a single profile with external coding and github data."""
+    service = IngestionService(db_session=db, settings=settings)
+    profile = await service.enrich_single_profile(student_uuid)
+    if not profile:
+        raise HTTPException(404, "Profile not found")
+    return profile
+
 @app.get("/profiles/{student_uuid}/qdrant-docs", response_model=List[QdrantDocument])
 async def get_qdrant_docs(
     student_uuid: str,

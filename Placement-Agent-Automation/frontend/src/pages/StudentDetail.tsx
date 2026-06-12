@@ -24,6 +24,7 @@ function SkillSection({ label, items }: { label: string; items: string[] }) {
 export default function StudentDetail({ studentId, onNavigate }: Props) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [enriching, setEnriching] = useState(false);
 
   useEffect(() => {
     if (!studentId) return;
@@ -39,6 +40,23 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
       });
   }, [studentId]);
 
+  const handleEnrich = async () => {
+    if (!studentId) return;
+    setEnriching(true);
+    try {
+      const response = await fetch(`http://localhost:8000/profiles/${studentId}/enrich`, { method: 'POST' });
+      if (!response.ok) throw new Error('Failed to enrich');
+      const data = await response.json();
+      setProfile(data);
+      alert('Platform data extracted successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to extract platform data.');
+    } finally {
+      setEnriching(false);
+    }
+  };
+
   if (loading || !profile) {
     return <div className="page"><div className="page-header"><h1>Loading student...</h1></div></div>;
   }
@@ -47,9 +65,16 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
 
   return (
     <div className="page">
-      <div className="page-header">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button className="btn btn-ghost" onClick={() => onNavigate('candidates')}>
-          Back to Dashboard
+          &larr; Back to Dashboard
+        </button>
+        <button 
+          className="btn btn-primary" 
+          onClick={handleEnrich} 
+          disabled={enriching}
+        >
+          {enriching ? 'Extracting...' : 'Extract Recent Platform Data'}
         </button>
       </div>
 

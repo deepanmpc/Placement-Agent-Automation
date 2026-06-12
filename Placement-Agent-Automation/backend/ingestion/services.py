@@ -121,3 +121,47 @@ class IngestionService:
                 errors.append(str(e))
                 
         return {"enriched": enriched_count, "errors": errors}
+
+    async def enrich_single_profile(self, student_uuid: str) -> Optional[StudentProfile]:
+        profile = await self.get_profile(student_uuid)
+        if not profile:
+            return None
+            
+        collector_tasks = {}
+        if profile.personal_info.github_url:
+            collector_tasks['github'] = self.github_collector.collect(profile.personal_info.github_url)
+        if profile.personal_info.leetcode_username:
+            collector_tasks['leetcode'] = self.leetcode_collector.collect(profile.personal_info.leetcode_username)
+        if profile.personal_info.codeforces_username:
+            collector_tasks['codeforces'] = self.codeforces_collector.collect(profile.personal_info.codeforces_username)
+        if profile.personal_info.codechef_username:
+            collector_tasks['codechef'] = self.codechef_collector.collect(profile.personal_info.codechef_username)
+        
+        if collector_tasks:
+            results = await asyncio.gather(*collector_tasks.values(), return_exceptions=True)
+            github_data = None
+            leetcode_data = None
+            codeforces_data = None
+            codechef_data = None
+            
+            for key, result in zip(collector_tasks.keys(), results):
+                if isinstance(result, Exception):
+                    logger.error(f"Collector {key} failed for {profile.student_uuid}: {result}")
+                    profile.metadata.errors.append(f"{key}: {str(result)}")
+                else:
+                    if key == 'github': github_data = result
+                    elif key == 'leetcode': leetcode_data = result
+                    elif key == 'codeforces': codeforces_data = result
+                    elif key == 'codechef': codechef_data = result
+            
+            profile = self.merger.merge_all(
+                profile,
+                github=github_data,
+                leetcode=leetcode_data,
+                codeforces=codeforces_data,
+                codechef=codechef_data
+            )
+            
+            await self.repository.save_profile(profile)
+            
+        return profile
