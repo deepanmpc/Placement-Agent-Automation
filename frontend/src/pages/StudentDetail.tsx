@@ -103,7 +103,7 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <div className="detail-main">
-          <div className="detail-header">
+          <div className="detail-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
               <h1>{s.personal_info.name || 'No Name'} {s.personal_info.id_number ? `(${s.personal_info.id_number})` : ''}</h1>
               <p className="detail-meta">
@@ -113,7 +113,24 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
                 {s.education.degree} in {s.education.branch} at {s.education.college}
                 &middot; CGPA {s.education.cgpa} &middot; {s.education.graduation_year}
               </p>
-              <div className="detail-links" style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+            </div>
+            {s.ranking && (
+              <div style={{ padding: '1rem', background: 'var(--bg)', border: '1px solid var(--primary)', borderRadius: '12px', textAlign: 'right' }}>
+                <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Intelligence Score</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary)' }}>
+                  {s.ranking.total_technical_score}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/100</span>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                  {s.ranking.github_score.total_score > 0 && <span>GH: {s.ranking.github_score.total_score}</span>}
+                  {s.ranking.leetcode_score.total_score > 0 && <span>LC: {s.ranking.leetcode_score.total_score}</span>}
+                  {s.ranking.codeforces_score.total_score > 0 && <span>CF: {s.ranking.codeforces_score.total_score}</span>}
+                  {s.ranking.codechef_score.total_score > 0 && <span>CC: {s.ranking.codechef_score.total_score}</span>}
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{ padding: '0 1.5rem 1.5rem' }}>
+            <div className="detail-links" style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                 {s.personal_info.github_url && (
                   <a href={s.personal_info.github_url.startsWith('http') ? s.personal_info.github_url : `https://${s.personal_info.github_url}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>GitHub</a>
                 )}

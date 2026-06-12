@@ -213,7 +213,12 @@ async def get_profile(
     profile = await service.get_profile(student_uuid)
     if not profile:
         raise HTTPException(404, "Profile not found")
-    attach_ranking(profile)
+    try:
+        attach_ranking(profile)
+    except Exception as e:
+        import traceback
+        logger.error(f"attach_ranking failed for {student_uuid}: {e}")
+        logger.error(traceback.format_exc())
     return profile
 
 @app.delete("/profiles/{student_uuid}")
