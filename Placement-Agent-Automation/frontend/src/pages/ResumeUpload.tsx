@@ -2,137 +2,168 @@ import { useRef, useState } from 'react';
 
 export default function ResumeUpload() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [files, setFiles] = useState<File[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [idNumber, setIdNumber] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [leetcodeUsername, setLeetcodeUsername] = useState('');
+  const [codeforcesUsername, setCodeforcesUsername] = useState('');
+  const [codechefUsername, setCodechefUsername] = useState('');
+
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = Array.from(e.target.files || []);
-    setFiles(f);
-    setErrors([]);
-    setResults([]);
+    const f = e.target.files?.[0] || null;
+    setFile(f);
+    setError(null);
+    setResult(null);
   };
 
   const handleUpload = async () => {
-    if (files.length === 0) return;
+    if (!file) return;
 
     setLoading(true);
-    setErrors([]);
-    setResults([]);
+    setError(null);
+    setResult(null);
 
-    const newResults: any[] = [];
-    const newErrors: string[] = [];
+    const formData = new FormData();
+    formData.append('file', file);
+    if (idNumber) formData.append('id_number', idNumber);
+    if (githubUrl) formData.append('github_url', githubUrl);
+    if (linkedinUrl) formData.append('linkedin_url', linkedinUrl);
+    if (leetcodeUsername) formData.append('leetcode_username', leetcodeUsername);
+    if (codeforcesUsername) formData.append('codeforces_username', codeforcesUsername);
+    if (codechefUsername) formData.append('codechef_username', codechefUsername);
 
-    for (const file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
+    try {
+      const response = await fetch('http://localhost:8000/ingest', {
+        method: 'POST',
+        body: formData,
+      });
 
-      try {
-        const response = await fetch('http://localhost:8000/ingest', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          try {
-            const errObj = JSON.parse(errorText);
-            throw new Error(`${file.name}: ${errObj.detail || response.statusText}`);
-          } catch {
-            throw new Error(`${file.name}: ${response.statusText}`);
-          }
+      if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error("This candidate's data is already registered in the system!");
         }
-
-        const data = await response.json();
-        newResults.push(data);
-      } catch (err: any) {
-        newErrors.push(err.message);
+        const errorText = await response.text();
+        try {
+          const errObj = JSON.parse(errorText);
+          throw new Error(`${errObj.detail || response.statusText}`);
+        } catch {
+          throw new Error(`Upload Failed: ${response.statusText}`);
+        }
       }
-    }
 
-    setResults(newResults);
-    setErrors(newErrors);
-    setLoading(false);
+      const data = await response.json();
+      setResult(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="page">
       <div className="page-header">
-        <h1>Upload Resumes</h1>
+        <h1>Add Candidate Profile</h1>
         <p className="page-subtitle">
-          Upload PDF, DOCX, or TXT files to parse structured candidate data
+          Upload a resume and manually provide platform usernames (optional).
         </p>
       </div>
 
       <div className="upload-card">
-        <div className="upload-zone" onClick={() => inputRef.current?.click()}>
+        <div className="upload-zone" onClick={() => inputRef.current?.click()} style={{ padding: '2rem' }}>
           <input
             ref={inputRef}
             type="file"
             accept=".pdf,.docx,.txt,.md"
-            multiple
             onChange={handleFileChange}
             className="upload-input"
           />
-          {files.length > 0 ? (
+          {file ? (
             <div className="upload-file-info">
-              <span className="upload-file-name">{files.length} file(s) selected</span>
-              <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#94a3b8' }}>
-                {files.slice(0, 3).map(f => f.name).join(', ')}
-                {files.length > 3 && ` and ${files.length - 3} more`}
-              </div>
+              <span className="upload-file-name">{file.name}</span>
             </div>
           ) : (
             <p className="upload-placeholder">
-              Click to choose files (multiple allowed)
+              Click to choose resume file
             </p>
           )}
         </div>
+
+        <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>ID Number / Roll Number</label>
+            <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="e.g. 21BCE001" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>GitHub Profile URL</label>
+            <input type="text" className="form-input" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>LinkedIn URL</label>
+            <input type="text" className="form-input" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/username" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>LeetCode Username</label>
+            <input type="text" className="form-input" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} placeholder="e.g. jdoe123" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>Codeforces Handle</label>
+            <input type="text" className="form-input" value={codeforcesUsername} onChange={e => setCodeforcesUsername(e.target.value)} placeholder="e.g. tourist" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: '#94a3b8' }}>CodeChef Username</label>
+            <input type="text" className="form-input" value={codechefUsername} onChange={e => setCodechefUsername(e.target.value)} placeholder="e.g. coder_123" style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f8fafc' }} />
+          </div>
+        </div>
+
         <button
           className="btn btn-primary"
           onClick={handleUpload}
-          disabled={files.length === 0 || loading}
+          disabled={!file || loading}
+          style={{ marginTop: '1.5rem', width: '100%' }}
         >
-          {loading ? 'Parsing...' : `Upload and Parse ${files.length > 0 ? files.length : ''}`}
+          {loading ? 'Creating Profile...' : 'Upload & Create Candidate Profile'}
         </button>
-        {errors.length > 0 && (
+        {error && (
           <div className="upload-error" style={{ textAlign: 'left', marginTop: '1rem' }}>
-            <p><strong>Errors:</strong></p>
-            <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
-              {errors.map((e, idx) => <li key={idx}>{e}</li>)}
-            </ul>
+            <p><strong>Error:</strong> {error}</p>
           </div>
         )}
       </div>
 
-      {results.length > 0 && (
-        <div style={{ marginTop: '2rem' }}>
-          <h3>Successfully Extracted ({results.length})</h3>
-          <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
-            {results.map((result, idx) => (
-              <div key={idx} className="upload-result" style={{ padding: '1.5rem', backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
-                <h4 style={{ marginBottom: '1rem', color: '#f8fafc', fontSize: '1.1rem', margin: '0 0 1rem 0' }}>
-                  <span style={{ color: '#38bdf8' }}>{result.personal_info?.name || 'Unknown Candidate'}</span>
-                </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', color: '#cbd5e1', fontSize: '0.9rem' }}>
-                  <div>
-                    <p style={{ margin: '0 0 0.25rem 0' }}><strong style={{ color: '#94a3b8' }}>College:</strong> {result.education?.college || 'N/A'}</p>
-                    <p style={{ margin: '0 0 0.25rem 0' }}><strong style={{ color: '#94a3b8' }}>Email:</strong> {result.personal_info?.email || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p style={{ margin: '0 0 0.25rem 0' }}><strong style={{ color: '#94a3b8' }}>GitHub:</strong> {result.personal_info?.github_url || 'N/A'}</p>
-                    <p style={{ margin: '0 0 0.25rem 0' }}><strong style={{ color: '#94a3b8' }}>LeetCode:</strong> {result.personal_info?.leetcode_username || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+      {result && (
+        <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', animation: 'fadeIn 0.5s ease' }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            backgroundColor: '#10b981',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '1rem',
+            boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)'
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
           </div>
-          <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#0f172a', borderRadius: '8px', borderLeft: '4px solid #10b981' }}>
-            <p style={{ color: '#10b981', margin: 0, fontWeight: 500 }}>
-              Profiles saved! Go to the Candidates Dashboard and click "Extract Coding & GitHub Data" to enrich them.
-            </p>
-          </div>
+          <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.25rem', fontWeight: 600 }}>Upload Successful</h3>
+          <p style={{ color: '#94a3b8', marginTop: '0.5rem', textAlign: 'center' }}>
+            {result.personal_info?.name || 'Candidate'} added to dashboard.
+          </p>
+          <button 
+            onClick={() => { setResult(null); setFile(null); setIdNumber(''); setGithubUrl(''); setLinkedinUrl(''); setLeetcodeUsername(''); setCodeforcesUsername(''); setCodechefUsername(''); }}
+            className="btn"
+            style={{ marginTop: '1.5rem', backgroundColor: '#1e293b', border: '1px solid #334155' }}
+          >
+            Upload Another
+          </button>
         </div>
       )}
     </div>

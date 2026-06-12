@@ -179,6 +179,20 @@ class StudentRepository:
             )
             raise
 
+    async def check_duplicate_id_number(self, id_number: str) -> bool:
+        """Check if a profile with the same id_number exists by inspecting all profiles."""
+        if not id_number:
+            return False
+        try:
+            profiles = await self.get_all_profiles(limit=1000)
+            for p in profiles:
+                if p.personal_info.id_number and p.personal_info.id_number.strip().lower() == id_number.strip().lower():
+                    return True
+            return False
+        except Exception as exc:
+            logger.error("Database error while checking duplicate id_number: {}", exc)
+            return False
+
     async def check_duplicate_filename(self, filename: str) -> bool:
         """Check if a profile with the same resume filename already exists."""
         if not filename:

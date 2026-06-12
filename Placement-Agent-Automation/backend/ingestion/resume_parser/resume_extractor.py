@@ -238,17 +238,20 @@ class ResumeExtractor:
 
         # Parse Projects
         if sections["PROJECT"]:
-            proj_lines = [l for l in sections["PROJECT"].split('\n') if l.strip()]
-            if proj_lines:
-                proj = Project()
-                proj.title = proj_lines[0][:100]
-                # Avoid cramming unrelated links and profiles into the description
-                desc = " ".join(proj_lines[1:])
-                # Clean up known URLs from the description to keep it clean
-                desc = re.sub(r'(https?://[^\s]+)', '', desc).strip()
-                proj.description = desc[:500] + ('...' if len(desc) > 500 else '')
-                data.projects.append(proj)
-                data.confidence.projects = 0.7
+            # Split projects by empty lines
+            paragraphs = re.split(r'\n\s*\n', sections["PROJECT"].strip())
+            for para in paragraphs:
+                proj_lines = [l for l in para.split('\n') if l.strip()]
+                if proj_lines:
+                    proj = Project()
+                    proj.title = proj_lines[0][:100]
+                    desc = " ".join(proj_lines[1:])
+                    desc = re.sub(r'(https?://[^\s]+)', '', desc).strip()
+                    if len(desc) < 10:
+                        continue # Skip very short snippets that aren't real projects
+                    proj.description = desc[:500] + ('...' if len(desc) > 500 else '')
+                    data.projects.append(proj)
+            data.confidence.projects = 0.7
 
         # Parse Experience
         if sections["EXPERIENCE"]:
@@ -261,18 +264,39 @@ class ResumeExtractor:
                 data.experience.append(exp)
                 data.confidence.experience = 0.7
                 
-        # Parse Leetcode / Codeforces
-        lc_match = re.search(r'leetcode\.com/([\w-]+)', text, re.IGNORECASE)
+        # Parse Competitive Programming Platforms
+        if data.competitive_programming is None:
+            data.competitive_programming = CompetitiveProgramming()
+
+        lc_match = re.search(r'leetcode\.com/(?:u/)?([\w-]+)', text, re.IGNORECASE)
+        if not lc_match:
+            lc_match = re.search(r'leetcode\s*[:-]\s*([\w-]+)', text, re.IGNORECASE)
         if lc_match:
-            if data.competitive_programming is None:
-                data.competitive_programming = CompetitiveProgramming()
-            data.competitive_programming.leetcode.username = lc_match.group(1)
+            username = lc_match.group(1)
+            if username.lower() != "u":
+                data.competitive_programming.leetcode.username = username
             
-        cf_match = re.search(r'codeforces\.com/profile/([\w-]+)', text, re.IGNORECASE)
+        cf_match = re.search(r'codeforces\.com/(?:profile/)?([\w-]+)', text, re.IGNORECASE)
+        if not cf_match:
+            cf_match = re.search(r'codeforces\s*[:-]\s*([\w-]+)', text, re.IGNORECASE)
         if cf_match:
-            if data.competitive_programming is None:
-                data.competitive_programming = CompetitiveProgramming()
-            data.competitive_programming.codeforces.username = cf_match.group(1)
+            username = cf_match.group(1)
+            if username.lower() != "profile":
+                data.competitive_programming.codeforces.username = username
+
+        cc_match = re.search(r'codechef\.com/users/([\w-]+)', text, re.IGNORECASE)
+        if not cc_match:
+            cc_match = re.search(r'codechef\s*[:-]\s*([\w-]+)', text, re.IGNORECASE)
+        if cc_match:
+            username = cc_match.group(1)
+            if username.lower() != "users":
+                data.competitive_programming.codechef.username = username
+
+        # Also GitHub might not be a URL
+        if not data.personal_info.github:
+            gh_match = re.search(r'github\s*[:-]\s*([\w-]+)', text, re.IGNORECASE)
+            if gh_match:
+                data.personal_info.github = gh_match.group(1)
 
         return data
 

@@ -2,7 +2,7 @@ import os
 import sys
 import tempfile
 import json
-from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Query
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
@@ -49,6 +49,10 @@ def extract_text_from_file(file_path: str, ext: str) -> str:
                     extracted = page.extract_text()
                     if extracted:
                         text += extracted + "\n"
+                    if hasattr(page, 'hyperlinks'):
+                        for link in page.hyperlinks:
+                            if 'uri' in link:
+                                text += "\n" + link['uri'] + "\n"
             return text
         except ImportError:
             import pypdf
@@ -58,6 +62,11 @@ def extract_text_from_file(file_path: str, ext: str) -> str:
                 extracted = page.extract_text()
                 if extracted:
                     text += extracted + "\n"
+                if '/Annots' in page:
+                    for annot in page['/Annots']:
+                        obj = annot.get_object()
+                        if '/A' in obj and '/URI' in obj['/A']:
+                            text += "\n" + obj['/A']['/URI'] + "\n"
             return text
     elif ext == ".docx":
         import docx
@@ -72,6 +81,12 @@ async def health():
 @app.post("/ingest", response_model=StudentProfile)
 async def ingest_resume(
     file: UploadFile = File(...),
+    id_number: Optional[str] = Form(None),
+    github_url: Optional[str] = Form(None),
+    linkedin_url: Optional[str] = Form(None),
+    leetcode_username: Optional[str] = Form(None),
+    codeforces_username: Optional[str] = Form(None),
+    codechef_username: Optional[str] = Form(None),
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
@@ -90,11 +105,20 @@ async def ingest_resume(
     
     from backend.database.repository import StudentRepository
     repo = StudentRepository(db)
-    is_duplicate = await repo.check_duplicate_filename(file.filename)
-    if is_duplicate:
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
-        raise HTTPException(409, f"Duplicate Profile: A resume named '{file.filename}' has already been uploaded.")
+    
+    # Duplicate check logic: Primary by ID Number, fallback to filename
+    if id_number:
+        is_duplicate = await repo.check_duplicate_id_number(id_number)
+        if is_duplicate:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+            raise HTTPException(409, f"Duplicate Profile: A candidate with ID '{id_number}' already exists.")
+    else:
+        is_duplicate = await repo.check_duplicate_filename(file.filename)
+        if is_duplicate:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+            raise HTTPException(409, f"Duplicate Profile: A resume named '{file.filename}' has already been uploaded.")
     
     try:
         text = extract_text_from_file(tmp_path, ext)
@@ -103,6 +127,23 @@ async def ingest_resume(
         
         service = IngestionService(db_session=db, settings=settings)
         profile = await service.ingest_resume(text, filename=file.filename)
+        
+        # Override with manual inputs if provided
+        if id_number:
+            profile.personal_info.id_number = id_number
+        if github_url:
+            profile.personal_info.github_url = github_url
+        if linkedin_url:
+            profile.personal_info.linkedin_url = linkedin_url
+        if leetcode_username:
+            profile.personal_info.leetcode_username = leetcode_username
+        if codeforces_username:
+            profile.personal_info.codeforces_username = codeforces_username
+        if codechef_username:
+            profile.personal_info.codechef_username = codechef_username
+            
+        await repo.save_profile(profile)
+        
         return profile
     except HTTPException:
         raise

@@ -160,7 +160,9 @@ export default function Candidates({ onSelect, onNavigate }: Props) {
               }}
             >
               <div className="candidate-info">
-                <h3 className="candidate-name">{p.personal_info.name || 'Unknown Candidate'}</h3>
+                <h3 className="candidate-name">
+                  {p.personal_info.name || 'Unknown Candidate'} {p.personal_info.id_number ? `(${p.personal_info.id_number})` : ''}
+                </h3>
                 <p className="candidate-meta">
                   {p.education.college} &middot; {p.education.branch} &middot;
                   CGPA {p.education.cgpa || 'N/A'}

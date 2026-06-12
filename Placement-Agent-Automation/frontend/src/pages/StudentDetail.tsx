@@ -82,7 +82,7 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
         <div className="detail-main">
           <div className="detail-header">
             <div>
-              <h1>{s.personal_info.name || 'No Name'}</h1>
+              <h1>{s.personal_info.name || 'No Name'} {s.personal_info.id_number ? `(${s.personal_info.id_number})` : ''}</h1>
               <p className="detail-meta">
                 {s.personal_info.email} &middot; {s.personal_info.phone}
               </p>
