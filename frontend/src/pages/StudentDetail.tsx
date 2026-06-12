@@ -168,36 +168,55 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
               
               <div className="detail-card" style={{ background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)', borderColor: 'rgba(52, 211, 153, 0.2)' }}>
                 <h3 style={{ color: '#34D399', borderBottom: '1px solid rgba(52, 211, 153, 0.2)', paddingBottom: '0.5rem' }}>Combined Technical Score</h3>
-                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#34D399', textAlign: 'center', margin: '1rem 0' }}>
+                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#34D399', textAlign: 'center', margin: '0.5rem 0' }}>
                   {s.ranking.total_technical_score}<span style={{ fontSize: '1.2rem', opacity: 0.7 }}>/100</span>
                 </div>
+                <div style={{ fontSize: '0.75rem', color: '#10B981', textAlign: 'center', marginBottom: '1rem', fontFamily: 'monospace' }}>
+                  = (Coding * 0.6) + (GitHub * 0.4)
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                  <span>Coding: 60% Weight</span>
-                  <span>GitHub: 40% Weight</span>
+                  <span>Coding: <strong>{(s.ranking.coding_score?.total_score || 0)}</strong> &times; 0.6</span>
+                  <span>GitHub: <strong>{(s.ranking.github_score?.total_score || 0)}</strong> &times; 0.4</span>
                 </div>
               </div>
 
               <div className="detail-card">
                 <h3 style={{ color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Coding Capability Analysis</h3>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0' }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0 0' }}>
                   {s.ranking.coding_score?.total_score || 0}<span style={{ fontSize: '1rem', opacity: 0.7 }}>/100</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>LeetCode Score:</span> <strong>{s.ranking.leetcode_score?.total_score || 0}</strong></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Codeforces Score:</span> <strong>{s.ranking.codeforces_score?.total_score || 0}</strong></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>CodeChef Score:</span> <strong>{s.ranking.codechef_score?.total_score || 0}</strong></div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '1rem', fontFamily: 'monospace' }}>
+                  = (LC*0.5) + (CF*0.3) + (CC*0.2)
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', fontSize: '0.85rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>LeetCode <span style={{ opacity: 0.5 }}>(50%)</span>:</span> 
+                    <strong>{s.ranking.leetcode_score?.total_score || 0}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Codeforces <span style={{ opacity: 0.5 }}>(30%)</span>:</span> 
+                    <strong>{s.ranking.codeforces_score?.total_score || 0}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>CodeChef <span style={{ opacity: 0.5 }}>(20%)</span>:</span> 
+                    <strong>{s.ranking.codechef_score?.total_score || 0}</strong>
+                  </div>
                 </div>
               </div>
 
               <div className="detail-card">
                 <h3 style={{ color: '#A78BFA', borderBottom: '1px solid rgba(167, 139, 250, 0.2)', paddingBottom: '0.5rem' }}>GitHub Capability Analysis</h3>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0' }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0 0' }}>
                   {s.ranking.github_score?.total_score || 0}<span style={{ fontSize: '1rem', opacity: 0.7 }}>/100</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Engineering Quality:</span> <strong>{s.github.github_strength?.engineering_score || 0}/100</strong></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Consistency & Activity:</span> <strong>{s.github.github_strength?.activity_score || 0}/100</strong></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Community Impact:</span> <strong>{s.github.github_strength?.community_score || 0}/100</strong></div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '1rem', fontFamily: 'monospace' }}>
+                  = &Sigma; (Metric &times; Weight)
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', fontSize: '0.85rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Engineering <span style={{ opacity: 0.5 }}>(20%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.engineering_score?.raw_value || s.github.github_strength?.engineering_score || 0}/100</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Activity <span style={{ opacity: 0.5 }}>(20%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.activity_score?.raw_value || s.github.github_strength?.activity_score || 0}/100</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Repositories <span style={{ opacity: 0.5 }}>(20%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.repository_score?.raw_value || s.github.github_strength?.repository_score || 0}/100</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Documentation <span style={{ opacity: 0.5 }}>(15%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.documentation_score?.raw_value || s.github.github_strength?.documentation_score || 0}/100</strong></div>
                 </div>
               </div>
 

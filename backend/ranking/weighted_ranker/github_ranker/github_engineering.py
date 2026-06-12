@@ -3,9 +3,12 @@ from ..common import ScoreBreakdown, ExplainableScore
 
 class GitHubEngineeringRanker:
     WEIGHTS = {
-        "activity": 0.20, "repository": 0.20, "collaboration": 0.10,
-        "commit_quality": 0.10, "documentation": 0.10, "portfolio": 0.15,
-        "community": 0.05, "behavior": 0.10
+        "activity_score": 0.20,
+        "repository_score": 0.20,
+        "collaboration_score": 0.15,
+        "documentation_score": 0.15,
+        "community_score": 0.10,
+        "engineering_score": 0.20
     }
     MAX_EXPECTED = {k: 100 for k in WEIGHTS.keys()}
 
