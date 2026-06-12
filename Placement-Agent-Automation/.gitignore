@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+*.so
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node / Frontend
+node_modules/
+.next/
+out/
+.cache/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+docker-compose.override.yml
+
+# Data
+*.parquet
+*.pickle
+*.joblib
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Qdrant
+qdrant/storage/
+
+# PostgreSQL
+postgres/data/
+
+# ML Models
+ml/models/*
+!ml/models/.gitkeep
+
+# Secrets
+*.pem
+*.key
+*.cert
+credentials.json
+service-account.json
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini

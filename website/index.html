@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COWORK - Autonomous macOS Desktop Agent</title>
+    <meta name="description" content="Give it a goal. It sees your screen, reasons, and acts — like a human co-worker who never sleeps.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <div class="logo-cube"></div>
+                <span class="logo-text">COWORK</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="https://github.com/deepanmpc/COWORK_AGENT_DESKTOP_AUTOMATION" target="_blank" class="btn github-btn">
+                    <i class="fab fa-github"></i> Star on GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    E.D.I.T.H. v2.0 is live
+                </div>
+                <h1 class="hero-title">
+                    The autonomous <br>
+                    <span class="gradient-text">desktop agent</span> for macOS.
+                </h1>
+                <p class="hero-subtitle">
+                    Give it a goal. It sees your screen, reasons, and acts — like a human co-worker who never sleeps. No scripting. No automation rules. Just a goal.
+                </p>
+                
+                <div class="hero-ctas">
+                    <a href="#get-started" class="btn btn-primary">
+                        Get Started <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <button class="btn btn-secondary copy-btn" id="clone-btn">
+                        <i class="fas fa-terminal"></i> git clone cowork
+                        <span class="tooltip">Copied!</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video / Showcase area mimicking Quadratic's large central visual -->
+            <div class="hero-visual-wrapper">
+                <div class="app-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <span class="control red"></span>
+                            <span class="control yellow"></span>
+                            <span class="control green"></span>
+                        </div>
+                        <div class="window-title">E.D.I.T.H. Runtime</div>
+                    </div>
+                    <div class="window-body">
+                        <!-- Simulated video interaction -->
+                        <div class="terminal-overlay">
+                            <div class="terminal-line system">⚙ SYSTEM: All systems nominal. Secure link established.</div>
+                            <div class="terminal-line typing">
+                                <span class="prompt">( CHAT ) ➤</span> <span id="typewriter"></span><span class="cursor">█</span>
+                            </div>
+                        </div>
+                        <div class="screen-mockup">
+                            <div class="mockup-bg"></div>
+                            <div class="agent-cursor" id="agent-cursor">
+                                <i class="fas fa-mouse-pointer"></i>
+                            </div>
+                            <div class="vision-box" id="vision-box"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <div class="section-header">
+                <h2>Built for complex reasoning.</h2>
+                <p>Four powerful services working in harmony to operate your macOS environment.</p>
+            </div>
+
+            <div class="bento-grid">
+                <div class="bento-card large">
+                    <div class="card-icon"><i class="fas fa-eye"></i></div>
+                    <h3>Computer Vision</h3>
+                    <p>Captures your screen in milliseconds using MSS. Passes the frame through PaddleOCR and OmniParser to build a token-compressed JSON graph of your UI elements.</p>
+                    <div class="visual-placeholder vision-bg"></div>
+                </div>
+
+                <div class="bento-card">
+                    <div class="card-icon"><i class="fas fa-brain"></i></div>
+                    <h3>Multi-step Planning</h3>
+                    <p>Powered by NVIDIA NIM (Llama 3.3 / GPT-OSS). It reasons about the goal, analyzes the UI state, and generates batched action queues.</p>
+                </div>
+
+                <div class="bento-card">
+                    <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Native Execution</h3>
+                    <p>Translates logical actions into real macOS events (clicks, typing, shortcuts) natively via PyAutoGUI and PyObjC.</p>
+                </div>
+
+                <div class="bento-card wide">
+                    <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Self-Healing Verification</h3>
+                    <p>After execution, the Verifier Service takes a new screenshot. It compares the before/after state to detect loops, verify progress, and automatically recover from errors without human intervention.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="architecture-section">
+            <div class="section-header">
+                <h2>How it works.</h2>
+                <p>A completely autonomous loop that never requires manual UI mapping.</p>
+            </div>
+            
+            <div class="arch-diagram">
+                <div class="arch-node">
+                    <i class="fas fa-microphone"></i>
+                    <span>Whisper STT</span>
+                </div>
+                <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="arch-node primary">
+                    <i class="fas fa-cogs"></i>
+                    <span>Orchestrator</span>
+                </div>
+                <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="arch-grid">
+                    <div class="arch-box">Vision Service</div>
+                    <div class="arch-box">Planner Service</div>
+                    <div class="arch-box">Executor Service</div>
+                    <div class="arch-box">Verifier Service</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="logo">
+                <div class="logo-cube"></div>
+                <span class="logo-text">COWORK</span>
+            </div>
+            <p>MIT Licensed. Built by deepanmpc.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

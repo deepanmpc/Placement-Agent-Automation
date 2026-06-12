@@ -1,0 +1,52 @@
+# Web Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+
+# Database
+sqlalchemy[asyncio]>=2.0.0
+asyncpg>=0.30.0
+psycopg2-binary>=2.9.0
+alembic>=1.14.0
+
+# Vector Store
+qdrant-client>=1.13.0
+
+# LLM & Embeddings
+openai>=1.55.0
+sentence-transformers
+
+# Resume Parsing
+pypdf>=5.1.0
+pdfplumber>=0.11.0
+python-docx>=1.1.0
+
+# API Clients (Coding Platforms)
+httpx>=0.28.0
+aiohttp>=3.11.0
+
+# Ranking / ML
+scikit-learn>=1.6.0
+xgboost>=2.1.0
+# lightgbm — install separately if your Python version supports it
+# catboost — install separately if your Python version supports it
+
+# Data Processing
+pandas>=2.2.0
+numpy>=2.1.0
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
+
+# Text / NLP
+spacy>=3.8.0
+nltk>=3.9.0
+
+# Task Queue / Async
+celery>=5.4.0
+redis>=5.2.0
+
+# Utils
+python-multipart>=0.0.18
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-dotenv>=1.0.0
+loguru>=0.7.0
