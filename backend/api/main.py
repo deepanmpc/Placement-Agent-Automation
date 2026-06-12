@@ -198,7 +198,8 @@ async def list_profiles(
             attach_ranking(p)
         except Exception as e:
             import traceback
-            traceback.print_exc()
+            with open("ranking_error.txt", "w") as f:
+                f.write(traceback.format_exc())
             logger.error(f"attach_ranking failed for {p.student_uuid}: {e}")
     return profiles
 
