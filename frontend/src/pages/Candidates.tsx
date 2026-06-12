@@ -122,18 +122,26 @@ export default function Candidates({ onSelect, onNavigate }: Props) {
         </div>
       </div>
 
-      <div className="ranking-summary">
+      <div className="ranking-summary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
         <div className="summary-stat">
           <span className="stat-value">{profiles.length}</span>
           <span className="stat-label">Total Students</span>
         </div>
         <div className="summary-stat">
-          <span className="stat-value">{profiles.filter(p => p.github?.public_repos > 0).length}</span>
+          <span className="stat-value">{profiles.filter(p => p.github?.public_repos > 0 || p.github?.total_stars > 0).length}</span>
           <span className="stat-label">With GitHub Data</span>
         </div>
         <div className="summary-stat">
           <span className="stat-value">{profiles.filter(p => p.leetcode?.total_solved > 0).length}</span>
           <span className="stat-label">With LeetCode Data</span>
+        </div>
+        <div className="summary-stat">
+          <span className="stat-value">{profiles.filter(p => p.codeforces?.rating > 0 || p.codeforces?.solved_count > 0).length}</span>
+          <span className="stat-label">With Codeforces Data</span>
+        </div>
+        <div className="summary-stat">
+          <span className="stat-value">{profiles.filter(p => p.codechef?.rating > 0 || p.codechef?.solved_count > 0).length}</span>
+          <span className="stat-label">With CodeChef Data</span>
         </div>
       </div>
 
