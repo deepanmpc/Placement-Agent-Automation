@@ -1,7 +1,6 @@
-import { MOCK_STUDENT, MOCK_RANKINGS } from '../data/mockData';
+import { useEffect, useState } from 'react';
 import type { PageView } from '../types';
-import ScoreGauge from '../components/ScoreGauge';
-import ScoreBreakdown from '../components/ScoreBreakdown';
+import type { Profile } from '../api';
 
 interface Props {
   studentId: string | null;
@@ -9,7 +8,7 @@ interface Props {
 }
 
 function SkillSection({ label, items }: { label: string; items: string[] }) {
-  if (items.length === 0) return null;
+  if (!items || items.length === 0) return null;
   return (
     <div className="skill-section">
       <h4>{label}</h4>
@@ -23,16 +22,34 @@ function SkillSection({ label, items }: { label: string; items: string[] }) {
 }
 
 export default function StudentDetail({ studentId, onNavigate }: Props) {
-  const ranking = MOCK_RANKINGS.find((r) => r.student.id === studentId);
-  const student = ranking ? ranking.student : MOCK_STUDENT;
-  const scores = ranking ? ranking.scores : MOCK_RANKINGS[0].scores;
-  const s = student;
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!studentId) return;
+    fetch(`http://localhost:8000/profiles/${studentId}`)
+      .then(res => res.json())
+      .then(data => {
+        setProfile(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [studentId]);
+
+  if (loading || !profile) {
+    return <div className="page"><div className="page-header"><h1>Loading student...</h1></div></div>;
+  }
+
+  const s = profile;
 
   return (
     <div className="page">
       <div className="page-header">
         <button className="btn btn-ghost" onClick={() => onNavigate('candidates')}>
-          Back to Candidates
+          Back to Dashboard
         </button>
       </div>
 
@@ -40,35 +57,39 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
         <div className="detail-main">
           <div className="detail-header">
             <div>
-              <h1>{s.personalInfo.name}</h1>
+              <h1>{s.personal_info.name || 'No Name'}</h1>
               <p className="detail-meta">
-                {s.personalInfo.email} &middot; {s.personalInfo.phone} &middot; {s.personalInfo.location}
+                {s.personal_info.email} &middot; {s.personal_info.phone}
               </p>
               <p className="detail-meta">
-                {s.education.degree} in {s.education.specialization} at {s.education.institution}
-                &middot; CGPA {s.education.cgpa} &middot; {s.education.endYear}
+                {s.education.degree} in {s.education.branch} at {s.education.college}
+                &middot; CGPA {s.education.cgpa} &middot; {s.education.graduation_year}
               </p>
               <div className="detail-links">
-                <a href={`https://${s.personalInfo.github}`} target="_blank" rel="noreferrer">
-                  GitHub
-                </a>
-                <a href={`https://${s.personalInfo.linkedin}`} target="_blank" rel="noreferrer">
-                  LinkedIn
-                </a>
+                {s.personal_info.github_url && (
+                  <a href={s.personal_info.github_url} target="_blank" rel="noreferrer">GitHub</a>
+                )}
+                {s.personal_info.linkedin_url && (
+                  <a href={s.personal_info.linkedin_url} target="_blank" rel="noreferrer">LinkedIn</a>
+                )}
+                {s.personal_info.portfolio_url && (
+                  <a href={s.personal_info.portfolio_url} target="_blank" rel="noreferrer">Portfolio</a>
+                )}
               </div>
             </div>
-            <ScoreGauge score={scores.finalScore} size={100} strokeWidth={8} label="Final" />
           </div>
 
           <div className="detail-skills">
             <h3>Skills</h3>
-            <SkillSection label="All Skills" items={s.skills} />
+            <SkillSection label="Programming" items={s.skills.programming_languages} />
+            <SkillSection label="Frameworks" items={s.skills.frameworks} />
+            <SkillSection label="All Extracted Skills" items={s.skills.all_skills} />
           </div>
 
           <div className="detail-projects">
             <h3>Projects ({s.projects.length})</h3>
-            {s.projects.map((p) => (
-              <div key={p.title} className="project-item">
+            {s.projects.map((p, idx) => (
+              <div key={idx} className="project-item">
                 <h4>{p.title}</h4>
                 <p>{p.description}</p>
                 <div className="skill-tags">
@@ -79,43 +100,18 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
               </div>
             ))}
           </div>
-
-          {s.experience.length > 0 && (
-            <div className="detail-experience">
-              <h3>Experience</h3>
-              {s.experience.map((e) => (
-                <div key={e.company + e.role} className="exp-item">
-                  <h4>{e.role} at {e.company}</h4>
-                  <p className="exp-duration">{e.duration}</p>
-                  <p>{e.description}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {s.certifications.length > 0 && (
-            <div className="detail-certs">
-              <h3>Certifications</h3>
-              {s.certifications.map((c) => (
-                <div key={c.name} className="cert-item">
-                  <span>{c.name}</span>
-                  <span className="cert-issuer">{c.issuer} &middot; {c.year}</span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="detail-sidebar">
           <div className="detail-card">
             <h3>GitHub Profile</h3>
             <div className="score-row">
-              <ScoreGauge score={s.github.score} size={56} strokeWidth={4} label="GitHub" />
               <div className="score-stats">
-                <div>Repos: {s.github.repositories}</div>
-                <div>Stars: {s.github.stars}</div>
-                <div>Commits: {s.github.commitCount}</div>
-                <div>Consistency: {s.github.contributionConsistency}%</div>
+                <div>Username: {s.github.username || 'N/A'}</div>
+                <div>Repos: {s.github.public_repos}</div>
+                <div>Stars: {s.github.total_stars}</div>
+                <div>Followers: {s.github.followers}</div>
+                <div>Consistency: {s.github.contribution_consistency.toFixed(1)}%</div>
               </div>
             </div>
             <div className="skill-tags">
@@ -126,28 +122,42 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
           </div>
 
           <div className="detail-card">
-            <h3>Coding Platforms</h3>
+            <h3>LeetCode Profile</h3>
             <div className="score-row">
-              <ScoreGauge score={s.coding.codingStrength} size={56} strokeWidth={4} label="Overall" />
               <div className="score-stats">
-                <div>LeetCode: {s.coding.leetcode.contestRating} ({s.coding.leetcode.mediumSolved + s.coding.leetcode.easySolved + s.coding.leetcode.hardSolved} solved)</div>
-                <div>Codeforces: {s.coding.codeforces.rating}</div>
-                <div>CodeChef: {s.coding.codechef.rating}</div>
+                <div>Username: {s.leetcode.username || 'N/A'}</div>
+                <div>Rating: {s.leetcode.rating.toFixed(0)}</div>
+                <div>Solved: {s.leetcode.total_solved} (E: {s.leetcode.easy_solved}, M: {s.leetcode.medium_solved}, H: {s.leetcode.hard_solved})</div>
               </div>
             </div>
           </div>
 
           <div className="detail-card">
-            <h3>Aptitude and Communication</h3>
+            <h3>Codeforces & CodeChef</h3>
             <div className="score-row">
-              <ScoreGauge score={s.aptitudeScore} size={56} strokeWidth={4} label="Aptitude" />
-              <ScoreGauge score={s.communicationScore} size={56} strokeWidth={4} label="Comm." />
+              <div className="score-stats">
+                <div>Codeforces: {s.codeforces.rating} (Max: {s.codeforces.max_rating}) - {s.codeforces.rank || 'Unrated'}</div>
+                <div>CF Solved: {s.codeforces.solved_count}</div>
+                <div>CodeChef: {s.codechef.rating} ({s.codechef.stars || 'Unrated'})</div>
+                <div>CC Solved: {s.codechef.solved_count}</div>
+              </div>
             </div>
           </div>
 
           <div className="detail-card detail-card-full">
-            <h3>Score Breakdown</h3>
-            <ScoreBreakdown scores={scores} />
+            <h3>Metadata</h3>
+            <div className="score-stats">
+              <div>Ingested At: {new Date(s.metadata.ingested_at).toLocaleString()}</div>
+              <div>Sources: {s.metadata.sources_collected.join(', ')}</div>
+              {s.metadata.errors.length > 0 && (
+                <div style={{ color: 'var(--color-danger)', marginTop: '8px' }}>
+                  <strong>Errors:</strong>
+                  <ul>
+                    {s.metadata.errors.map((e, i) => <li key={i}>{e}</li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

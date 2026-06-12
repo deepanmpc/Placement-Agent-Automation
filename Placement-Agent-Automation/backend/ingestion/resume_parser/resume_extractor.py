@@ -169,14 +169,14 @@ class ResumeExtractor:
             data.confidence.personal_info += 0.1
 
         # Basic Section Splitter
-        sections = {"EDUCATION": "", "EXPERIENCE": "", "PROJECT": "", "SKILL": "", "CERTIFICATION": ""}
+        sections = {"EDUCATION": "", "EXPERIENCE": "", "PROJECT": "", "SKILL": "", "CERTIFICATION": "", "LINKS": "", "PROFILE": "", "ACHIEVEMENT": ""}
         current_section = None
         
         for line in lines:
             upper_line = line.upper()
             matched_section = None
             for sec in sections.keys():
-                if sec in upper_line and len(line) < 25:
+                if sec in upper_line and len(line) < 30:
                     matched_section = sec
                     break
             
@@ -242,7 +242,11 @@ class ResumeExtractor:
             if proj_lines:
                 proj = Project()
                 proj.title = proj_lines[0][:100]
-                proj.description = " ".join(proj_lines[1:])
+                # Avoid cramming unrelated links and profiles into the description
+                desc = " ".join(proj_lines[1:])
+                # Clean up known URLs from the description to keep it clean
+                desc = re.sub(r'(https?://[^\s]+)', '', desc).strip()
+                proj.description = desc[:500] + ('...' if len(desc) > 500 else '')
                 data.projects.append(proj)
                 data.confidence.projects = 0.7
 

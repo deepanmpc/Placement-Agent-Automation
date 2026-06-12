@@ -2,14 +2,26 @@ import os
 import sys
 import tempfile
 import json
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
+from loguru import logger
+from typing import List, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Fix imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from ingestion.resume_parser.resume_extractor import ResumeExtractor
+from backend.config import get_settings, Settings
+from backend.database.connection import get_db, init_db
+from backend.ingestion.services import IngestionService
+from backend.ingestion.models.student_profile import StudentProfile
+from backend.ingestion.qdrant_preparer import QdrantPreparer, QdrantDocument
 
-app = FastAPI(title="Placement Agent API")
+app = FastAPI(
+    title="Placement Agent API",
+    description="Student Intelligence Ingestion Layer",
+    version="1.0.0"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,8 +30,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup():
+    await init_db()
+    logger.info("Database initialized")
+
+# Helper to extract text from file
 def extract_text_from_file(file_path: str, ext: str) -> str:
-    if ext == ".txt" or ext == ".md":
+    if ext in (".txt", ".md"):
         with open(file_path, "r", encoding="utf-8") as f:
             return f.read()
     elif ext == ".pdf":
@@ -48,34 +66,108 @@ def extract_text_from_file(file_path: str, ext: str) -> str:
     return ""
 
 @app.get("/health")
-def health():
-    return {"status": "ok"}
+async def health():
+    return {"status": "ok", "service": "placement-agent-ingestion"}
 
-@app.post("/upload")
-async def upload_resume(file: UploadFile = File(...)):
+@app.post("/ingest", response_model=StudentProfile)
+async def ingest_resume(
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    """Upload a resume and run the full ingestion pipeline."""
     if not file.filename:
         raise HTTPException(400, "No file provided")
-
+    
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in (".pdf", ".docx", ".txt", ".md"):
-        raise HTTPException(400, f"Unsupported format: {ext}. Use PDF, DOCX, TXT, or MD.")
-
+        raise HTTPException(400, f"Unsupported format: {ext}")
+    
     with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
         content = await file.read()
         tmp.write(content)
         tmp_path = tmp.name
-
+    
+    from backend.database.repository import StudentRepository
+    repo = StudentRepository(db)
+    is_duplicate = await repo.check_duplicate_filename(file.filename)
+    if is_duplicate:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise HTTPException(409, f"Duplicate Profile: A resume named '{file.filename}' has already been uploaded.")
+    
     try:
         text = extract_text_from_file(tmp_path, ext)
         if not text.strip():
             raise HTTPException(400, "Could not extract text from file")
-            
-        extractor = ResumeExtractor()
-        result_json = extractor.extract(text)
         
-        return json.loads(result_json)
+        service = IngestionService(db_session=db, settings=settings)
+        profile = await service.ingest_resume(text, filename=file.filename)
+        return profile
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(500, f"Failed to parse resume: {str(e)}")
+        logger.exception("Ingestion failed")
+        raise HTTPException(500, f"Ingestion failed: {str(e)}")
     finally:
         if os.path.exists(tmp_path):
             os.unlink(tmp_path)
+
+@app.get("/profiles", response_model=List[StudentProfile])
+async def list_profiles(
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    service = IngestionService(db_session=db, settings=settings)
+    return await service.get_all_profiles(limit=limit, offset=offset)
+
+@app.get("/profiles/{student_uuid}", response_model=StudentProfile)
+async def get_profile(
+    student_uuid: str,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    service = IngestionService(db_session=db, settings=settings)
+    profile = await service.get_profile(student_uuid)
+    if not profile:
+        raise HTTPException(404, "Profile not found")
+    return profile
+
+@app.delete("/profiles/{student_uuid}")
+async def delete_profile(
+    student_uuid: str,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    service = IngestionService(db_session=db, settings=settings)
+    deleted = await service.delete_profile(student_uuid)
+    if not deleted:
+        raise HTTPException(404, "Profile not found")
+    return {"status": "deleted", "student_uuid": student_uuid}
+
+@app.post("/profiles/batch-enrich")
+async def batch_enrich(
+    batch_size: int = Query(default=10, ge=1, le=50),
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    """Enrich up to `batch_size` profiles with external coding and github data."""
+    service = IngestionService(db_session=db, settings=settings)
+    result = await service.batch_enrich_profiles(batch_size=batch_size)
+    return result
+
+@app.get("/profiles/{student_uuid}/qdrant-docs", response_model=List[QdrantDocument])
+async def get_qdrant_docs(
+    student_uuid: str,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    """Get the prepared Qdrant documents for a student."""
+    service = IngestionService(db_session=db, settings=settings)
+    profile = await service.get_profile(student_uuid)
+    if not profile:
+        raise HTTPException(404, "Profile not found")
+    preparer = QdrantPreparer()
+    return preparer.prepare(profile)

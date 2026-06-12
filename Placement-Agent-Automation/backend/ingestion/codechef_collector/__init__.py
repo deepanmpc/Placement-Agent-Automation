@@ -1,0 +1,1 @@
+"""CodeChef collector package."""
