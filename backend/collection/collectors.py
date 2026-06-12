@@ -129,7 +129,7 @@ class LeetCodeCollector:
                     easy_solved=easy,
                     medium_solved=medium,
                     hard_solved=hard,
-                    contest_rating=contest_data.get("rating", 0.0),
+                    rating=contest_data.get("rating", 0.0),
                     global_ranking=contest_data.get("globalRanking", 0),
                     attended_contests=contest_data.get("attendedContestsCount", 0)
                 )

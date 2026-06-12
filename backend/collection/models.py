@@ -34,7 +34,7 @@ class LeetCodeProfile(BaseModel):
     easy_solved: int = 0
     medium_solved: int = 0
     hard_solved: int = 0
-    contest_rating: float = 0.0
+    rating: float = 0.0
     global_ranking: int = 0
     attended_contests: int = 0
     submissions_last_30_days: int = 0

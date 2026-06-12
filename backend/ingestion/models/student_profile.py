@@ -81,7 +81,7 @@ class ProjectInfo(BaseModel):
 class GitHubRepository(BaseModel):
     """Lightweight representation of a single GitHub repository."""
 
-    name: Optional[str] = None
+    name: str
     stars: int = 0
     forks: int = 0
     language: Optional[str] = None
@@ -92,65 +92,73 @@ class GitHubRepository(BaseModel):
 
 
 class GitHubProfile(BaseModel):
-    """Aggregated GitHub activity metrics and repository listing."""
-
     username: Optional[str] = None
+    name: Optional[str] = None
+    bio: Optional[str] = None
     public_repos: int = 0
     followers: int = 0
     following: int = 0
     total_stars: int = 0
+    total_forks: int = 0
+    account_age_days: int = 0
+    language_distribution: Dict[str, int] = Field(default_factory=dict)
     languages: List[str] = Field(default_factory=list)
     repositories: List[GitHubRepository] = Field(default_factory=list)
-    commit_frequency: float = Field(
-        default=0.0,
-        description="Average commits per week over the last year.",
-    )
-    activity_score: float = Field(
-        default=0.0,
-        description="Composite score derived from stars, forks, and commit frequency.",
-    )
-    contribution_consistency: float = Field(
-        default=0.0,
-        description="Fraction of weeks in the past year with ≥1 commit.",
-    )
+    commit_frequency: float = 0.0
+    activity_score: float = 0.0
+    contribution_consistency: float = 0.0
+    repository_growth: float = 0.0
+    snapshots: List[Dict[str, Any]] = Field(default_factory=list)
     collected_at: Optional[datetime] = None
 
 
 class LeetCodeProfile(BaseModel):
-    """LeetCode competitive-programming statistics."""
-
     username: Optional[str] = None
     rating: float = 0.0
+    global_ranking: int = 0
     ranking: int = 0
     easy_solved: int = 0
     medium_solved: int = 0
     hard_solved: int = 0
     total_solved: int = 0
     contests_participated: int = 0
+    attended_contests: int = 0
     recent_contest_rating: float = 0.0
+    submissions_last_30_days: int = 0
+    active_days_last_30_days: int = 0
+    rating_growth: float = 0.0
+    solving_consistency: float = 0.0
+    snapshots: List[Dict[str, Any]] = Field(default_factory=list)
     collected_at: Optional[datetime] = None
 
 
 class CodeforcesProfile(BaseModel):
-    """Codeforces competitive-programming statistics."""
-
     username: Optional[str] = None
     rating: int = 0
     max_rating: int = 0
     rank: Optional[str] = None
+    max_rank: Optional[str] = None
     contests: int = 0
+    contest_count: int = 0
+    recent_contests: int = 0
     solved_count: int = 0
+    rating_growth: float = 0.0
+    participation_consistency: float = 0.0
+    snapshots: List[Dict[str, Any]] = Field(default_factory=list)
     collected_at: Optional[datetime] = None
 
 
 class CodeChefProfile(BaseModel):
-    """CodeChef competitive-programming statistics."""
-
     username: Optional[str] = None
     rating: int = 0
     stars: Optional[str] = None
+    highest_rating: int = 0
     contests: int = 0
+    contest_count: int = 0
     solved_count: int = 0
+    contest_activity: float = 0.0
+    rating_growth: float = 0.0
+    snapshots: List[Dict[str, Any]] = Field(default_factory=list)
     collected_at: Optional[datetime] = None
 
 

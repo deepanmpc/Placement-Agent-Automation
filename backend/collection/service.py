@@ -62,7 +62,7 @@ class PlatformSyncService:
         elif leetcode_result is not None:
             old_snapshots = record.leetcode_profile.get("snapshots", []) if record.leetcode_profile else []
             if not any(s.get("date") == today for s in old_snapshots):
-                old_snapshots.append({"date": today, "rating": leetcode_result.contest_rating, "total_solved": leetcode_result.total_solved})
+                old_snapshots.append({"date": today, "rating": leetcode_result.rating, "total_solved": leetcode_result.total_solved})
             leetcode_result.snapshots = old_snapshots
             record.leetcode_profile = leetcode_result.model_dump()
             
