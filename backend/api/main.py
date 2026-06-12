@@ -142,6 +142,12 @@ async def ingest_resume(
         if codechef_username:
             profile.personal_info.codechef_username = codechef_username
             
+        # Secondary duplicate check in case the LLM extracted an ID that was not provided manually
+        if profile.personal_info.id_number:
+            is_dup = await repo.check_duplicate_id_number(profile.personal_info.id_number)
+            if is_dup:
+                raise HTTPException(409, f"Duplicate Profile: A candidate with extracted ID '{profile.personal_info.id_number}' already exists.")
+                
         await repo.save_profile(profile)
         
         return profile
