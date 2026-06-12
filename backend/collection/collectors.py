@@ -180,32 +180,47 @@ class CodeChefCollector:
         if not username:
             return None
             
-        # Using a public unofficial API or mock since official API requires OAuth
-        url = f"https://codechef-api.vercel.app/handle/{username}"
+        url = f"https://www.codechef.com/users/{username}"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
         
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
             try:
-                resp = await client.get(url)
+                resp = await client.get(url, headers=headers)
                 resp.raise_for_status()
-                data = resp.json()
+                html = resp.text
                 
-                if not data.get("success", False):
-                    return None
-                    
+                # Use regex to extract data from the page
+                import re
+                
+                # Rating
+                match = re.search(r'<div class="rating-number">.*?(\d+).*?</div>', html, re.DOTALL)
+                rating = int(match.group(1)) if match else 0
+                
+                # Stars
+                star_match = re.search(r'(\d+★)', html)
+                stars = star_match.group(1) if star_match else "1★"
+                
+                # Highest Rating
+                hr_match = re.search(r'Highest Rating[^0-9]*(\d+)', html)
+                highest_rating = int(hr_match.group(1)) if hr_match else 0
+                
+                # Contests
+                c_match = re.search(r'Contests Participated[^0-9]*(\d+)', html)
+                contests = int(c_match.group(1)) if c_match else 0
+                
+                # Solved Count
+                s_match = re.search(r'Total Problems Solved[^0-9]*([0-9]+)', html, re.IGNORECASE)
+                solved_count = int(s_match.group(1)) if s_match else 0
+                
                 return CodeChefProfile(
-                    rating=data.get("currentRating", 0),
-                    stars=data.get("stars", "1★"),
-                    highest_rating=data.get("highestRating", 0),
-                    contest_count=len(data.get("ratingData", [])),
-                    solved_count=0  # The API might not provide this easily
+                    rating=rating,
+                    stars=stars,
+                    highest_rating=highest_rating,
+                    contest_count=contests,
+                    solved_count=solved_count
                 )
             except Exception as e:
                 logger.error(f"CodeChefCollector failed for {username}: {e}")
-                # Mock fallback if api is down
-                return CodeChefProfile(
-                    rating=1500,
-                    stars="3★",
-                    highest_rating=1600,
-                    contest_count=5,
-                    solved_count=20
-                )
+                return None

@@ -188,7 +188,7 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
                   <div><strong>Username:</strong> {s.personal_info.leetcode_username || 'Not provided'}</div>
                   {s.metadata.sources_collected.includes('leetcode') ? (
                     <>
-                      <div>Rating: {s.leetcode.rating.toFixed(0)}</div>
+                      <div>Rating: {s.leetcode.contest_rating?.toFixed(0) || '0'}</div>
                       <div>Solved: {s.leetcode.total_solved} (E: {s.leetcode.easy_solved}, M: {s.leetcode.medium_solved}, H: {s.leetcode.hard_solved})</div>
                     </>
                   ) : (
