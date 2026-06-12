@@ -153,17 +153,10 @@ export default function ResumeUpload() {
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
           </div>
-          <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.25rem', fontWeight: 600 }}>Upload Successful</h3>
+          <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.25rem', fontWeight: 600 }}>Registration Successful</h3>
           <p style={{ color: '#94a3b8', marginTop: '0.5rem', textAlign: 'center' }}>
-            {result.personal_info?.name || 'Candidate'} added to dashboard.
+            Your profile has been submitted and registered successfully.
           </p>
-          <button 
-            onClick={() => { setResult(null); setFile(null); setIdNumber(''); setGithubUrl(''); setLinkedinUrl(''); setLeetcodeUsername(''); setCodeforcesUsername(''); setCodechefUsername(''); }}
-            className="btn"
-            style={{ marginTop: '1.5rem', backgroundColor: '#1e293b', border: '1px solid #334155' }}
-          >
-            Upload Another
-          </button>
         </div>
       )}
     </div>

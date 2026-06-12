@@ -132,27 +132,41 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
             <h3>GitHub Profile</h3>
             <div className="score-row">
               <div className="score-stats">
-                <div>Username: {s.github.username || 'N/A'}</div>
-                <div>Repos: {s.github.public_repos}</div>
-                <div>Stars: {s.github.total_stars}</div>
-                <div>Followers: {s.github.followers}</div>
-                <div>Consistency: {s.github.contribution_consistency.toFixed(1)}%</div>
+                <div><strong>URL:</strong> {s.personal_info.github_url || 'Not provided'}</div>
+                {s.metadata.sources_collected.includes('github') ? (
+                  <>
+                    <div>Repos: {s.github.public_repos}</div>
+                    <div>Stars: {s.github.total_stars}</div>
+                    <div>Followers: {s.github.followers}</div>
+                    <div>Consistency: {s.github.contribution_consistency.toFixed(1)}%</div>
+                  </>
+                ) : (
+                  <div style={{ color: '#94a3b8', fontStyle: 'italic', marginTop: '0.5rem' }}>Features not extracted yet.</div>
+                )}
               </div>
             </div>
-            <div className="skill-tags">
-              {s.github.languages.map((l) => (
-                <span key={l} className="tag tag-lang">{l}</span>
-              ))}
-            </div>
+            {s.github.languages && s.github.languages.length > 0 && (
+              <div className="skill-tags" style={{ marginTop: '0.5rem' }}>
+                {s.github.languages.map((l) => (
+                  <span key={l} className="tag tag-lang">{l}</span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="detail-card">
             <h3>LeetCode Profile</h3>
             <div className="score-row">
               <div className="score-stats">
-                <div>Username: {s.leetcode.username || 'N/A'}</div>
-                <div>Rating: {s.leetcode.rating.toFixed(0)}</div>
-                <div>Solved: {s.leetcode.total_solved} (E: {s.leetcode.easy_solved}, M: {s.leetcode.medium_solved}, H: {s.leetcode.hard_solved})</div>
+                <div><strong>Username:</strong> {s.personal_info.leetcode_username || 'Not provided'}</div>
+                {s.metadata.sources_collected.includes('leetcode') ? (
+                  <>
+                    <div>Rating: {s.leetcode.rating.toFixed(0)}</div>
+                    <div>Solved: {s.leetcode.total_solved} (E: {s.leetcode.easy_solved}, M: {s.leetcode.medium_solved}, H: {s.leetcode.hard_solved})</div>
+                  </>
+                ) : (
+                  <div style={{ color: '#94a3b8', fontStyle: 'italic', marginTop: '0.5rem' }}>Features not extracted yet.</div>
+                )}
               </div>
             </div>
           </div>
@@ -161,10 +175,28 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
             <h3>Codeforces & CodeChef</h3>
             <div className="score-row">
               <div className="score-stats">
-                <div>Codeforces: {s.codeforces.rating} (Max: {s.codeforces.max_rating}) - {s.codeforces.rank || 'Unrated'}</div>
-                <div>CF Solved: {s.codeforces.solved_count}</div>
-                <div>CodeChef: {s.codechef.rating} ({s.codechef.stars || 'Unrated'})</div>
-                <div>CC Solved: {s.codechef.solved_count}</div>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <strong>Codeforces:</strong> {s.personal_info.codeforces_username || 'Not provided'}
+                  {s.metadata.sources_collected.includes('codeforces') && (
+                    <div style={{ paddingLeft: '1rem', marginTop: '0.25rem', fontSize: '0.9em' }}>
+                      Rating: {s.codeforces.rating} (Max: {s.codeforces.max_rating})<br/>
+                      Rank: {s.codeforces.rank || 'Unrated'}<br/>
+                      Solved: {s.codeforces.solved_count}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <strong>CodeChef:</strong> {s.personal_info.codechef_username || 'Not provided'}
+                  {s.metadata.sources_collected.includes('codechef') && (
+                    <div style={{ paddingLeft: '1rem', marginTop: '0.25rem', fontSize: '0.9em' }}>
+                      Rating: {s.codechef.rating} ({s.codechef.stars || 'Unrated'})<br/>
+                      Solved: {s.codechef.solved_count}
+                    </div>
+                  )}
+                </div>
+                {(!s.metadata.sources_collected.includes('codeforces') && !s.metadata.sources_collected.includes('codechef')) && (
+                  <div style={{ color: '#94a3b8', fontStyle: 'italic', marginTop: '0.5rem' }}>Features not extracted yet.</div>
+                )}
               </div>
             </div>
           </div>
