@@ -161,6 +161,50 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
 
         </div>
 
+        {s.ranking && (
+          <div style={{ marginTop: '2rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Intelligence & Capability Analysis</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+              
+              <div className="detail-card" style={{ background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)', borderColor: 'rgba(52, 211, 153, 0.2)' }}>
+                <h3 style={{ color: '#34D399', borderBottom: '1px solid rgba(52, 211, 153, 0.2)', paddingBottom: '0.5rem' }}>Combined Technical Score</h3>
+                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#34D399', textAlign: 'center', margin: '1rem 0' }}>
+                  {s.ranking.total_technical_score}<span style={{ fontSize: '1.2rem', opacity: 0.7 }}>/100</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                  <span>Coding: 60% Weight</span>
+                  <span>GitHub: 40% Weight</span>
+                </div>
+              </div>
+
+              <div className="detail-card">
+                <h3 style={{ color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Coding Capability Analysis</h3>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0' }}>
+                  {s.ranking.coding_score?.total_score || 0}<span style={{ fontSize: '1rem', opacity: 0.7 }}>/100</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>LeetCode Score:</span> <strong>{s.ranking.leetcode_score?.total_score || 0}</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Codeforces Score:</span> <strong>{s.ranking.codeforces_score?.total_score || 0}</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>CodeChef Score:</span> <strong>{s.ranking.codechef_score?.total_score || 0}</strong></div>
+                </div>
+              </div>
+
+              <div className="detail-card">
+                <h3 style={{ color: '#A78BFA', borderBottom: '1px solid rgba(167, 139, 250, 0.2)', paddingBottom: '0.5rem' }}>GitHub Capability Analysis</h3>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0' }}>
+                  {s.ranking.github_score?.total_score || 0}<span style={{ fontSize: '1rem', opacity: 0.7 }}>/100</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Engineering Quality:</span> <strong>{s.github.github_strength?.engineering_score || 0}/100</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Consistency & Activity:</span> <strong>{s.github.github_strength?.activity_score || 0}/100</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Community Impact:</span> <strong>{s.github.github_strength?.community_score || 0}/100</strong></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
         <div>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '0.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Open Source Profile</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
