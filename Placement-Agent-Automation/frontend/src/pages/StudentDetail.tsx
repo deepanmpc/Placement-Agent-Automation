@@ -78,7 +78,7 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
         </button>
       </div>
 
-      <div className="student-detail">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <div className="detail-main">
           <div className="detail-header">
             <div>
@@ -90,15 +90,24 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
                 {s.education.degree} in {s.education.branch} at {s.education.college}
                 &middot; CGPA {s.education.cgpa} &middot; {s.education.graduation_year}
               </p>
-              <div className="detail-links">
+              <div className="detail-links" style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                 {s.personal_info.github_url && (
-                  <a href={s.personal_info.github_url} target="_blank" rel="noreferrer">GitHub</a>
+                  <a href={s.personal_info.github_url.startsWith('http') ? s.personal_info.github_url : `https://${s.personal_info.github_url}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>GitHub</a>
                 )}
                 {s.personal_info.linkedin_url && (
-                  <a href={s.personal_info.linkedin_url} target="_blank" rel="noreferrer">LinkedIn</a>
+                  <a href={s.personal_info.linkedin_url.startsWith('http') ? s.personal_info.linkedin_url : `https://${s.personal_info.linkedin_url}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>LinkedIn</a>
                 )}
                 {s.personal_info.portfolio_url && (
-                  <a href={s.personal_info.portfolio_url} target="_blank" rel="noreferrer">Portfolio</a>
+                  <a href={s.personal_info.portfolio_url.startsWith('http') ? s.personal_info.portfolio_url : `https://${s.personal_info.portfolio_url}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>Portfolio</a>
+                )}
+                {s.personal_info.leetcode_username && (
+                  <a href={`https://leetcode.com/u/${s.personal_info.leetcode_username}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>LeetCode</a>
+                )}
+                {s.personal_info.codeforces_username && (
+                  <a href={`https://codeforces.com/profile/${s.personal_info.codeforces_username}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>Codeforces</a>
+                )}
+                {s.personal_info.codechef_username && (
+                  <a href={`https://www.codechef.com/users/${s.personal_info.codechef_username}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>CodeChef</a>
                 )}
               </div>
             </div>
@@ -111,98 +120,107 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
             <SkillSection label="All Extracted Skills" items={s.skills.all_skills} />
           </div>
 
-          <div className="detail-projects">
-            <h3>Projects ({s.projects.length})</h3>
-            {s.projects.map((p, idx) => (
-              <div key={idx} className="project-item">
-                <h4>{p.title}</h4>
-                <p>{p.description}</p>
-                <div className="skill-tags">
-                  {p.technologies.map((t) => (
-                    <span key={t} className="tag tag-tech">{t}</span>
-                  ))}
+        </div>
+
+        <div>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '0.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Open Source Profile</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+            <div className="detail-card">
+              <h3>GitHub</h3>
+              <div className="score-row">
+                <div className="score-stats">
+                  <div><strong>URL:</strong> {s.personal_info.github_url || 'Not provided'}</div>
+                  {s.metadata.sources_collected.includes('github') ? (
+                    <>
+                      <div>Repos: {s.github.public_repos}</div>
+                      <div>Stars: {s.github.total_stars}</div>
+                      <div>Followers: {s.github.followers}</div>
+                      <div>Consistency: {s.github.contribution_consistency.toFixed(1)}%</div>
+                    </>
+                  ) : (
+                    <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderLeft: '4px solid #f59e0b', borderRadius: '4px', color: '#fcd34d', fontSize: '0.85rem' }}>
+                      <strong>Pending Extraction:</strong> Click "Extract Recent Platform Data" above to sync live repositories, stars, and consistency scores.
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+              {s.github.languages && s.github.languages.length > 0 && (
+                <div className="skill-tags" style={{ marginTop: '0.5rem' }}>
+                  {s.github.languages.map((l) => (
+                    <span key={l} className="tag tag-lang">{l}</span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="detail-sidebar">
-          <div className="detail-card">
-            <h3>GitHub Profile</h3>
-            <div className="score-row">
-              <div className="score-stats">
-                <div><strong>URL:</strong> {s.personal_info.github_url || 'Not provided'}</div>
-                {s.metadata.sources_collected.includes('github') ? (
-                  <>
-                    <div>Repos: {s.github.public_repos}</div>
-                    <div>Stars: {s.github.total_stars}</div>
-                    <div>Followers: {s.github.followers}</div>
-                    <div>Consistency: {s.github.contribution_consistency.toFixed(1)}%</div>
-                  </>
-                ) : (
-                  <div style={{ color: '#94a3b8', fontStyle: 'italic', marginTop: '0.5rem' }}>Features not extracted yet.</div>
-                )}
-              </div>
-            </div>
-            {s.github.languages && s.github.languages.length > 0 && (
-              <div className="skill-tags" style={{ marginTop: '0.5rem' }}>
-                {s.github.languages.map((l) => (
-                  <span key={l} className="tag tag-lang">{l}</span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="detail-card">
-            <h3>LeetCode Profile</h3>
-            <div className="score-row">
-              <div className="score-stats">
-                <div><strong>Username:</strong> {s.personal_info.leetcode_username || 'Not provided'}</div>
-                {s.metadata.sources_collected.includes('leetcode') ? (
-                  <>
-                    <div>Rating: {s.leetcode.rating.toFixed(0)}</div>
-                    <div>Solved: {s.leetcode.total_solved} (E: {s.leetcode.easy_solved}, M: {s.leetcode.medium_solved}, H: {s.leetcode.hard_solved})</div>
-                  </>
-                ) : (
-                  <div style={{ color: '#94a3b8', fontStyle: 'italic', marginTop: '0.5rem' }}>Features not extracted yet.</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="detail-card">
-            <h3>Codeforces & CodeChef</h3>
-            <div className="score-row">
-              <div className="score-stats">
-                <div style={{ marginBottom: '0.5rem' }}>
-                  <strong>Codeforces:</strong> {s.personal_info.codeforces_username || 'Not provided'}
-                  {s.metadata.sources_collected.includes('codeforces') && (
-                    <div style={{ paddingLeft: '1rem', marginTop: '0.25rem', fontSize: '0.9em' }}>
-                      Rating: {s.codeforces.rating} (Max: {s.codeforces.max_rating})<br/>
-                      Rank: {s.codeforces.rank || 'Unrated'}<br/>
-                      Solved: {s.codeforces.solved_count}
+        <div>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Coding Platforms</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+            <div className="detail-card">
+              <h3>LeetCode</h3>
+              <div className="score-row">
+                <div className="score-stats">
+                  <div><strong>Username:</strong> {s.personal_info.leetcode_username || 'Not provided'}</div>
+                  {s.metadata.sources_collected.includes('leetcode') ? (
+                    <>
+                      <div>Rating: {s.leetcode.rating.toFixed(0)}</div>
+                      <div>Solved: {s.leetcode.total_solved} (E: {s.leetcode.easy_solved}, M: {s.leetcode.medium_solved}, H: {s.leetcode.hard_solved})</div>
+                    </>
+                  ) : (
+                    <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderLeft: '4px solid #f59e0b', borderRadius: '4px', color: '#fcd34d', fontSize: '0.85rem' }}>
+                      <strong>Pending Extraction:</strong> Click "Extract Recent Platform Data" above to sync live problem solving counts and ratings.
                     </div>
                   )}
                 </div>
-                <div>
-                  <strong>CodeChef:</strong> {s.personal_info.codechef_username || 'Not provided'}
-                  {s.metadata.sources_collected.includes('codechef') && (
-                    <div style={{ paddingLeft: '1rem', marginTop: '0.25rem', fontSize: '0.9em' }}>
-                      Rating: {s.codechef.rating} ({s.codechef.stars || 'Unrated'})<br/>
-                      Solved: {s.codechef.solved_count}
+              </div>
+            </div>
+
+            <div className="detail-card">
+              <h3>Codeforces</h3>
+              <div className="score-row">
+                <div className="score-stats">
+                  <div><strong>Username:</strong> {s.personal_info.codeforces_username || 'Not provided'}</div>
+                  {s.metadata.sources_collected.includes('codeforces') ? (
+                    <>
+                      <div>Rating: {s.codeforces.rating} (Max: {s.codeforces.max_rating})</div>
+                      <div>Rank: {s.codeforces.rank || 'Unrated'}</div>
+                      <div>Solved: {s.codeforces.solved_count}</div>
+                    </>
+                  ) : (
+                    <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderLeft: '4px solid #f59e0b', borderRadius: '4px', color: '#fcd34d', fontSize: '0.85rem' }}>
+                      <strong>Pending Extraction:</strong> Click "Extract Recent Platform Data" above to sync live ratings and rankings.
                     </div>
                   )}
                 </div>
-                {(!s.metadata.sources_collected.includes('codeforces') && !s.metadata.sources_collected.includes('codechef')) && (
-                  <div style={{ color: '#94a3b8', fontStyle: 'italic', marginTop: '0.5rem' }}>Features not extracted yet.</div>
-                )}
+              </div>
+            </div>
+
+            <div className="detail-card">
+              <h3>CodeChef</h3>
+              <div className="score-row">
+                <div className="score-stats">
+                  <div><strong>Username:</strong> {s.personal_info.codechef_username || 'Not provided'}</div>
+                  {s.metadata.sources_collected.includes('codechef') ? (
+                    <>
+                      <div>Rating: {s.codechef.rating} ({s.codechef.stars || 'Unrated'})</div>
+                      <div>Solved: {s.codechef.solved_count}</div>
+                    </>
+                  ) : (
+                    <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderLeft: '4px solid #f59e0b', borderRadius: '4px', color: '#fcd34d', fontSize: '0.85rem' }}>
+                      <strong>Pending Extraction:</strong> Click "Extract Recent Platform Data" above to sync live ratings and rankings.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="detail-card detail-card-full">
-            <h3>Metadata</h3>
+        <div>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>System Metadata</h2>
+          <div className="detail-card">
             <div className="score-stats">
               <div>Ingested At: {new Date(s.metadata.ingested_at).toLocaleString()}</div>
               <div>Sources: {s.metadata.sources_collected.join(', ')}</div>
