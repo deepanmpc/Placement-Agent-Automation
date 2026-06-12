@@ -109,15 +109,15 @@ export default function ResumeUpload() {
           </div>
           <div className="form-group">
             <label className="form-label">LeetCode Username</label>
-            <input type="text" className="form-input" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} placeholder="e.g. jdoe123" />
+            <input type="text" className="form-input" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
           <div className="form-group">
             <label className="form-label">Codeforces Handle</label>
-            <input type="text" className="form-input" value={codeforcesUsername} onChange={e => setCodeforcesUsername(e.target.value)} placeholder="e.g. tourist" />
+            <input type="text" className="form-input" value={codeforcesUsername} onChange={e => setCodeforcesUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
           <div className="form-group">
             <label className="form-label">CodeChef Username</label>
-            <input type="text" className="form-input" value={codechefUsername} onChange={e => setCodechefUsername(e.target.value)} placeholder="e.g. coder_123" />
+            <input type="text" className="form-input" value={codechefUsername} onChange={e => setCodechefUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
         </div>
 
