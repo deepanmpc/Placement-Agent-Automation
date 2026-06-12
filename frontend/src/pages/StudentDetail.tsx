@@ -151,7 +151,6 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
                 )}
               </div>
             </div>
-          </div>
 
           <div className="detail-skills">
             <h3>Skills</h3>
