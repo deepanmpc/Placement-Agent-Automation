@@ -9,9 +9,9 @@
   --border: #E5E7EB;
   --border-light: #F3F4F6;
   --border-hover: #D1D5DB;
-  --text-primary: #191B21;
-  --text-secondary: #656C82;
-  --text-tertiary: #8A92A6;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-tertiary: #6B7280;
   --text-inverse: #FFFFFF;
   --accent: #5C7BFF;
   --accent-hover: #4865E6;
@@ -1231,8 +1231,8 @@ a:hover { color: var(--accent-hover); }
   display: block;
   margin-bottom: 0.5rem;
   font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 .form-input {
   width: 100%;
@@ -1248,8 +1248,9 @@ a:hover { color: var(--accent-hover); }
 .form-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-bg);
+  box-shadow: 0 0 0 3px var(--accent-bg);
 }
 .form-input::placeholder {
   color: var(--text-tertiary);
+  opacity: 0.8;
 }
