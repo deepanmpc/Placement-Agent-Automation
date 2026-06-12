@@ -3,10 +3,8 @@ from .common import ExplainableScore
 
 class RuleScoreAggregator:
     CAPABILITY_WEIGHTS = {
-        "coding": 0.35,
-        "github": 0.25,
-        "resume": 0.25,
-        "academic": 0.15
+        "coding": 0.60,
+        "github": 0.40
     }
     
     BEHAVIOR_WEIGHTS = {
@@ -22,8 +20,8 @@ class RuleScoreAggregator:
     }
 
     @classmethod
-    def calculate_capability(cls, coding: float, github: float, resume: float, academic: float) -> ExplainableScore:
-        scores = {"coding": coding, "github": github, "resume": resume, "academic": academic}
+    def calculate_capability(cls, coding: float, github: float) -> ExplainableScore:
+        scores = {"coding": coding, "github": github}
         breakdowns = {}
         total = 0.0
         for k, val in scores.items():
