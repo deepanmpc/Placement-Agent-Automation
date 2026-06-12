@@ -15,7 +15,7 @@ export default function Candidates({ onSelect, onNavigate }: Props) {
   const [deleting, setDeleting] = useState(false);
 
   const fetchProfiles = () => {
-    fetch('http://localhost:8000/profiles')
+    fetch('http://localhost:8000/profiles', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         setProfiles(data);

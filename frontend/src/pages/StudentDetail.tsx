@@ -28,7 +28,7 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
 
   useEffect(() => {
     if (!studentId) return;
-    fetch(`http://localhost:8000/profiles/${studentId}`)
+    fetch(`http://localhost:8000/profiles/${studentId}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         setProfile(data);
