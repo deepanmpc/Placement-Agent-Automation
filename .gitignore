@@ -1,9 +1,0 @@
-.env
-__pycache__/
-*.pyc
-.venv/
-outputs/
-*.onnx
-*.onnx.json
-outputs/
-.DS_Store
