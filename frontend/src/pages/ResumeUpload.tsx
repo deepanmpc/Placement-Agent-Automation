@@ -4,6 +4,7 @@ export default function ResumeUpload() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [idNumber, setIdNumber] = useState('');
+  const [batch, setBatch] = useState('2026');
   const [githubUrl, setGithubUrl] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [leetcodeUsername, setLeetcodeUsername] = useState('');
@@ -31,6 +32,7 @@ export default function ResumeUpload() {
     const formData = new FormData();
     formData.append('file', file);
     if (idNumber) formData.append('id_number', idNumber);
+    if (batch) formData.append('graduation_year', batch);
     if (githubUrl) formData.append('github_url', githubUrl);
     if (linkedinUrl) formData.append('linkedin_url', linkedinUrl);
     if (leetcodeUsername) formData.append('leetcode_username', leetcodeUsername);
@@ -98,6 +100,20 @@ export default function ResumeUpload() {
           <div className="form-group">
             <label className="form-label">ID Number / Roll Number</label>
             <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="23000*****" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Graduation Batch</label>
+            <select 
+              className="form-input" 
+              value={batch} 
+              onChange={e => setBatch(e.target.value)}
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="2023">Y23 (Class of 2023)</option>
+              <option value="2024">Y24 (Class of 2024)</option>
+              <option value="2025">Y25 (Class of 2025)</option>
+              <option value="2026">Y26 (Class of 2026)</option>
+            </select>
           </div>
           <div className="form-group">
             <label className="form-label">GitHub Profile URL</label>

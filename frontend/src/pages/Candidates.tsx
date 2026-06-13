@@ -9,6 +9,19 @@ const MODE_LABELS: Record<ScoringMode, string> = {
   custom: 'Custom',
 };
 
+const getBatchLabel = (year: number | string | undefined | null): string => {
+  if (!year) return '';
+  const yearStr = year.toString();
+  if (yearStr === '2023') return 'Y23';
+  if (yearStr === '2024') return 'Y24';
+  if (yearStr === '2025') return 'Y25';
+  if (yearStr === '2026') return 'Y26';
+  if (yearStr.length >= 2) {
+    return 'Y' + yearStr.slice(-2);
+  }
+  return 'Y' + yearStr;
+};
+
 interface Props {
   onSelect: (studentId: string) => void;
   onNavigate: (page: PageView) => void;
@@ -134,6 +147,25 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
   if (loading) {
     return <div className="page"><div className="page-header"><h1>Loading profiles...</h1></div></div>;
   }
+
+  // Group profiles by batch
+  const groupedProfiles: Record<string, Profile[]> = {};
+  filteredProfiles.forEach(p => {
+    const label = getBatchLabel(p.education?.graduation_year) || 'Unknown Batch';
+    const finalLabel = label === 'Unknown Batch' || label.endsWith('Batch') ? label : `${label} Batch`;
+    if (!groupedProfiles[finalLabel]) {
+      groupedProfiles[finalLabel] = [];
+    }
+    groupedProfiles[finalLabel].push(p);
+  });
+
+  const sortedBatchKeys = Object.keys(groupedProfiles).sort((a, b) => {
+    if (a === 'Unknown Batch') return 1;
+    if (b === 'Unknown Batch') return -1;
+    const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+    return numB - numA;
+  });
 
   return (
     <div className="page">
@@ -268,9 +300,18 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
             }}
           >
             <option value="all">All Batches</option>
-            {uniqueBatches.map(batch => (
-              <option key={batch} value={batch.toString()}>{batch} Batch</option>
-            ))}
+            <option value="2023">Y23 Batch</option>
+            <option value="2024">Y24 Batch</option>
+            <option value="2025">Y25 Batch</option>
+            <option value="2026">Y26 Batch</option>
+            {uniqueBatches
+              .filter(b => b !== 2023 && b !== 2024 && b !== 2025 && b !== 2026)
+              .map(batch => (
+                <option key={batch} value={batch.toString()}>
+                  {getBatchLabel(batch)} Batch
+                </option>
+              ))
+            }
           </select>
         </div>
 
@@ -341,79 +382,120 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
         <span>Select All Candidates ({filteredProfiles.length})</span>
       </div>
 
-      <div className="candidates-list">
-        {filteredProfiles.map((p) => (
-          <div 
-            key={p.student_uuid} 
-            className="candidate-card" 
-            style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1rem 1.25rem' }}
-          >
-            {/* Custom Checkbox */}
-            <div 
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSelect(p.student_uuid, !selectedIds.has(p.student_uuid));
-              }}
-              style={{
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '22px',
-                height: '22px',
+      <div className="candidates-list" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        {sortedBatchKeys.map(batchKey => (
+          <div key={batchKey} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              paddingBottom: '0.4rem',
+              borderBottom: '1px solid var(--border)',
+              margin: '0.5rem 0 0.2rem 0'
+            }}>
+              <span style={{
+                background: 'var(--accent)',
+                color: 'white',
+                padding: '0.15rem 0.5rem',
                 borderRadius: '6px',
-                border: `2px solid ${selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'var(--border)'}`,
-                background: selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'transparent',
-                boxShadow: selectedIds.has(p.student_uuid) ? '0 0 10px rgba(99, 102, 241, 0.25)' : 'none',
-                transition: 'all 0.2s ease',
-                flexShrink: 0
-              }}
-            >
-              {selectedIds.has(p.student_uuid) && (
-                <span style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
-              )}
+                fontSize: '0.75rem',
+                fontWeight: 750,
+                textTransform: 'uppercase'
+              }}>
+                {batchKey}
+              </span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                ({groupedProfiles[batchKey].length} {groupedProfiles[batchKey].length === 1 ? 'candidate' : 'candidates'})
+              </span>
             </div>
+            
+            {groupedProfiles[batchKey].map((p) => (
+              <div 
+                key={p.student_uuid} 
+                className="candidate-card" 
+                style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1rem 1.25rem' }}
+              >
+                {/* Custom Checkbox */}
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelect(p.student_uuid, !selectedIds.has(p.student_uuid));
+                  }}
+                  style={{
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '6px',
+                    border: `2px solid ${selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'var(--border)'}`,
+                    background: selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'transparent',
+                    boxShadow: selectedIds.has(p.student_uuid) ? '0 0 10px rgba(99, 102, 241, 0.25)' : 'none',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0
+                  }}
+                >
+                  {selectedIds.has(p.student_uuid) && (
+                    <span style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
+                  )}
+                </div>
 
-            <div 
-              style={{ flex: 1, display: 'flex', justifyContent: 'space-between', cursor: 'pointer', alignItems: 'center' }}
-              onClick={() => {
-                onSelect(p.student_uuid);
-                onNavigate('student');
-              }}
-            >
-              <div className="candidate-info" style={{ display: 'flex', alignItems: 'center' }}>
-                <h3 className="candidate-name" style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                  {p.personal_info.name || 'Unknown Candidate'} {p.personal_info.id_number ? `(${p.personal_info.id_number})` : ''}
-                </h3>
-              </div>
-              <div className="candidate-scores" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
-                {p.ranking ? (
-                  <>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'right', marginBottom: '0.1rem' }}>
-                      {MODE_LABELS[scoringMode]}
-                    </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1 }}>
-                      {scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
-                        : scoringMode === 'github_mode' ? p.ranking.overall_github_mode
-                        : p.ranking.custom_score ?? p.ranking.total_technical_score}
-                      <span style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 400 }}>/100</span>
-                    </div>
-                    <div className="score-mini" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
-                      {(p.ranking.lc_score ?? 0) > 0 && <span>LC: {p.ranking.lc_score}</span>}
-                      {(p.ranking.cc_score ?? 0) > 0 && <span>CC: {p.ranking.cc_score}</span>}
-                      {(p.ranking.cf_score ?? 0) > 0 && <span>CF: {p.ranking.cf_score}</span>}
-                      {(p.ranking.github_score_total ?? 0) > 0 && <span>GH: {p.ranking.github_score_total}</span>}
-                    </div>
-                  </>
-                ) : (
-                  <div className="score-mini">
-                    <span>GH Repos: {p.github.public_repos}</span>
-                    <span>LC Solved: {p.leetcode.total_solved}</span>
-                    <span>CF Rating: {p.codeforces.rating}</span>
+                <div 
+                  style={{ flex: 1, display: 'flex', justifyContent: 'space-between', cursor: 'pointer', alignItems: 'center' }}
+                  onClick={() => {
+                    onSelect(p.student_uuid);
+                    onNavigate('student');
+                  }}
+                >
+                  <div className="candidate-info" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <h3 className="candidate-name" style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+                      {p.personal_info.name || 'Unknown Candidate'} {p.personal_info.id_number ? `(${p.personal_info.id_number})` : ''}
+                    </h3>
+                    {p.education?.graduation_year && (
+                      <span style={{
+                        background: 'var(--bg-secondary)',
+                        color: 'var(--accent)',
+                        border: '1px solid var(--border)',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '6px',
+                        fontSize: '0.7rem',
+                        fontWeight: 700
+                      }}>
+                        {getBatchLabel(p.education.graduation_year)}
+                      </span>
+                    )}
                   </div>
-                )}
+                  <div className="candidate-scores" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
+                    {p.ranking ? (
+                      <>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'right', marginBottom: '0.1rem' }}>
+                          {MODE_LABELS[scoringMode]}
+                        </div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1 }}>
+                          {scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
+                            : scoringMode === 'github_mode' ? p.ranking.overall_github_mode
+                            : p.ranking.custom_score ?? p.ranking.total_technical_score}
+                          <span style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 400 }}>/100</span>
+                        </div>
+                        <div className="score-mini" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+                          {(p.ranking.lc_score ?? 0) > 0 && <span>LC: {p.ranking.lc_score}</span>}
+                          {(p.ranking.cc_score ?? 0) > 0 && <span>CC: {p.ranking.cc_score}</span>}
+                          {(p.ranking.cf_score ?? 0) > 0 && <span>CF: {p.ranking.cf_score}</span>}
+                          {(p.ranking.github_score_total ?? 0) > 0 && <span>GH: {p.ranking.github_score_total}</span>}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="score-mini">
+                        <span>GH Repos: {p.github.public_repos}</span>
+                        <span>LC Solved: {p.leetcode.total_solved}</span>
+                        <span>CF Rating: {p.codeforces.rating}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         ))}
         {profiles.length === 0 ? (

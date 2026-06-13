@@ -87,6 +87,7 @@ async def ingest_resume(
     leetcode_username: Optional[str] = Form(None),
     codeforces_username: Optional[str] = Form(None),
     codechef_username: Optional[str] = Form(None),
+    graduation_year: Optional[int] = Form(None),
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
@@ -141,6 +142,8 @@ async def ingest_resume(
             profile.personal_info.codeforces_username = codeforces_username
         if codechef_username:
             profile.personal_info.codechef_username = codechef_username
+        if graduation_year:
+            profile.education.graduation_year = graduation_year
             
         # Secondary duplicate check in case the LLM extracted an ID that was not provided manually
         if profile.personal_info.id_number:
