@@ -109,10 +109,10 @@ export default function ResumeUpload() {
               onChange={e => setBatch(e.target.value)}
               style={{ cursor: 'pointer' }}
             >
-              <option value="2023">Y23 (Class of 2023)</option>
-              <option value="2024">Y24 (Class of 2024)</option>
-              <option value="2025">Y25 (Class of 2025)</option>
-              <option value="2026">Y26 (Class of 2026)</option>
+              <option value="2023">Y23</option>
+              <option value="2024">Y24</option>
+              <option value="2025">Y25</option>
+              <option value="2026">Y26</option>
             </select>
           </div>
           <div className="form-group">
@@ -131,7 +131,7 @@ export default function ResumeUpload() {
             <label className="form-label">Codeforces Handle</label>
             <input type="text" className="form-input" value={codeforcesUsername} onChange={e => setCodeforcesUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
-          <div className="form-group">
+          <div className="form-group" style={{ gridColumn: 'span 2' }}>
             <label className="form-label">CodeChef Username</label>
             <input type="text" className="form-input" value={codechefUsername} onChange={e => setCodechefUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
