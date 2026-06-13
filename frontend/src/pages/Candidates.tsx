@@ -22,6 +22,37 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
 
+  // Search & Filtering States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [minScore, setMinScore] = useState<number>(0);
+  const [selectedBatch, setSelectedBatch] = useState<string>('all');
+
+  const getCandidateScore = (p: Profile): number => {
+    if (!p.ranking) return 0;
+    return scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
+      : scoringMode === 'github_mode' ? p.ranking.overall_github_mode
+      : p.ranking.custom_score ?? p.ranking.total_technical_score;
+  };
+
+  const uniqueBatches = Array.from(new Set(profiles.map(p => p.education?.graduation_year).filter(Boolean))).sort();
+
+  const filteredProfiles = profiles.filter(p => {
+    const name = (p.personal_info.name || '').toLowerCase();
+    const id = (p.personal_info.id_number || '').toLowerCase();
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = name.includes(query) || id.includes(query);
+
+    const score = getCandidateScore(p);
+    const matchesScore = score >= minScore;
+
+    const batch = p.education?.graduation_year?.toString() || '';
+    const matchesBatch = selectedBatch === 'all' || batch === selectedBatch;
+
+    return matchesSearch && matchesScore && matchesBatch;
+  });
+
+  const allFilteredSelected = filteredProfiles.length > 0 && filteredProfiles.every(p => selectedIds.has(p.student_uuid));
+
   const fetchProfiles = () => {
     fetch('http://localhost:8000/profiles', { cache: 'no-store' })
       .then(res => res.json())
@@ -62,11 +93,15 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
     }
   };
 
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedIds(new Set(profiles.map(p => p.student_uuid)));
+  const handleSelectAll = () => {
+    if (allFilteredSelected) {
+      const newSet = new Set(selectedIds);
+      filteredProfiles.forEach(p => newSet.delete(p.student_uuid));
+      setSelectedIds(newSet);
     } else {
-      setSelectedIds(new Set());
+      const newSet = new Set(selectedIds);
+      filteredProfiles.forEach(p => newSet.add(p.student_uuid));
+      setSelectedIds(newSet);
     }
   };
 
@@ -153,8 +188,122 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
         </div>
       </div>
 
+      {/* Search & Filter Section */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '1.25rem',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '1.25rem',
+        marginBottom: '1.5rem',
+        boxShadow: 'var(--shadow-sm)'
+      }}>
+        {/* Search */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Search Candidate
+          </label>
+          <input 
+            type="text"
+            placeholder="Search name or ID..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              borderRadius: '8px',
+              border: '1px solid var(--border)',
+              background: 'var(--bg)',
+              color: 'var(--text-primary)',
+              fontSize: '0.82rem',
+              outline: 'none',
+            }}
+          />
+        </div>
+
+        {/* Score filter */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Min Score
+            </label>
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>
+              {minScore} pts
+            </span>
+          </div>
+          <input 
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={minScore}
+            onChange={e => setMinScore(Number(e.target.value))}
+            style={{
+              width: '100%',
+              accentColor: 'var(--accent)',
+              cursor: 'pointer',
+              marginTop: '0.35rem'
+            }}
+          />
+        </div>
+
+        {/* Batch filter */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Graduation Batch
+          </label>
+          <select
+            value={selectedBatch}
+            onChange={e => setSelectedBatch(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              borderRadius: '8px',
+              border: '1px solid var(--border)',
+              background: 'var(--bg)',
+              color: 'var(--text-primary)',
+              fontSize: '0.82rem',
+              outline: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">All Batches</option>
+            {uniqueBatches.map(batch => (
+              <option key={batch} value={batch.toString()}>{batch} Batch</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Clear Filters Button */}
+        {(searchQuery || minScore > 0 || selectedBatch !== 'all') && (
+          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setMinScore(0);
+                setSelectedBatch('all');
+              }}
+              style={{
+                width: '100%',
+                padding: '0.5rem 0.75rem',
+                background: 'transparent',
+                border: '1px dashed var(--color-danger)',
+                color: 'var(--color-danger)',
+                borderRadius: '8px',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+      </div>
+
       <div 
-        onClick={() => handleSelectAll({ target: { checked: !(profiles.length > 0 && selectedIds.size === profiles.length) } } as any)}
+        onClick={handleSelectAll}
         style={{
           marginBottom: '1.25rem',
           display: 'inline-flex',
@@ -177,23 +326,23 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
           width: '18px',
           height: '18px',
           borderRadius: '5px',
-          border: `2px solid ${profiles.length > 0 && selectedIds.size === profiles.length ? 'var(--accent)' : 'var(--border)'}`,
-          background: profiles.length > 0 && selectedIds.size === profiles.length ? 'var(--accent)' : 'transparent',
+          border: `2px solid ${allFilteredSelected ? 'var(--accent)' : 'var(--border)'}`,
+          background: allFilteredSelected ? 'var(--accent)' : 'transparent',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           transition: 'all 0.2s ease',
           flexShrink: 0
         }}>
-          {profiles.length > 0 && selectedIds.size === profiles.length && (
+          {allFilteredSelected && (
             <span style={{ color: '#fff', fontSize: '0.65rem', fontWeight: 'bold' }}>✓</span>
           )}
         </div>
-        <span>Select All Candidates</span>
+        <span>Select All Candidates ({filteredProfiles.length})</span>
       </div>
 
       <div className="candidates-list">
-        {profiles.map((p) => (
+        {filteredProfiles.map((p) => (
           <div 
             key={p.student_uuid} 
             className="candidate-card" 
@@ -267,7 +416,15 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
             </div>
           </div>
         ))}
-        {profiles.length === 0 && <p>No profiles ingested yet. Upload some resumes!</p>}
+        {profiles.length === 0 ? (
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', padding: '2rem' }}>
+            No profiles ingested yet. Upload some resumes!
+          </p>
+        ) : filteredProfiles.length === 0 ? (
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', padding: '2rem' }}>
+            No profiles match the search or filter criteria.
+          </p>
+        ) : null}
       </div>
     </div>
   );
