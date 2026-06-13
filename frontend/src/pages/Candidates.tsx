@@ -38,7 +38,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
   // Search & Filtering States
   const [searchQuery, setSearchQuery] = useState('');
   const [minScore, setMinScore] = useState<number>(0);
-  const [selectedBatch, setSelectedBatch] = useState<string>('all');
+  const [activeBatch, setActiveBatch] = useState<string | null>(null);
 
   const getCandidateScore = (p: Profile): number => {
     if (!p.ranking) return 0;
@@ -47,7 +47,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
       : p.ranking.custom_score ?? p.ranking.total_technical_score;
   };
 
-  const uniqueBatches = Array.from(new Set(profiles.map(p => p.education?.graduation_year).filter(Boolean))).sort();
+
 
   const filteredProfiles = profiles.filter(p => {
     const name = (p.personal_info.name || '').toLowerCase();
@@ -59,7 +59,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
     const matchesScore = score >= minScore;
 
     const batch = p.education?.graduation_year?.toString() || '';
-    const matchesBatch = selectedBatch === 'all' || batch === selectedBatch;
+    const matchesBatch = activeBatch === 'all' || batch === activeBatch;
 
     return matchesSearch && matchesScore && matchesBatch;
   });
@@ -148,6 +148,88 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
     return <div className="page"><div className="page-header"><h1>Loading profiles...</h1></div></div>;
   }
 
+  if (activeBatch === null) {
+    return (
+      <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '70vh' }}>
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          padding: '2.5rem',
+          maxWidth: '500px',
+          width: '100%',
+          textAlign: 'center',
+          boxShadow: 'var(--shadow-lg)',
+          animation: 'fadeIn 0.3s ease'
+        }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
+            Select Graduation Batch
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '2rem' }}>
+            Which graduation batch would you like to view in the dashboard?
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+            {[
+              { value: '2023', label: 'Y23' },
+              { value: '2024', label: 'Y24' },
+              { value: '2025', label: 'Y25' },
+              { value: '2026', label: 'Y26' }
+            ].map(item => (
+              <button
+                key={item.value}
+                onClick={() => setActiveBatch(item.value)}
+                style={{
+                  padding: '1rem',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '12px',
+                  color: 'var(--text-primary)',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = 'var(--accent)';
+                  e.currentTarget.style.background = 'var(--bg-tertiary)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.background = 'var(--bg)';
+                }}
+              >
+                {item.label} Batch
+              </button>
+            ))}
+            <button
+              onClick={() => setActiveBatch('all')}
+              style={{
+                gridColumn: 'span 2',
+                padding: '1rem',
+                background: 'var(--accent)',
+                border: '1px solid var(--accent)',
+                borderRadius: '12px',
+                color: 'white',
+                fontSize: '1rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.opacity = '0.9';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              All Batches
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Group profiles by batch
   const groupedProfiles: Record<string, Profile[]> = {};
   filteredProfiles.forEach(p => {
@@ -220,6 +302,48 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
         </div>
       </div>
 
+      {/* Batch Switcher Bar */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '0.4rem',
+        marginBottom: '1.25rem',
+        width: 'fit-content'
+      }}>
+        {[
+          { value: 'all', label: 'All Batches' },
+          { value: '2023', label: 'Y23' },
+          { value: '2024', label: 'Y24' },
+          { value: '2025', label: 'Y25' },
+          { value: '2026', label: 'Y26' }
+        ].map(item => {
+          const isSelected = activeBatch === item.value;
+          return (
+            <button
+              key={item.value}
+              onClick={() => setActiveBatch(item.value)}
+              style={{
+                padding: '0.45rem 1rem',
+                borderRadius: '8px',
+                border: 'none',
+                background: isSelected ? 'var(--accent)' : 'transparent',
+                color: isSelected ? '#fff' : 'var(--text-secondary)',
+                fontSize: '0.82rem',
+                fontWeight: isSelected ? 700 : 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Search & Filter Section */}
       <div style={{
         display: 'grid',
@@ -280,49 +404,14 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
           />
         </div>
 
-        {/* Batch filter */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Graduation Batch
-          </label>
-          <select
-            value={selectedBatch}
-            onChange={e => setSelectedBatch(e.target.value)}
-            style={{
-              padding: '0.5rem 0.75rem',
-              borderRadius: '8px',
-              border: '1px solid var(--border)',
-              background: 'var(--bg)',
-              color: 'var(--text-primary)',
-              fontSize: '0.82rem',
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <option value="all">All Batches</option>
-            <option value="2023">Y23 Batch</option>
-            <option value="2024">Y24 Batch</option>
-            <option value="2025">Y25 Batch</option>
-            <option value="2026">Y26 Batch</option>
-            {uniqueBatches
-              .filter(b => b !== 2023 && b !== 2024 && b !== 2025 && b !== 2026)
-              .map(batch => (
-                <option key={batch} value={batch.toString()}>
-                  {getBatchLabel(batch)} Batch
-                </option>
-              ))
-            }
-          </select>
-        </div>
-
         {/* Clear Filters Button */}
-        {(searchQuery || minScore > 0 || selectedBatch !== 'all') && (
+        {(searchQuery || minScore > 0 || activeBatch !== 'all') && (
           <div style={{ display: 'flex', alignItems: 'flex-end' }}>
             <button
               onClick={() => {
                 setSearchQuery('');
                 setMinScore(0);
-                setSelectedBatch('all');
+                setActiveBatch('all');
               }}
               style={{
                 width: '100%',
