@@ -60,6 +60,19 @@ export default function ResumeUpload() {
 
       const data = await response.json();
       setResult(data);
+      
+      // Clear form inputs
+      setFile(null);
+      setIdNumber('');
+      setBatch('2026');
+      setGithubUrl('');
+      setLinkedinUrl('');
+      setLeetcodeUsername('');
+      setCodeforcesUsername('');
+      setCodechefUsername('');
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -69,6 +82,17 @@ export default function ResumeUpload() {
 
   return (
     <div className="page">
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleUp {
+          from { transform: scale(0.9); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
+
       <div className="page-header">
         <h1>Add Candidate Profile</h1>
         <p className="page-subtitle">
@@ -154,26 +178,67 @@ export default function ResumeUpload() {
       </div>
 
       {result && (
-        <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', animation: 'fadeIn 0.5s ease' }}>
-          <div style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '50%',
-            backgroundColor: '#10b981',
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '1rem',
-            boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)'
-          }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+            zIndex: 1000,
+            animation: 'fadeIn 0.25s ease'
+          }}
+          onClick={() => setResult(null)}
+        >
+          <div 
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border)',
+              borderRadius: '16px',
+              padding: '2.5rem 2rem',
+              maxWidth: '400px',
+              width: '90%',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              boxShadow: 'var(--shadow-lg)',
+              animation: 'scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: '#10b981',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '1.25rem',
+              boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)'
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.35rem', fontWeight: 700 }}>Registration Successful</h3>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: 1.5 }}>
+              Your profile has been submitted and registered successfully.
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={() => setResult(null)}
+              style={{ width: '120px', padding: '0.6rem', fontSize: '0.88rem', fontWeight: 600 }}
+            >
+              Close
+            </button>
           </div>
-          <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.25rem', fontWeight: 600 }}>Registration Successful</h3>
-          <p style={{ color: '#94a3b8', marginTop: '0.5rem', textAlign: 'center' }}>
-            Your profile has been submitted and registered successfully.
-          </p>
         </div>
       )}
     </div>
