@@ -34,8 +34,20 @@ echo "Java Spring Boot API:  http://localhost:9090"
 echo "================================================="
 echo "Press Ctrl+C to stop all services."
 
-# Trap Ctrl+C (SIGINT) to kill background processes
-trap "echo 'Stopping services...'; kill $JAVA_BACKEND_PID $PYTHON_BACKEND_PID $FRONTEND_PID; exit 0" SIGINT
+cleanup() {
+    echo "Stopping services..."
+    kill $JAVA_BACKEND_PID $PYTHON_BACKEND_PID $FRONTEND_PID 2>/dev/null
+    
+    echo "Ensuring ports are safely freed..."
+    kill -9 $(lsof -t -i :9090) 2>/dev/null
+    kill -9 $(lsof -t -i :8000) 2>/dev/null
+    kill -9 $(lsof -t -i :5173) 2>/dev/null
+    
+    exit 0
+}
+
+# Trap Ctrl+C (SIGINT) and EXIT to ensure safe kill
+trap cleanup SIGINT EXIT
 
 # Wait for background processes to keep script running
 wait
