@@ -6,7 +6,11 @@ from sqlalchemy.future import select
 import logging
 
 from backend.database.models import StudentProfileRecord
-from .collectors import GitHubCollector, LeetCodeCollector, CodeforcesCollector, CodeChefCollector
+from backend.ingestion.github_collector.collector import GitHubCollector
+from backend.ingestion.leetcode_collector.collector import LeetCodeCollector
+from backend.ingestion.codeforces_collector.collector import CodeforcesCollector
+from backend.ingestion.codechef_collector.collector import CodeChefCollector
+from backend.config import get_settings
 from .models import PlatformSyncMetadata
 
 logger = logging.getLogger(__name__)
@@ -29,12 +33,24 @@ class PlatformSyncService:
         codeforces_username = record.codeforces_username
         codechef_username = record.codechef_username
         
+        # Initialize collectors
+        settings = get_settings()
+        github_collector = GitHubCollector(token=settings.github_token if settings and hasattr(settings, 'github_token') else None)
+        leetcode_collector = LeetCodeCollector()
+        codeforces_collector = CodeforcesCollector()
+        codechef_collector = CodeChefCollector()
+        
+        async def safe_collect(collector, value):
+            if not value:
+                return None
+            return await collector.collect(value)
+            
         # 3. Run collectors concurrently
         results = await asyncio.gather(
-            GitHubCollector.collect(github_url),
-            LeetCodeCollector.collect(leetcode_username),
-            CodeforcesCollector.collect(codeforces_username),
-            CodeChefCollector.collect(codechef_username),
+            safe_collect(github_collector, github_url),
+            safe_collect(leetcode_collector, leetcode_username),
+            safe_collect(codeforces_collector, codeforces_username),
+            safe_collect(codechef_collector, codechef_username),
             return_exceptions=True
         )
         
@@ -53,7 +69,7 @@ class PlatformSyncService:
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "public_repos": github_result.public_repos, "total_stars": github_result.total_stars})
             github_result.snapshots = old_snapshots
-            record.github_profile = github_result.model_dump()
+            record.github_profile = github_result.model_dump(mode="json")
             
         # Process LeetCode
         if isinstance(leetcode_result, Exception):
@@ -64,7 +80,7 @@ class PlatformSyncService:
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": leetcode_result.rating, "total_solved": leetcode_result.total_solved})
             leetcode_result.snapshots = old_snapshots
-            record.leetcode_profile = leetcode_result.model_dump()
+            record.leetcode_profile = leetcode_result.model_dump(mode="json")
             
         # Process Codeforces
         if isinstance(codeforces_result, Exception):
@@ -75,7 +91,7 @@ class PlatformSyncService:
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": codeforces_result.rating, "solved_count": codeforces_result.solved_count})
             codeforces_result.snapshots = old_snapshots
-            record.codeforces_profile = codeforces_result.model_dump()
+            record.codeforces_profile = codeforces_result.model_dump(mode="json")
             
         # Process CodeChef
         if isinstance(codechef_result, Exception):
@@ -86,7 +102,7 @@ class PlatformSyncService:
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": codechef_result.rating, "solved_count": codechef_result.solved_count})
             codechef_result.snapshots = old_snapshots
-            record.codechef_profile = codechef_result.model_dump()
+            record.codechef_profile = codechef_result.model_dump(mode="json")
             
         # 4. Update sync metadata
         sync_status = "success" if not failed_platforms else ("partial" if len(failed_platforms) < 4 else "failed")

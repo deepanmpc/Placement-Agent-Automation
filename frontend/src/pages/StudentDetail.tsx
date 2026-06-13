@@ -61,6 +61,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
           leetcode: data.leetcode_profile || prev.leetcode,
           codeforces: data.codeforces_profile || prev.codeforces,
           codechef: data.codechef_profile || prev.codechef,
+          ranking: data.ranking || prev.ranking,
           metadata: {
             ...prev.metadata,
             sources_collected: [

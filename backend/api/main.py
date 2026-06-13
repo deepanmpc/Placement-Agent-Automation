@@ -352,10 +352,14 @@ async def sync_platforms(
     db: AsyncSession = Depends(get_db)
 ):
     from backend.collection.service import PlatformSyncService
+    from backend.ingestion.models.student_profile import StudentProfile
     
     updated_record = await PlatformSyncService.sync_platforms(db, student_uuid)
     if not updated_record:
         raise HTTPException(404, "Student profile not found")
+        
+    profile = StudentProfile.model_validate(updated_record.profile_data)
+    attach_ranking(profile)
         
     return {
         "status": "success",
@@ -363,5 +367,6 @@ async def sync_platforms(
         "leetcode_profile": updated_record.leetcode_profile,
         "codeforces_profile": updated_record.codeforces_profile,
         "codechef_profile": updated_record.codechef_profile,
-        "platform_sync_metadata": updated_record.platform_sync_metadata
+        "platform_sync_metadata": updated_record.platform_sync_metadata,
+        "ranking": profile.ranking
     }

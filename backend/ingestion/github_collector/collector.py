@@ -8,6 +8,7 @@ contribution consistency). Does **not** calculate any scores or rankings.
 from __future__ import annotations
 
 import asyncio
+import re
 from datetime import datetime, timezone
 from typing import Any, Optional
 from urllib.parse import urlparse
@@ -94,6 +95,51 @@ class GitHubCollector:
             repositories, now
         )
 
+        commits_last_365 = 0
+        contribution_days_365 = 0
+        active_days_90 = 0
+        merged_prs = 0
+        issues_closed = 0
+        
+        # Scrape Contributions graph
+        try:
+            async with httpx.AsyncClient() as unauth_client:
+                contrib_resp = await unauth_client.get(f"https://github.com/users/{username}/contributions", timeout=10.0)
+                if contrib_resp.status_code == 200:
+                    text = contrib_resp.text
+                    m = re.search(r'(\d{1,3}(?:,\d{3})*)\s+contributions\s+in\s+the\s+last\s+year', text, re.IGNORECASE)
+                    if m:
+                        commits_last_365 = int(m.group(1).replace(',', ''))
+                    
+                    days = re.findall(r'data-date="([^"]+)"[^>]*data-level="([0-4])"', text)
+                    if not days:
+                        days = re.findall(r'data-level="([0-4])"[^>]*data-date="([^"]+)"', text)
+                        days = [(d, l) for l, d in days]
+                    
+                    if days:
+                        contribution_days_365 = sum(1 for d, l in days if l != '0')
+                        last_90 = days[-90:]
+                        active_days_90 = sum(1 for d, l in last_90 if l != '0')
+        except Exception as e:
+            logger.warning(f"Failed to scrape contributions for {username}: {e}")
+
+        async with httpx.AsyncClient(headers=self.headers, timeout=httpx.Timeout(15.0)) as client:
+            try:
+                pr_url = f"{self.BASE_URL}/search/issues?q=author:{username}+type:pr+is:merged"
+                pr_resp = await self._request(client, "GET", pr_url)
+                if pr_resp:
+                    merged_prs = pr_resp.json().get("total_count", 0)
+            except Exception as e:
+                logger.warning(f"Failed to fetch PRs for {username}: {e}")
+
+            try:
+                iss_url = f"{self.BASE_URL}/search/issues?q=author:{username}+type:issue+is:closed"
+                iss_resp = await self._request(client, "GET", iss_url)
+                if iss_resp:
+                    issues_closed = iss_resp.json().get("total_count", 0)
+            except Exception as e:
+                logger.warning(f"Failed to fetch issues for {username}: {e}")
+
         profile = GitHubProfile(
             username=user_data.get("login", username),
             name=user_data.get("name"),
@@ -103,10 +149,16 @@ class GitHubCollector:
             following=user_data.get("following", 0),
             total_stars=total_stars,
             repositories=repo_models,
-            languages=languages,
+            language_distribution=languages,
+            languages=list(languages.keys()),
             commit_frequency=round(commit_frequency, 2),
             activity_score=round(activity_score, 2),
             contribution_consistency=round(contribution_consistency, 2),
+            commits_last_365=commits_last_365,
+            contribution_days_365=contribution_days_365,
+            active_days_90=active_days_90,
+            merged_prs=merged_prs,
+            issues_closed=issues_closed,
             profile_url=user_data.get("html_url", f"https://github.com/{username}"),
             avatar_url=user_data.get("avatar_url"),
             created_at=self._parse_dt(user_data.get("created_at")),
@@ -259,9 +311,8 @@ class GitHubCollector:
                     stars=r.get("stargazers_count", 0),
                     forks=r.get("forks_count", 0),
                     topics=r.get("topics", []),
-                    created_at=GitHubCollector._parse_dt(r.get("created_at")),
-                    updated_at=GitHubCollector._parse_dt(r.get("updated_at")),
-                    is_fork=r.get("fork", False),
+                    created_at=r.get("created_at"),
+                    updated_at=r.get("updated_at"),
                 )
             )
         return models
@@ -355,6 +406,10 @@ class GitHubCollector:
             The username string, or ``None`` if extraction fails.
         """
         url = url.strip()
+
+        # If it's just a raw username without slashes or domain
+        if "/" not in url and "github.com" not in url:
+            return url
 
         # Ensure a scheme so urlparse works correctly
         if not url.startswith(("http://", "https://")):

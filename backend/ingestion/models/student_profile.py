@@ -120,6 +120,11 @@ class GitHubProfile(BaseModel):
     commit_frequency: float = 0.0
     activity_score: float = 0.0
     contribution_consistency: float = 0.0
+    commits_last_365: int = 0
+    contribution_days_365: int = 0
+    merged_prs: int = 0
+    issues_closed: int = 0
+    active_days_90: int = 0
     repository_growth: float = 0.0
     snapshots: List[Dict[str, Any]] = Field(default_factory=list)
     collected_at: Optional[datetime] = None
