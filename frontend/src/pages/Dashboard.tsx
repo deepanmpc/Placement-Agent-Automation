@@ -166,7 +166,7 @@ export default function Dashboard() {
                     width: '2px',
                     height: '24px',
                     marginLeft: '36px',
-                    background: stage.status === 'completed' ? '#10B981' : stage.status === 'active' ? '#6366F1' : 'var(--border)',
+                    background: stage.status === 'completed' ? '#10B981' : stage.status === 'active' ? 'var(--accent)' : 'var(--border)',
                     opacity: stage.status === 'future' ? 0.3 : 1,
                     transition: 'all 0.25s ease'
                   }} />

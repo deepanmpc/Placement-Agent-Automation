@@ -14,7 +14,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, { text: string; bg: string; border: string }> = {
   completed: { text: '#10B981', bg: 'rgba(16, 185, 129, 0.06)', border: 'rgba(16, 185, 129, 0.18)' },
-  active: { text: '#6366F1', bg: 'rgba(99, 102, 241, 0.06)', border: 'rgba(99, 102, 241, 0.3)' },
+  active: { text: 'var(--accent)', bg: 'var(--accent-bg)', border: 'var(--accent-border)' },
   pending: { text: 'var(--text-secondary)', bg: 'var(--bg-secondary)', border: 'var(--border)' },
   future: { text: 'var(--text-tertiary)', bg: 'var(--bg-secondary)', border: 'var(--border)' },
 };
@@ -96,9 +96,9 @@ export default function StageCard({ stage, index }: Props) {
             right: '1.25rem',
             width: '8px',
             height: '8px',
-            background: '#6366F1',
+            background: 'var(--accent)',
             borderRadius: '50%',
-            boxShadow: '0 0 0 4px rgba(99, 102, 241, 0.2)',
+            boxShadow: '0 0 0 4px var(--accent-bg)',
           }}
         />
       )}

@@ -520,7 +520,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
                     borderRadius: '6px',
                     border: `2px solid ${selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'var(--border)'}`,
                     background: selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'transparent',
-                    boxShadow: selectedIds.has(p.student_uuid) ? '0 0 10px rgba(99, 102, 241, 0.25)' : 'none',
+                    boxShadow: selectedIds.has(p.student_uuid) ? '0 0 10px var(--accent-bg)' : 'none',
                     transition: 'all 0.2s ease',
                     flexShrink: 0
                   }}
