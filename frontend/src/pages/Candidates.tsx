@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
 import type { PageView } from '../types';
 import type { Profile } from '../api';
+import type { ScoringMode } from '../components/ScoringSettings';
+
+const MODE_LABELS: Record<ScoringMode, string> = {
+  dsa_mode: 'DSA Mode',
+  github_mode: 'GH Mode',
+  custom: 'Custom',
+};
 
 interface Props {
   onSelect: (studentId: string) => void;
   onNavigate: (page: PageView) => void;
+  scoringMode: ScoringMode;
 }
 
-export default function Candidates({ onSelect, onNavigate }: Props) {
+export default function Candidates({ onSelect, onNavigate, scoringMode }: Props) {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [enriching, setEnriching] = useState(false);
@@ -192,17 +200,20 @@ export default function Candidates({ onSelect, onNavigate }: Props) {
               <div className="candidate-scores" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
                 {p.ranking ? (
                   <>
-                    <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)', marginBottom: '0.2rem' }}>
-                      Score: {p.ranking.total_technical_score}/100
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'right', marginBottom: '0.1rem' }}>
+                      {MODE_LABELS[scoringMode]}
                     </div>
-                    <div className="score-mini" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                      {p.ranking.github_score.total_score > 0 && <span>GH: {p.ranking.github_score.total_score}</span>}
-                      {p.ranking.leetcode_score.total_score > 0 && <span>LC: {p.ranking.leetcode_score.total_score}</span>}
-                      {p.ranking.codeforces_score.total_score > 0 && <span>CF: {p.ranking.codeforces_score.total_score}</span>}
-                      {p.ranking.codechef_score.total_score > 0 && <span>CC: {p.ranking.codechef_score.total_score}</span>}
-                      {Object.keys(p.ranking.coding_score.breakdown).length === 0 && p.ranking.github_score.total_score === 0 && (
-                        <span>No extraction yet</span>
-                      )}
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1 }}>
+                      {scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
+                        : scoringMode === 'github_mode' ? p.ranking.overall_github_mode
+                        : p.ranking.custom_score ?? p.ranking.total_technical_score}
+                      <span style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 400 }}>/100</span>
+                    </div>
+                    <div className="score-mini" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+                      {(p.ranking.lc_score ?? 0) > 0 && <span>LC: {p.ranking.lc_score}</span>}
+                      {(p.ranking.cc_score ?? 0) > 0 && <span>CC: {p.ranking.cc_score}</span>}
+                      {(p.ranking.cf_score ?? 0) > 0 && <span>CF: {p.ranking.cf_score}</span>}
+                      {(p.ranking.github_score_total ?? 0) > 0 && <span>GH: {p.ranking.github_score_total}</span>}
                     </div>
                   </>
                 ) : (

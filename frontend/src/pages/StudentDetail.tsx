@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { PageView } from '../types';
 import type { Profile } from '../api';
+import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
 
 interface Props {
   studentId: string | null;
   onNavigate: (page: PageView) => void;
+  scoringMode: ScoringMode;
+  customWeights: CustomWeights;
 }
 
 function SkillSection({ label, items }: { label: string; items: string[] }) {
@@ -21,7 +24,7 @@ function SkillSection({ label, items }: { label: string; items: string[] }) {
   );
 }
 
-export default function StudentDetail({ studentId, onNavigate }: Props) {
+export default function StudentDetail({ studentId, onNavigate, scoringMode, customWeights }: Props) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [enriching, setEnriching] = useState(false);
@@ -161,68 +164,178 @@ export default function StudentDetail({ studentId, onNavigate }: Props) {
 
         </div>
 
-        {s.ranking && (
-          <div style={{ marginTop: '2rem' }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Intelligence & Capability Analysis</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
-              
-              <div className="detail-card" style={{ background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)', borderColor: 'rgba(52, 211, 153, 0.2)' }}>
-                <h3 style={{ color: '#34D399', borderBottom: '1px solid rgba(52, 211, 153, 0.2)', paddingBottom: '0.5rem' }}>Combined Technical Score</h3>
-                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#34D399', textAlign: 'center', margin: '0.5rem 0' }}>
-                  {s.ranking.total_technical_score}<span style={{ fontSize: '1.2rem', opacity: 0.7 }}>/100</span>
+        {s.ranking && (() => {
+          const r = s.ranking;
+          const activeScore = scoringMode === 'dsa_mode' ? r.overall_dsa_mode
+            : scoringMode === 'github_mode' ? r.overall_github_mode
+            : r.custom_score ?? r.total_technical_score;
+          const activeLabel = scoringMode === 'dsa_mode' ? 'DSA Mode'
+            : scoringMode === 'github_mode' ? 'GitHub Mode' : 'Custom Mode';
+          const activeColor = scoringMode === 'dsa_mode' ? '#60A5FA'
+            : scoringMode === 'github_mode' ? '#A78BFA' : '#34D399';
+          const activeFormula = scoringMode === 'dsa_mode'
+            ? `DSA(${r.dsa_score}) × 0.60  +  GH(${r.github_score_total}) × 0.40`
+            : scoringMode === 'github_mode'
+            ? `GH(${r.github_score_total}) × 0.60  +  DSA(${r.dsa_score}) × 0.40`
+            : `(LC×${customWeights.lc} + CC×${customWeights.cc} + CF×${customWeights.cf} + GH×${customWeights.gh}) / 100`;
+
+          return (
+            <div style={{ marginTop: '2rem' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
+                Intelligence & Capability Analysis
+              </h2>
+
+              {/* Row 1: Active mode score + all 3 modes comparison */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                {/* Active Mode Big Score */}
+                <div className="detail-card" style={{ background: `linear-gradient(135deg, ${activeColor}18 0%, transparent 100%)`, borderColor: `${activeColor}40`, textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: activeColor, marginBottom: '0.4rem' }}>{activeLabel} Score</div>
+                  <div style={{ fontSize: '3rem', fontWeight: 900, color: activeColor, lineHeight: 1 }}>
+                    {activeScore}<span style={{ fontSize: '1.3rem', opacity: 0.6 }}>/100</span>
+                  </div>
+                  <div style={{ fontSize: '0.68rem', fontFamily: 'monospace', color: 'var(--text-muted)', marginTop: '0.75rem', lineHeight: 1.6 }}>
+                    {activeFormula}
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#10B981', textAlign: 'center', marginBottom: '1rem', fontFamily: 'monospace' }}>
-                  = (Coding * 0.6) + (GitHub * 0.4)
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                  <span>Coding: <strong>{(s.ranking.coding_score?.total_score || 0)}</strong> &times; 0.6</span>
-                  <span>GitHub: <strong>{(s.ranking.github_score?.total_score || 0)}</strong> &times; 0.4</span>
+
+                {/* All 3 Mode Comparison */}
+                <div className="detail-card">
+                  <h3 style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>All Scoring Modes</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {[
+                      { key: 'dsa_mode', label: 'Overall DSA Mode', score: r.overall_dsa_mode, color: '#60A5FA',
+                        formula: `(DSA×0.60) + (GH×0.40)` },
+                      { key: 'github_mode', label: 'Overall GitHub Mode', score: r.overall_github_mode, color: '#A78BFA',
+                        formula: `(GH×0.60) + (DSA×0.40)` },
+                      { key: 'custom', label: 'Custom Score', score: r.custom_score, color: '#34D399',
+                        formula: `(LC×${customWeights.lc}+CC×${customWeights.cc}+CF×${customWeights.cf}+GH×${customWeights.gh})/100` },
+                    ].map(item => (
+                      <div key={item.key} style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '0.5rem 0.75rem', borderRadius: '8px',
+                        background: scoringMode === item.key ? `${item.color}12` : 'var(--bg)',
+                        border: `1px solid ${scoringMode === item.key ? item.color : 'var(--border)'}`,
+                      }}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.82rem', color: item.color }}>{item.label}</div>
+                          <div style={{ fontSize: '0.65rem', fontFamily: 'monospace', color: 'var(--text-muted)', marginTop: '0.1rem' }}>{item.formula}</div>
+                        </div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: scoringMode === item.key ? item.color : 'var(--text)' }}>
+                          {item.score ?? '—'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="detail-card">
-                <h3 style={{ color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Coding Capability Analysis</h3>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0 0' }}>
-                  {s.ranking.coding_score?.total_score || 0}<span style={{ fontSize: '1rem', opacity: 0.7 }}>/100</span>
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '1rem', fontFamily: 'monospace' }}>
-                  = (LC*0.5) + (CF*0.3) + (CC*0.2)
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', fontSize: '0.85rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>LeetCode <span style={{ opacity: 0.5 }}>(50%)</span>:</span> 
-                    <strong>{s.ranking.leetcode_score?.total_score || 0}</strong>
+              {/* Row 2: Platform scores in detail */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+
+                {/* DSA Aggregate */}
+                <div className="detail-card" style={{ borderColor: 'rgba(96,165,250,0.3)' }}>
+                  <h3 style={{ color: '#60A5FA', borderBottom: '1px solid rgba(96,165,250,0.2)', paddingBottom: '0.5rem' }}>DSA Score</h3>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.dsa_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
+                  <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>LC×0.33 + CC×0.34 + CF×0.33</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                    {[
+                      { name: 'LeetCode (33%)', val: r.lc_score, color: '#F59E0B' },
+                      { name: 'CodeChef (34%)', val: r.cc_score, color: '#EF4444' },
+                      { name: 'Codeforces (33%)', val: r.cf_score, color: '#3B82F6' },
+                    ].map(p => (
+                      <div key={p.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: p.color }}>{p.name}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ width: 60, height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min(p.val ?? 0, 100)}%`, background: p.color, borderRadius: 3 }} />
+                          </div>
+                          <strong style={{ minWidth: 28, textAlign: 'right' }}>{p.val ?? 0}</strong>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Codeforces <span style={{ opacity: 0.5 }}>(30%)</span>:</span> 
-                    <strong>{s.ranking.codeforces_score?.total_score || 0}</strong>
+                </div>
+
+                {/* GitHub Score */}
+                <div className="detail-card" style={{ borderColor: 'rgba(167,139,250,0.3)' }}>
+                  <h3 style={{ color: '#A78BFA', borderBottom: '1px solid rgba(167,139,250,0.2)', paddingBottom: '0.5rem' }}>GitHub Score</h3>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.github_score_total}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
+                  <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>Repos+Stars+Commits+Activity+…</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                    {Object.entries(r.github_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ width: 50, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min((bd.contribution / (r.github_score?.total_score || 1)) * 100, 100)}%`, background: '#A78BFA', borderRadius: 3 }} />
+                          </div>
+                          <strong style={{ minWidth: 28, textAlign: 'right' }}>{bd.contribution}</strong>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>CodeChef <span style={{ opacity: 0.5 }}>(20%)</span>:</span> 
-                    <strong>{s.ranking.codechef_score?.total_score || 0}</strong>
+                </div>
+
+                {/* LeetCode Detail */}
+                <div className="detail-card" style={{ borderColor: 'rgba(245,158,11,0.3)' }}>
+                  <h3 style={{ color: '#F59E0B', borderBottom: '1px solid rgba(245,158,11,0.2)', paddingBottom: '0.5rem' }}>LeetCode Breakdown</h3>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.lc_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
+                  <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>DiffScore(60)+Contest(25)+Part(5)+Activity(10)</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                    {Object.entries(r.leetcode_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{ fontSize: '0.65rem', opacity: 0.5, fontFamily: 'monospace' }}>{bd.formula}</span>
+                          <strong>{bd.contribution}</strong>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Row 3: CodeChef + Codeforces */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+                <div className="detail-card" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
+                  <h3 style={{ color: '#EF4444', borderBottom: '1px solid rgba(239,68,68,0.2)', paddingBottom: '0.5rem' }}>CodeChef Breakdown</h3>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.cc_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
+                  <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>Stars(40)+Rating(30)+Solved(15)+Contests(10)+Activity(5)</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                    {Object.entries(r.codechef_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{ fontSize: '0.65rem', opacity: 0.5, fontFamily: 'monospace' }}>{bd.formula}</span>
+                          <strong>{bd.contribution}</strong>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="detail-card" style={{ borderColor: 'rgba(59,130,246,0.3)' }}>
+                  <h3 style={{ color: '#3B82F6', borderBottom: '1px solid rgba(59,130,246,0.2)', paddingBottom: '0.5rem' }}>Codeforces Breakdown</h3>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.cf_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
+                  <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>Rating(50)+MaxRating(20)+Solved(15)+Contests(10)+Activity(5)</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                    {Object.entries(r.codeforces_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{ fontSize: '0.65rem', opacity: 0.5, fontFamily: 'monospace' }}>{bd.formula}</span>
+                          <strong>{bd.contribution}</strong>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-
-              <div className="detail-card">
-                <h3 style={{ color: '#A78BFA', borderBottom: '1px solid rgba(167, 139, 250, 0.2)', paddingBottom: '0.5rem' }}>GitHub Capability Analysis</h3>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', textAlign: 'center', margin: '0.5rem 0 0' }}>
-                  {s.ranking.github_score?.total_score || 0}<span style={{ fontSize: '1rem', opacity: 0.7 }}>/100</span>
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '1rem', fontFamily: 'monospace' }}>
-                  = &Sigma; (Metric &times; Weight)
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', fontSize: '0.85rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Engineering <span style={{ opacity: 0.5 }}>(20%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.engineering_score?.raw_value || s.github.github_strength?.engineering_score || 0}/100</strong></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Activity <span style={{ opacity: 0.5 }}>(20%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.activity_score?.raw_value || s.github.github_strength?.activity_score || 0}/100</strong></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Repositories <span style={{ opacity: 0.5 }}>(20%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.repository_score?.raw_value || s.github.github_strength?.repository_score || 0}/100</strong></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Documentation <span style={{ opacity: 0.5 }}>(15%)</span>:</span> <strong>{s.ranking.github_score?.breakdown?.documentation_score?.raw_value || s.github.github_strength?.documentation_score || 0}/100</strong></div>
-                </div>
-              </div>
-
             </div>
-          </div>
-        )}
+          );
+        })()}
+
 
         <div>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', marginTop: '0.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Open Source Profile</h2>

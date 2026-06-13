@@ -1,6 +1,0 @@
-SKILLS
-Python, React, AWS
-EDUCATION
-B.Tech
-2022-2026
-CGPA: 8.5

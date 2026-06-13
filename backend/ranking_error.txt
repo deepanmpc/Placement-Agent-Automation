@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/deepandee/Desktop/Placement-Agent-Automation/backend/api/main.py", line 198, in list_profiles
+    attach_ranking(p)
+  File "/Users/deepandee/Desktop/Placement-Agent-Automation/backend/api/main.py", line 172, in attach_ranking
+    cc = CodeChefRanker.calculate(profile.codechef.model_dump())
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/deepandee/Desktop/Placement-Agent-Automation/backend/ranking/weighted_ranker/coding_ranker/codechef_score.py", line 19, in calculate
+    b = ScoreBreakdown(key, raw, 0, cls.WEIGHTS[key], cls.MAX_EXPECTED[key])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/deepandee/Desktop/Placement-Agent-Automation/backend/ranking/weighted_ranker/common.py", line 8, in __init__
+    self.normalized_value = min(raw_value / max_expected, 1.0) if max_expected > 0 else 0.0
+                                ~~~~~~~~~~^~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for /: 'str' and 'int'

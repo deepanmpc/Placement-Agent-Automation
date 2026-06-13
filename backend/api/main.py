@@ -165,23 +165,69 @@ from backend.ranking.weighted_ranker.coding_ranker.codeforces_score import Codef
 from backend.ranking.weighted_ranker.coding_ranker.codechef_score import CodeChefRanker
 from backend.ranking.weighted_ranker.coding_ranker.coding_aggregator import CodingAggregator
 from backend.ranking.weighted_ranker.github_ranker.github_engineering import GitHubEngineeringRanker
+from backend.ranking.weighted_ranker.rule_score import RuleScoreAggregator
 
-def attach_ranking(profile: StudentProfile):
+
+def attach_ranking(profile: StudentProfile, custom_weights: dict | None = None):
+    """
+    Computes all scoring modes and attaches them to the profile.ranking field.
+    
+    Modes:
+      dsa_mode    = DSA_SCORE × 0.60 + GITHUB_SCORE × 0.40
+      github_mode = GITHUB_SCORE × 0.60 + DSA_SCORE × 0.40
+      custom      = (LC×lc_w + CC×cc_w + CF×cf_w + GH×gh_w) / 100
+    """
     lc = LeetCodeRanker.calculate(profile.leetcode.model_dump())
     cf = CodeforcesRanker.calculate(profile.codeforces.model_dump())
     cc = CodeChefRanker.calculate(profile.codechef.model_dump())
-    coding = CodingAggregator.calculate(lc, cf, cc)
-    
-    gh_data = profile.github.github_strength.model_dump() if profile.github.github_strength else {}
-    gh = GitHubEngineeringRanker.calculate(gh_data)
-    
+
+    # DSA aggregate: LC×0.33 + CC×0.34 + CF×0.33
+    dsa = CodingAggregator.calculate(lc, cf, cc)
+
+    # GitHub score
+    gh_raw = profile.github.model_dump()
+    # Also merge github_strength sub-fields if present
+    if profile.github.github_strength:
+        gh_raw.update(profile.github.github_strength.model_dump())
+    gh = GitHubEngineeringRanker.calculate(gh_raw)
+
+    # All three composite modes
+    dsa_mode    = RuleScoreAggregator.calculate_dsa_mode(dsa.total_score, gh.total_score)
+    github_mode = RuleScoreAggregator.calculate_github_mode(dsa.total_score, gh.total_score)
+
+    cw = custom_weights or {}
+    custom = RuleScoreAggregator.calculate_custom(
+        lc_score=lc.total_score, cc_score=cc.total_score,
+        cf_score=cf.total_score, github_score=gh.total_score,
+        lc_weight=cw.get("lc", 25.0), cc_weight=cw.get("cc", 25.0),
+        cf_weight=cw.get("cf", 25.0), gh_weight=cw.get("gh", 25.0),
+    )
+
     profile.ranking = {
-        "leetcode_score": lc.to_dict(),
+        # Individual platform scores
+        "lc_score":  round(lc.total_score, 2),
+        "cc_score":  round(cc.total_score, 2),
+        "cf_score":  round(cf.total_score, 2),
+        "dsa_score": round(dsa.total_score, 2),
+        "github_score_total": round(gh.total_score, 2),
+
+        # Composite modes
+        "overall_dsa_mode":    round(dsa_mode.total_score, 2),
+        "overall_github_mode": round(github_mode.total_score, 2),
+        "custom_score":        round(custom.total_score, 2),
+
+        # Full breakdowns (for detailed UI)
+        "leetcode_score":   lc.to_dict(),
+        "codechef_score":   cc.to_dict(),
         "codeforces_score": cf.to_dict(),
-        "codechef_score": cc.to_dict(),
-        "coding_score": coding.to_dict(),
-        "github_score": gh.to_dict(),
-        "total_technical_score": round(coding.total_score * 0.6 + gh.total_score * 0.4, 2)
+        "coding_score":     dsa.to_dict(),
+        "github_score":     gh.to_dict(),
+        "dsa_mode_breakdown":    dsa_mode.to_dict(),
+        "github_mode_breakdown": github_mode.to_dict(),
+        "custom_breakdown":      custom.to_dict(),
+
+        # Legacy field kept for backward-compat
+        "total_technical_score": round(dsa_mode.total_score, 2),
     }
 
 @app.get("/profiles", response_model=List[StudentProfile])
