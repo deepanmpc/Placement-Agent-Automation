@@ -153,14 +153,43 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
         </div>
       </div>
 
-      <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <input 
-          type="checkbox" 
-          checked={profiles.length > 0 && selectedIds.size === profiles.length}
-          onChange={handleSelectAll}
-          id="selectAll"
-        />
-        <label htmlFor="selectAll">Select All</label>
+      <div 
+        onClick={() => handleSelectAll({ target: { checked: !(profiles.length > 0 && selectedIds.size === profiles.length) } } as any)}
+        style={{
+          marginBottom: '1.25rem',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.6rem',
+          cursor: 'pointer',
+          padding: '0.45rem 0.85rem',
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+          borderRadius: '8px',
+          fontSize: '0.82rem',
+          fontWeight: 600,
+          color: 'var(--text-secondary)',
+          userSelect: 'none',
+          boxShadow: 'var(--shadow-sm)',
+          transition: 'all 0.2s ease'
+        }}
+      >
+        <div style={{
+          width: '18px',
+          height: '18px',
+          borderRadius: '5px',
+          border: `2px solid ${profiles.length > 0 && selectedIds.size === profiles.length ? 'var(--accent)' : 'var(--border)'}`,
+          background: profiles.length > 0 && selectedIds.size === profiles.length ? 'var(--accent)' : 'transparent',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.2s ease',
+          flexShrink: 0
+        }}>
+          {profiles.length > 0 && selectedIds.size === profiles.length && (
+            <span style={{ color: '#fff', fontSize: '0.65rem', fontWeight: 'bold' }}>✓</span>
+          )}
+        </div>
+        <span>Select All Candidates</span>
       </div>
 
       <div className="candidates-list">
@@ -168,23 +197,43 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
           <div 
             key={p.student_uuid} 
             className="candidate-card" 
-            style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1rem 1.25rem' }}
           >
-            <input 
-              type="checkbox" 
-              checked={selectedIds.has(p.student_uuid)}
-              onChange={(e) => handleSelect(p.student_uuid, e.target.checked)}
-              style={{ transform: 'scale(1.2)' }}
-            />
+            {/* Custom Checkbox */}
             <div 
-              style={{ flex: 1, display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelect(p.student_uuid, !selectedIds.has(p.student_uuid));
+              }}
+              style={{
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '22px',
+                height: '22px',
+                borderRadius: '6px',
+                border: `2px solid ${selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'var(--border)'}`,
+                background: selectedIds.has(p.student_uuid) ? 'var(--accent)' : 'transparent',
+                boxShadow: selectedIds.has(p.student_uuid) ? '0 0 10px rgba(99, 102, 241, 0.25)' : 'none',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
+              }}
+            >
+              {selectedIds.has(p.student_uuid) && (
+                <span style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
+              )}
+            </div>
+
+            <div 
+              style={{ flex: 1, display: 'flex', justifyContent: 'space-between', cursor: 'pointer', alignItems: 'center' }}
               onClick={() => {
                 onSelect(p.student_uuid);
                 onNavigate('student');
               }}
             >
               <div className="candidate-info" style={{ display: 'flex', alignItems: 'center' }}>
-                <h3 className="candidate-name" style={{ margin: 0 }}>
+                <h3 className="candidate-name" style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
                   {p.personal_info.name || 'Unknown Candidate'} {p.personal_info.id_number ? `(${p.personal_info.id_number})` : ''}
                 </h3>
               </div>
