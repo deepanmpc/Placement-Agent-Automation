@@ -57,6 +57,7 @@ export default function App() {
           studentId={selectedStudent}
           onNavigate={setPage}
           scoringMode={scoringMode}
+          onScoringModeChange={setScoringMode}
           customWeights={customWeights}
         />
       )}

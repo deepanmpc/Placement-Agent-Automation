@@ -7,6 +7,7 @@ interface Props {
   studentId: string | null;
   onNavigate: (page: PageView) => void;
   scoringMode: ScoringMode;
+  onScoringModeChange: (m: ScoringMode) => void;
   customWeights: CustomWeights;
 }
 
@@ -24,7 +25,7 @@ function SkillSection({ label, items }: { label: string; items: string[] }) {
   );
 }
 
-export default function StudentDetail({ studentId, onNavigate, scoringMode, customWeights }: Props) {
+export default function StudentDetail({ studentId, onNavigate, scoringMode, onScoringModeChange, customWeights }: Props) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [enriching, setEnriching] = useState(false);
@@ -207,12 +208,32 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
                       { key: 'custom', label: 'Custom Score', score: r.custom_score, color: '#34D399',
                         formula: `(LC×${customWeights.lc}+CC×${customWeights.cc}+CF×${customWeights.cf}+GH×${customWeights.gh})/100` },
                     ].map(item => (
-                      <div key={item.key} style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '0.5rem 0.75rem', borderRadius: '8px',
-                        background: scoringMode === item.key ? `${item.color}12` : 'var(--bg)',
-                        border: `1px solid ${scoringMode === item.key ? item.color : 'var(--border)'}`,
-                      }}>
+                      <button
+                        key={item.key}
+                        onClick={() => onScoringModeChange(item.key as ScoringMode)}
+                        style={{
+                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          padding: '0.5rem 0.75rem', borderRadius: '8px',
+                          background: scoringMode === item.key ? `${item.color}12` : 'var(--bg)',
+                          border: `1px solid ${scoringMode === item.key ? item.color : 'var(--border)'}`,
+                          cursor: 'pointer', width: '100%', textAlign: 'left',
+                          fontFamily: 'inherit', color: 'inherit',
+                          transition: 'all 0.15s ease',
+                          outline: 'none',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (scoringMode !== item.key) {
+                            e.currentTarget.style.borderColor = item.color;
+                            e.currentTarget.style.background = `${item.color}06`;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (scoringMode !== item.key) {
+                            e.currentTarget.style.borderColor = 'var(--border)';
+                            e.currentTarget.style.background = 'var(--bg)';
+                          }
+                        }}
+                      >
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '0.82rem', color: item.color }}>{item.label}</div>
                           <div style={{ fontSize: '0.65rem', fontFamily: 'monospace', color: 'var(--text-muted)', marginTop: '0.1rem' }}>{item.formula}</div>
@@ -220,7 +241,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
                         <div style={{ fontSize: '1.5rem', fontWeight: 800, color: scoringMode === item.key ? item.color : 'var(--text)' }}>
                           {item.score ?? '—'}
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
