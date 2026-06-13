@@ -25,7 +25,15 @@ export default function ResumeUpload() {
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file) {
+      setError("Please select a resume file.");
+      return;
+    }
+    
+    if (!name.trim() || !idNumber.trim() || !dept.trim() || !batch.trim() || !githubUrl.trim() || !linkedinUrl.trim() || !leetcodeUsername.trim() || !codeforcesUsername.trim() || !codechefUsername.trim()) {
+      setError("All form fields are required.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -128,15 +136,15 @@ export default function ResumeUpload() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
           <div className="form-group">
-            <label className="form-label">Full Name</label>
+            <label className="form-label">Full Name <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="Varun Reddy" />
           </div>
           <div className="form-group">
-            <label className="form-label">ID Number / Roll Number</label>
+            <label className="form-label">ID Number / Roll Number <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="23000*****" />
           </div>
           <div className="form-group">
-            <label className="form-label">Department</label>
+            <label className="form-label">Department <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <select 
               className="form-input" 
               value={dept} 
@@ -152,7 +160,7 @@ export default function ResumeUpload() {
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">Batch</label>
+            <label className="form-label">Batch <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <select 
               className="form-input" 
               value={batch} 
@@ -166,23 +174,23 @@ export default function ResumeUpload() {
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">LinkedIn URL</label>
+            <label className="form-label">LinkedIn URL <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" className="form-input" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/username" />
           </div>
           <div className="form-group">
-            <label className="form-label">GitHub Profile URL</label>
+            <label className="form-label">GitHub Profile URL <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" className="form-input" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username" />
           </div>
           <div className="form-group">
-            <label className="form-label">LeetCode Username</label>
+            <label className="form-label">LeetCode Username <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" className="form-input" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
           <div className="form-group">
-            <label className="form-label">Codeforces Handle</label>
+            <label className="form-label">Codeforces Handle <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" className="form-input" value={codeforcesUsername} onChange={e => setCodeforcesUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
           <div className="form-group" style={{ gridColumn: 'span 2' }}>
-            <label className="form-label">CodeChef Username</label>
+            <label className="form-label">CodeChef Username <span style={{ color: 'var(--color-danger)' }}>*</span></label>
             <input type="text" className="form-input" value={codechefUsername} onChange={e => setCodechefUsername(e.target.value)} placeholder="klu23000*****" />
           </div>
         </div>
