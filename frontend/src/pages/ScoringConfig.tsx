@@ -5,6 +5,7 @@ interface Props {
   onScoringModeChange: (m: ScoringMode) => void;
   customWeights: CustomWeights;
   onCustomWeightsChange: (w: CustomWeights) => void;
+  onSave: () => void;
 }
 
 interface ModeUIConfig {
@@ -96,7 +97,7 @@ const PLATFORM_FORMULAS = [
   },
 ];
 
-export default function ScoringConfig({ scoringMode, onScoringModeChange, customWeights, onCustomWeightsChange }: Props) {
+export default function ScoringConfig({ scoringMode, onScoringModeChange, customWeights, onCustomWeightsChange, onSave }: Props) {
   const weightSum = customWeights.lc + customWeights.cc + customWeights.cf + customWeights.gh;
   const validWeights = Math.abs(weightSum - 100) < 0.01;
 
@@ -141,7 +142,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                 alert(`Cannot save: Custom weights must sum to 100%. Currently ${weightSum}%.`);
                 return;
               }
-              alert("Configuration Saved! Ranks have been dynamically updated in the dashboard.");
+              onSave();
             }}
             style={{ padding: '0.8rem 2rem', fontSize: '1rem', fontWeight: 700, backgroundColor: 'var(--accent)', color: 'white' }}
           >

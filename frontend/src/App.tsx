@@ -49,10 +49,13 @@ export default function App() {
         if (res.data) {
           if (res.data.SCORING_MODE) {
             setScoringMode(res.data.SCORING_MODE as ScoringMode);
+            localStorage.setItem('scoringMode', res.data.SCORING_MODE);
           }
           if (res.data.CUSTOM_WEIGHTS) {
             try {
-              setCustomWeights(JSON.parse(res.data.CUSTOM_WEIGHTS));
+              const cw = JSON.parse(res.data.CUSTOM_WEIGHTS);
+              setCustomWeights(cw);
+              localStorage.setItem('customWeights', res.data.CUSTOM_WEIGHTS);
             } catch (e) {}
           }
         }
@@ -60,23 +63,20 @@ export default function App() {
       .catch(console.error);
   }, []);
 
-  useEffect(() => {
+  const saveConfig = () => {
     localStorage.setItem('scoringMode', scoringMode);
-    fetch('http://localhost:9090/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ SCORING_MODE: scoringMode })
-    }).catch(console.error);
-  }, [scoringMode]);
-
-  useEffect(() => {
     localStorage.setItem('customWeights', JSON.stringify(customWeights));
     fetch('http://localhost:9090/api/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ CUSTOM_WEIGHTS: JSON.stringify(customWeights) })
-    }).catch(console.error);
-  }, [customWeights]);
+      body: JSON.stringify({
+        SCORING_MODE: scoringMode,
+        CUSTOM_WEIGHTS: JSON.stringify(customWeights)
+      })
+    })
+    .then(() => alert(`Configuration Saved!\nMode: ${scoringMode}\nWeights: LC ${customWeights.lc}%, CC ${customWeights.cc}%, CF ${customWeights.cf}%, GH ${customWeights.gh}%`))
+    .catch(console.error);
+  };
   
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const jwt = localStorage.getItem('jwt');
@@ -149,12 +149,13 @@ export default function App() {
             />
           )}
           {page === 'scoring-config' && (
-            <ScoringConfig
-              scoringMode={scoringMode}
-              onScoringModeChange={setScoringMode}
-              customWeights={customWeights}
-              onCustomWeightsChange={setCustomWeights}
-            />
+            <ScoringConfig 
+            scoringMode={scoringMode} 
+            onScoringModeChange={setScoringMode} 
+            customWeights={customWeights} 
+            onCustomWeightsChange={setCustomWeights} 
+            onSave={saveConfig}
+          />
           )}
           {page === 'analytics' && <Analytics />}
         </div>
