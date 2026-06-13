@@ -7,41 +7,42 @@ interface Props {
   onCustomWeightsChange: (w: CustomWeights) => void;
 }
 
-const FORMULAS: Record<ScoringMode, { title: string; color: string; desc: string; lines: string[] }> = {
+interface ModeUIConfig {
+  title: string;
+  color: string;
+  desc: string;
+  formula: string;
+  components: { name: string; weight: string }[];
+}
+
+const FORMULA_CONFIGS: Record<ScoringMode, ModeUIConfig> = {
   dsa_mode: {
     title: 'DSA Mode (Default)',
     color: '#60A5FA',
     desc: 'Prioritizes Data Structures & Algorithms capability with a 60% weight, combined with 40% open source engineering score.',
-    lines: [
-      'OVERALL_DSA_MODE =',
-      '  (DSA_SCORE × 0.60) + (GITHUB_SCORE × 0.40)',
-      '',
-      'DSA_SCORE =',
-      '  LeetCode × 0.33 + CodeChef × 0.34 + Codeforces × 0.33',
+    formula: 'Score = (DSA × 0.60) + (GitHub × 0.40)',
+    components: [
+      { name: 'DSA Aggregate (LC, CC, CF)', weight: '60%' },
+      { name: 'GitHub Engineering', weight: '40%' },
     ],
   },
   github_mode: {
     title: 'GitHub Mode',
     color: '#A78BFA',
     desc: 'Prioritizes real-world engineering, documentation, and repository activity with a 60% weight, combined with 40% DSA rating.',
-    lines: [
-      'OVERALL_GITHUB_MODE =',
-      '  (GITHUB_SCORE × 0.60) + (DSA_SCORE × 0.40)',
-      '',
-      'GITHUB_SCORE =',
-      '  Repos(15) + Stars(20) + Followers(10) + Commits(20)',
-      '  + ContribDays(15) + PRs(10) + Issues(5) + ActiveDays(5)',
+    formula: 'Score = (GitHub × 0.60) + (DSA × 0.40)',
+    components: [
+      { name: 'GitHub Engineering', weight: '60%' },
+      { name: 'DSA Aggregate (LC, CC, CF)', weight: '40%' },
     ],
   },
   custom: {
     title: 'Custom Mode',
     color: '#34D399',
     desc: 'Fully customizable scoring weights. Set individual platform weights to customize evaluations according to your requirements.',
-    lines: [
-      'CUSTOM_SCORE =',
-      '  (LC × LC_W + CC × CC_W + CF × CF_W + GH × GH_W) / 100',
-      '',
-      'Adjust the sliders below to allocate weights (must sum to 100%).',
+    formula: 'Score = LC × W_LC + CC × W_CC + CF × W_CF + GH × W_GH',
+    components: [
+      { name: 'User Defined Allocations', weight: '100% Total' },
     ],
   },
 };
@@ -50,80 +51,47 @@ const PLATFORM_FORMULAS = [
   {
     name: 'LeetCode (LC) Formula Details',
     color: '#F59E0B',
-    formula: [
-      '// 1. Difficulty Points (Capped at 3000 pts)',
-      'DifficultyPoints = (Easy × 1) + (Medium × 3) + (Hard × 8)',
-      'DifficultyScore = MIN(DifficultyPoints / 3000, 1) × 60',
-      '',
-      '// 2. Contest Rating Score',
-      'ContestScore = MIN(ContestRating / 2500, 1) × 25',
-      '',
-      '// 3. Participation Consistency',
-      'ParticipationScore = MIN(ContestsAttended / 50, 1) × 5',
-      '',
-      '// 4. Recent Activity',
-      'ActivityScore = MIN(ActiveDays90 / 90, 1) × 10',
-      '',
-      '// LC_SCORE Total = Difficulty + Contest + Participation + Activity',
+    components: [
+      { name: 'Difficulty Points (Easy × 1, Med × 3, Hard × 8)', weight: 'Max 60 pts', formula: 'MIN(Points / 3000, 1) × 60' },
+      { name: 'Contest Rating Score', weight: 'Max 25 pts', formula: 'MIN(ContestRating / 2500, 1) × 25' },
+      { name: 'Participation Consistency', weight: 'Max 5 pts', formula: 'MIN(ContestsAttended / 50, 1) × 5' },
+      { name: 'Recent Activity (90 days)', weight: 'Max 10 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 10' },
     ],
   },
   {
     name: 'CodeChef (CC) Formula Details',
     color: '#EF4444',
-    formula: [
-      '// 1. Star Rank Points',
-      '1★ = 10  |  2★ = 25  |  3★ = 40  |  4★ = 60',
-      '5★ = 80  |  6★ = 95  |  7★ = 100',
-      'StarScore = StarMapPoints × 0.40',
-      '',
-      '// 2. Rating & Problem Solving Counts',
-      'RatingScore = MIN(Rating / 3000, 1) × 30',
-      'ProblemsScore = MIN(ProblemsSolved / 1000, 1) × 15',
-      '',
-      '// 3. Contest Participation & Activity',
-      'ContestScore = MIN(ContestsCount / 50, 1) × 10',
-      'ActivityScore = MIN(ActiveDays90 / 90, 1) × 5',
-      '',
-      '// CC_SCORE Total = StarScore + Rating + Problems + Contest + Activity',
+    components: [
+      { name: 'Star Rank Points (1★=10, 2★=25, 3★=40, 4★=60...)', weight: 'Max 40 pts', formula: 'StarMapPoints × 0.40' },
+      { name: 'Current Rating Score', weight: 'Max 30 pts', formula: 'MIN(Rating / 3000, 1) × 30' },
+      { name: 'Problems Solved Score', weight: 'Max 15 pts', formula: 'MIN(ProblemsSolved / 1000, 1) × 15' },
+      { name: 'Contest Count Score', weight: 'Max 10 pts', formula: 'MIN(ContestsCount / 50, 1) × 10' },
+      { name: 'Recent Activity (90 days)', weight: 'Max 5 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 5' },
     ],
   },
   {
     name: 'Codeforces (CF) Formula Details',
     color: '#3B82F6',
-    formula: [
-      '// 1. Live & Max Ratings',
-      'RatingScore = MIN(CurrentRating / 3500, 1) × 50',
-      'MaxRatingScore = MIN(MaxRating / 3500, 1) × 20',
-      '',
-      '// 2. Solved Problems Count',
-      'SolvedScore = MIN(ProblemsSolved / 3000, 1) × 15',
-      '',
-      '// 3. Contest Participation & Activity',
-      'ContestScore = MIN(ContestsCount / 100, 1) × 10',
-      'ActivityScore = MIN(ActiveDays90 / 90, 1) × 5',
-      '',
-      '// CF_SCORE Total = Rating + MaxRating + Solved + Contest + Activity',
+    components: [
+      { name: 'Current Rating Score', weight: 'Max 50 pts', formula: 'MIN(CurrentRating / 3500, 1) × 50' },
+      { name: 'Maximum Rating Score', weight: 'Max 20 pts', formula: 'MIN(MaxRating / 3500, 1) × 20' },
+      { name: 'Problems Solved Score', weight: 'Max 15 pts', formula: 'MIN(ProblemsSolved / 3000, 1) × 15' },
+      { name: 'Contest Count Score', weight: 'Max 10 pts', formula: 'MIN(ContestsCount / 100, 1) × 10' },
+      { name: 'Recent Activity (90 days)', weight: 'Max 5 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 5' },
     ],
   },
   {
     name: 'GitHub (GH) Engineering Formula Details',
     color: '#10B981',
-    formula: [
-      '// 1. Repo counts, Stars, and Followers',
-      'ReposScore = MIN(PublicRepos / 50, 1) × 15',
-      'StarsScore = MIN(TotalStars / 500, 1) × 20',
-      'FollowersScore = MIN(Followers / 250, 1) × 10',
-      '',
-      '// 2. Contribution frequency & Consistency',
-      'CommitsScore = MIN(CommitsLast365 / 1500, 1) × 20',
-      'ConsistencyScore = (ContributionDays365 / 365) × 15',
-      '',
-      '// 3. Collaboration & Pull Requests',
-      'PRsScore = MIN(MergedPRs / 100, 1) × 10',
-      'IssuesScore = MIN(ClosedIssues / 100, 1) × 5',
-      'ActivityScore = MIN(ActiveDays90 / 90, 1) × 5',
-      '',
-      '// GITHUB_SCORE Total = Sum of all 8 components',
+    components: [
+      { name: 'Public Repositories', weight: 'Max 15 pts', formula: 'MIN(PublicRepos / 50, 1) × 15' },
+      { name: 'Total Repository Stars', weight: 'Max 20 pts', formula: 'MIN(TotalStars / 500, 1) × 20' },
+      { name: 'Followers count', weight: 'Max 10 pts', formula: 'MIN(Followers / 250, 1) × 10' },
+      { name: 'Commit Count (Year)', weight: 'Max 20 pts', formula: 'MIN(Commits365 / 1500, 1) × 20' },
+      { name: 'Contribution Consistency (Days)', weight: 'Max 15 pts', formula: '(ContributionDays365 / 365) × 15' },
+      { name: 'Merged Pull Requests', weight: 'Max 10 pts', formula: 'MIN(MergedPRs / 100, 1) × 10' },
+      { name: 'Closed Issues', weight: 'Max 5 pts', formula: 'MIN(ClosedIssues / 100, 1) × 5' },
+      { name: 'Recent Activity (90 days)', weight: 'Max 5 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 5' },
     ],
   },
 ];
@@ -137,37 +105,37 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
   };
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <h1>Scoring Engine Settings</h1>
-        <p className="page-subtitle">Configure overall candidate ranking modes, custom platform evaluation weights, and review scoring formulas.</p>
+    <div className="page" style={{ paddingBottom: '3rem' }}>
+      <div className="page-header" style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', marginBottom: '0.4rem' }}>Scoring Engine Settings</h1>
+        <p className="page-subtitle" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Configure overall candidate ranking modes, custom platform evaluation weights, and review scoring formulas.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         
         {/* Section 1: Ranking Modes */}
         <div>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-            Overall Ranking Mode
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
+            Overall Ranking Mode Selection
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
             {(['dsa_mode', 'github_mode', 'custom'] as ScoringMode[]).map(m => {
-              const f = FORMULAS[m];
+              const f = FORMULA_CONFIGS[m];
               const isActive = scoringMode === m;
               return (
                 <button
                   key={m}
                   onClick={() => onScoringModeChange(m)}
                   style={{
-                    background: isActive ? `${f.color}12` : 'var(--bg)',
+                    background: isActive ? `${f.color}08` : 'var(--bg)',
                     border: isActive ? `2px solid ${f.color}` : '1px solid var(--border)',
                     borderRadius: '12px',
                     padding: '1.5rem',
                     cursor: 'pointer',
                     textAlign: 'left',
                     width: '100%',
-                    boxShadow: isActive ? `0 4px 20px -5px ${f.color}40` : 'none',
-                    transition: 'all 0.2s ease',
+                    boxShadow: isActive ? `0 8px 30px -10px ${f.color}35` : 'none',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     position: 'relative',
                     outline: 'none',
                   }}
@@ -184,28 +152,38 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                     }
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <div style={{ width: 10, height: 10, borderRadius: '50%', background: f.color }} />
-                      <strong style={{ fontSize: '1rem', color: isActive ? f.color : 'var(--text)' }}>{f.title}</strong>
+                      <strong style={{ fontSize: '1rem', fontWeight: 700, color: isActive ? f.color : 'var(--text)' }}>{f.title}</strong>
                     </div>
                     {isActive && (
                       <span style={{
-                        fontSize: '0.7rem', fontWeight: 700, background: f.color, color: '#FFF',
-                        padding: '0.2rem 0.5rem', borderRadius: '20px', textTransform: 'uppercase'
+                        fontSize: '0.65rem', fontWeight: 800, background: f.color, color: '#FFF',
+                        padding: '0.25rem 0.6rem', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.06em'
                       }}>
                         Active
                       </span>
                     )}
                   </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>{f.desc}</p>
-                  <pre style={{
-                    margin: 0, padding: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)',
-                    borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.74rem', color: 'var(--text-primary)',
-                    lineHeight: 1.6, whiteSpace: 'pre-wrap'
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5, height: '40px', overflow: 'hidden' }}>{f.desc}</p>
+                  
+                  {/* Styled Math Equation Block */}
+                  <div style={{
+                    display: 'flex', flexDirection: 'column', gap: '0.55rem',
+                    background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+                    borderRadius: '8px', padding: '0.85rem 1rem'
                   }}>
-                    {f.lines.join('\n')}
-                  </pre>
+                    <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)', paddingBottom: '0.35rem', fontFamily: 'monospace' }}>
+                      {f.formula}
+                    </div>
+                    {f.components.map((c, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>{c.name}</span>
+                        <strong style={{ color: isActive ? f.color : 'var(--text)' }}>{c.weight}</strong>
+                      </div>
+                    ))}
+                  </div>
                 </button>
               );
             })}
@@ -220,7 +198,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
               <div>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#34D399', margin: 0 }}>Custom Mode Scoring Allocations</h3>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#34D399', margin: 0 }}>Custom Mode Scoring Allocations</h3>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>Configure weights for each developer platform. The total allocations must sum to exactly 100%.</p>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -285,23 +263,41 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
 
         {/* Section 3: Full Platform Scoring Formula References */}
         <div>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem', marginTop: '1rem' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem', marginTop: '1rem' }}>
             Detailed Platform Evaluation Formulas
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.25rem' }}>
             {PLATFORM_FORMULAS.map(pf => (
               <div key={pf.name} style={{
                 background: 'var(--bg)', border: '1px solid var(--border)', borderLeft: `4px solid ${pf.color}`,
-                borderRadius: '8px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem'
+                borderRadius: '10px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem',
+                boxShadow: 'var(--shadow-sm)'
               }}>
-                <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: pf.color, margin: 0 }}>{pf.name}</h3>
-                <pre style={{
-                  margin: 0, padding: '0.75rem', background: 'var(--bg-secondary)', borderRadius: '6px',
-                  fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-muted)',
-                  lineHeight: 1.6, overflowX: 'auto', whiteSpace: 'pre'
-                }}>
-                  {pf.formula.join('\n')}
-                </pre>
+                <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: pf.color, margin: 0, paddingBottom: '0.5rem', borderBottom: `1px solid ${pf.color}20` }}>{pf.name}</h3>
+                
+                {/* Structured Formula Rows */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {pf.components.map((comp, idx) => (
+                    <div key={idx} style={{
+                      display: 'flex', flexDirection: 'column', gap: '0.2rem',
+                      paddingBottom: idx !== pf.components.length - 1 ? '0.65rem' : '0',
+                      borderBottom: idx !== pf.components.length - 1 ? '1px solid var(--border)' : 'none'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        <span>{comp.name}</span>
+                        <span style={{ color: pf.color }}>{comp.weight}</span>
+                      </div>
+                      <div style={{
+                        fontSize: '0.74rem', fontFamily: 'monospace', color: 'var(--text-secondary)',
+                        background: 'var(--bg-secondary)', padding: '0.35rem 0.5rem', borderRadius: '4px',
+                        marginTop: '0.2rem', border: '1px solid var(--border)', overflowX: 'auto',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {comp.formula}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
