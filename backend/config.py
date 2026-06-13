@@ -37,9 +37,7 @@ class Settings(BaseSettings):
     )
 
     # ── Database ──────────────────────────────────────────────────────
-    database_url: str = (
-        "sqlite+aiosqlite:///placement_agent.db"
-    )
+    database_url: str = "mysql+aiomysql://root:15713007@127.0.0.1:3306/placement_agent"
 
     # ── Qdrant ────────────────────────────────────────────────────────
     qdrant_host: str = "localhost"

@@ -3,7 +3,9 @@ import { useRef, useState } from 'react';
 export default function ResumeUpload() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [name, setName] = useState('');
   const [idNumber, setIdNumber] = useState('');
+  const [dept, setDept] = useState('cse-1');
   const [batch, setBatch] = useState('2026');
   const [githubUrl, setGithubUrl] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
@@ -31,7 +33,9 @@ export default function ResumeUpload() {
 
     const formData = new FormData();
     formData.append('file', file);
+    if (name) formData.append('name', name);
     if (idNumber) formData.append('id_number', idNumber);
+    if (dept) formData.append('department', dept);
     if (batch) formData.append('graduation_year', batch);
     if (githubUrl) formData.append('github_url', githubUrl);
     if (linkedinUrl) formData.append('linkedin_url', linkedinUrl);
@@ -63,7 +67,9 @@ export default function ResumeUpload() {
       
       // Clear form inputs
       setFile(null);
+      setName('');
       setIdNumber('');
+      setDept('cse-1');
       setBatch('2026');
       setGithubUrl('');
       setLinkedinUrl('');
@@ -115,18 +121,38 @@ export default function ResumeUpload() {
             </div>
           ) : (
             <p className="upload-placeholder" style={{ fontSize: '1.05rem' }}>
-              Click or drag to choose resume file
+              Click to choose resume file
             </p>
           )}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
+          <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <label className="form-label">Full Name</label>
+            <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="Varun Reddy" />
+          </div>
           <div className="form-group">
             <label className="form-label">ID Number / Roll Number</label>
             <input type="text" className="form-input" value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="23000*****" />
           </div>
           <div className="form-group">
-            <label className="form-label">Graduation Batch</label>
+            <label className="form-label">Department</label>
+            <select 
+              className="form-input" 
+              value={dept} 
+              onChange={e => setDept(e.target.value)}
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="cse-1">CSE-1</option>
+              <option value="cse-2">CSE-2</option>
+              <option value="cse-3">CSE-3</option>
+              <option value="cse-4">CSE-4</option>
+              <option value="eee">EEE</option>
+              <option value="ece">ECE</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Batch</label>
             <select 
               className="form-input" 
               value={batch} 

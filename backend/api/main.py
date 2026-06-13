@@ -88,6 +88,8 @@ async def ingest_resume(
     codeforces_username: Optional[str] = Form(None),
     codechef_username: Optional[str] = Form(None),
     graduation_year: Optional[int] = Form(None),
+    name: Optional[str] = Form(None),
+    department: Optional[str] = Form(None),
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
@@ -130,8 +132,15 @@ async def ingest_resume(
         profile = await service.ingest_resume(text, filename=file.filename)
         
         # Override with manual inputs if provided
+        if name:
+            profile.personal_info.name = name
         if id_number:
             profile.personal_info.id_number = id_number
+        if department:
+            if profile.education is None:
+                from backend.ingestion.models.student_profile import Education
+                profile.education = Education()
+            profile.education.branch = department
         if github_url:
             profile.personal_info.github_url = github_url
         if linkedin_url:
@@ -143,6 +152,9 @@ async def ingest_resume(
         if codechef_username:
             profile.personal_info.codechef_username = codechef_username
         if graduation_year:
+            if profile.education is None:
+                from backend.ingestion.models.student_profile import Education
+                profile.education = Education()
             profile.education.graduation_year = graduation_year
             
         # Secondary duplicate check in case the LLM extracted an ID that was not provided manually
