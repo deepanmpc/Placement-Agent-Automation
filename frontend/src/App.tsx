@@ -17,12 +17,38 @@ function getInitialTheme(): 'light' | 'dark' {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+function getInitialScoringMode(): ScoringMode {
+  const stored = localStorage.getItem('scoringMode');
+  if (stored === 'dsa_mode' || stored === 'dev_mode' || stored === 'custom_mode') return stored;
+  return 'dsa_mode';
+}
+
+function getInitialCustomWeights(): CustomWeights {
+  const stored = localStorage.getItem('customWeights');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      // ignore parse error
+    }
+  }
+  return { lc: 25, cc: 25, cf: 25, gh: 25 };
+}
+
 export default function App() {
   const [page, setPage] = useState<PageView>('upload');
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
-  const [scoringMode, setScoringMode] = useState<ScoringMode>('dsa_mode');
-  const [customWeights, setCustomWeights] = useState<CustomWeights>({ lc: 25, cc: 25, cf: 25, gh: 25 });
+  const [scoringMode, setScoringMode] = useState<ScoringMode>(getInitialScoringMode);
+  const [customWeights, setCustomWeights] = useState<CustomWeights>(getInitialCustomWeights);
+
+  useEffect(() => {
+    localStorage.setItem('scoringMode', scoringMode);
+  }, [scoringMode]);
+
+  useEffect(() => {
+    localStorage.setItem('customWeights', JSON.stringify(customWeights));
+  }, [customWeights]);
   
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const jwt = localStorage.getItem('jwt');
