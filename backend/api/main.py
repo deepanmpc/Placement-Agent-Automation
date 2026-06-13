@@ -237,24 +237,35 @@ def attach_ranking(profile: StudentProfile, custom_weights: dict | None = None):
 async def list_profiles(
     limit: int = Query(default=100, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
+    lc_w: Optional[float] = None,
+    cc_w: Optional[float] = None,
+    cf_w: Optional[float] = None,
+    gh_w: Optional[float] = None,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
     service = IngestionService(db_session=db, settings=settings)
     profiles = await service.get_all_profiles(limit=limit, offset=offset)
+    
+    custom_weights = None
+    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
+        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+        
     for p in profiles:
         try:
-            attach_ranking(p)
+            attach_ranking(p, custom_weights=custom_weights)
         except Exception as e:
             import traceback
-            with open("ranking_error.txt", "w") as f:
-                f.write(traceback.format_exc())
             logger.error(f"attach_ranking failed for {p.student_uuid}: {e}")
     return profiles
 
 @app.get("/profiles/{student_uuid}", response_model=StudentProfile)
 async def get_profile(
     student_uuid: str,
+    lc_w: Optional[float] = None,
+    cc_w: Optional[float] = None,
+    cf_w: Optional[float] = None,
+    gh_w: Optional[float] = None,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
@@ -262,8 +273,13 @@ async def get_profile(
     profile = await service.get_profile(student_uuid)
     if not profile:
         raise HTTPException(404, "Profile not found")
+        
+    custom_weights = None
+    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
+        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+        
     try:
-        attach_ranking(profile)
+        attach_ranking(profile, custom_weights=custom_weights)
     except Exception as e:
         import traceback
         logger.error(f"attach_ranking failed for {student_uuid}: {e}")

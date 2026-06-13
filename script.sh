@@ -13,7 +13,7 @@ BACKEND_PID=$!
 echo "Starting Frontend on port 5173..."
 cd frontend
 npm install
-npm run dev &
+npm run dev -- --host &
 FRONTEND_PID=$!
 cd ..
 

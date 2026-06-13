@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { PageView } from '../types';
 import type { Profile } from '../api';
-import type { ScoringMode } from '../components/ScoringSettings';
+import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
 
 const MODE_LABELS: Record<ScoringMode, string> = {
   dsa_mode: 'DSA Mode',
@@ -26,9 +26,10 @@ interface Props {
   onSelect: (studentId: string) => void;
   onNavigate: (page: PageView) => void;
   scoringMode: ScoringMode;
+  customWeights: CustomWeights;
 }
 
-export default function Candidates({ onSelect, onNavigate, scoringMode }: Props) {
+export default function Candidates({ onSelect, onNavigate, scoringMode, customWeights }: Props) {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [enriching, setEnriching] = useState(false);
@@ -67,7 +68,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
   const allFilteredSelected = filteredProfiles.length > 0 && filteredProfiles.every(p => selectedIds.has(p.student_uuid));
 
   const fetchProfiles = () => {
-    fetch('http://localhost:8000/profiles', { cache: 'no-store' })
+    fetch(`http://localhost:8000/profiles?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         setProfiles(data);
@@ -81,7 +82,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
 
   useEffect(() => {
     fetchProfiles();
-  }, []);
+  }, [customWeights]);
 
   const handleEnrich = async () => {
     setEnriching(true);
@@ -253,14 +254,28 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
 
   return (
     <div className="page">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1>Ingested Profiles Dashboard</h1>
           <p className="page-subtitle">
-            {profiles.length} total students ingested
+            {profiles.length} total students ingested in {activeBatch === 'all' ? 'All Batches' : activeBatch}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+          <button
+            onClick={() => setActiveBatch(null)}
+            className="btn btn-ghost"
+            style={{ fontSize: '0.85rem' }}
+          >
+            Switch Batch
+          </button>
+          <button
+            onClick={() => onNavigate('scoring-config')}
+            className="btn btn-secondary"
+            style={{ fontSize: '0.85rem' }}
+          >
+            ⚙️ Configure Scoring
+          </button>
           {selectedIds.size > 0 && (
             <button 
               className="btn btn-primary" 

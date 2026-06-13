@@ -46,6 +46,7 @@ export default function App() {
           onSelect={(id) => setSelectedStudent(id)}
           onNavigate={setPage}
           scoringMode={scoringMode}
+          customWeights={customWeights}
         />
       )}
       {page === 'student' && (
