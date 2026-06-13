@@ -125,64 +125,97 @@ export default function ScoringSettings({ mode, onModeChange, weights, onWeights
 
   return (
     <div style={{ borderTop: '1px solid var(--border)', marginTop: '1rem', paddingTop: '1rem' }}>
-      {/* Header toggle */}
+      {/* Header toggle widget */}
       <button
         onClick={() => setExpanded(e => !e)}
         style={{
           width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'none', border: 'none', cursor: 'pointer', padding: '0 0.25rem',
-          color: 'var(--text)', fontWeight: 600, fontSize: '0.82rem', letterSpacing: '0.06em',
-          textTransform: 'uppercase'
+          background: expanded ? 'var(--bg-secondary)' : 'transparent', 
+          border: '1px solid var(--border)', cursor: 'pointer', padding: '0.6rem 0.75rem',
+          color: 'var(--text)', fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.06em',
+          textTransform: 'uppercase', borderRadius: '8px', transition: 'all 0.15s ease'
         }}
       >
-        <span>⚙ Scoring Settings</span>
-        <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>{expanded ? '▲' : '▼'}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span style={{ fontSize: '0.95rem' }}>⚙</span>
+          <span>Scoring Settings</span>
+        </div>
+        <span style={{ opacity: 0.7, fontSize: '0.65rem' }}>{expanded ? '▲' : '▼'}</span>
       </button>
 
       {expanded && (
-        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
-          {/* Mode selector */}
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.2rem', paddingLeft: '0.1rem' }}>
-            RANKING MODE
+          {/* Ranking Mode Headline */}
+          <div style={{
+            fontSize: '0.74rem',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: 'var(--text)',
+            textTransform: 'uppercase',
+            marginTop: '0.4rem',
+            marginBottom: '0.1rem',
+            borderLeft: '3px solid var(--accent)',
+            paddingLeft: '0.5rem',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            Ranking Mode
           </div>
-          {(['dsa_mode', 'github_mode', 'custom'] as ScoringMode[]).map(m => {
-            const f = FORMULAS[m];
-            const isActive = mode === m;
-            return (
-              <button
-                key={m}
-                onClick={() => onModeChange(m)}
-                style={{
-                  background: isActive ? `${f.color}18` : 'transparent',
-                  border: `1px solid ${isActive ? f.color : 'var(--border)'}`,
-                  borderRadius: '8px', padding: '0.6rem 0.75rem',
-                  cursor: 'pointer', textAlign: 'left', width: '100%',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.35rem' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: isActive ? f.color : 'var(--text-muted)', flexShrink: 0 }} />
-                  <span style={{ fontWeight: 700, fontSize: '0.78rem', color: isActive ? f.color : 'var(--text)' }}>{f.title}</span>
-                </div>
-                {isActive && (
-                  <pre style={{
-                    margin: 0, fontFamily: 'monospace', fontSize: '0.67rem',
-                    color: 'var(--text-muted)', lineHeight: 1.55, whiteSpace: 'pre-wrap',
-                  }}>
-                    {f.lines.join('\n')}
-                  </pre>
-                )}
-              </button>
-            );
-          })}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            {(['dsa_mode', 'github_mode', 'custom'] as ScoringMode[]).map(m => {
+              const f = FORMULAS[m];
+              const isActive = mode === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => onModeChange(m)}
+                  style={{
+                    background: isActive ? `${f.color}12` : 'transparent',
+                    border: `1px solid ${isActive ? f.color : 'var(--border)'}`,
+                    borderRadius: '8px', padding: '0.6rem 0.75rem',
+                    cursor: 'pointer', textAlign: 'left', width: '100%',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: isActive ? '0.35rem' : '0' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: isActive ? f.color : 'var(--text-muted)', flexShrink: 0 }} />
+                    <span style={{ fontWeight: 700, fontSize: '0.78rem', color: isActive ? f.color : 'var(--text)' }}>{f.title}</span>
+                  </div>
+                  {isActive && (
+                    <pre style={{
+                      margin: 0, fontFamily: 'monospace', fontSize: '0.67rem',
+                      color: 'var(--text-muted)', lineHeight: 1.55, whiteSpace: 'pre-wrap',
+                    }}>
+                      {f.lines.join('\n')}
+                    </pre>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
           {/* Custom weight sliders */}
           {mode === 'custom' && (
-            <div style={{ marginTop: '0.4rem', padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
-                CUSTOM WEIGHTS (must sum to 100) — currently: <strong style={{ color: validWeights ? '#34D399' : '#EF4444' }}>{weightSum}</strong>
+            <div style={{ padding: '0.75rem', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+              <div style={{
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                color: 'var(--text)',
+                textTransform: 'uppercase',
+                marginBottom: '0.6rem',
+                borderLeft: '3px solid #34D399',
+                paddingLeft: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <span>Custom Weights</span>
+                <span style={{ color: validWeights ? '#34D399' : '#EF4444', fontWeight: 800 }}>{weightSum}%</span>
               </div>
+              
               {(['lc', 'cc', 'cf', 'gh'] as (keyof CustomWeights)[]).map(k => {
                 const labels: Record<string, string> = { lc: 'LeetCode', cc: 'CodeChef', cf: 'Codeforces', gh: 'GitHub' };
                 return (
@@ -209,23 +242,38 @@ export default function ScoringSettings({ mode, onModeChange, weights, onWeights
           )}
 
           {/* Collapsible platform formula reference */}
-          <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--border)', paddingTop: '0.6rem' }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.4rem', paddingLeft: '0.1rem' }}>
-              FORMULA REFERENCE
+          <div style={{ marginTop: '0.3rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
+            <div style={{
+              fontSize: '0.74rem',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              color: 'var(--text)',
+              textTransform: 'uppercase',
+              marginBottom: '0.5rem',
+              borderLeft: '3px solid var(--text-muted)',
+              paddingLeft: '0.5rem',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              Formula Reference
             </div>
+
             {PLATFORM_FORMULAS.map(pf => (
               <div key={pf.name} style={{ marginBottom: '0.3rem' }}>
                 <button
                   onClick={() => setExpandedPlatform(p => p === pf.name ? null : pf.name)}
                   style={{
                     width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    background: 'none', border: 'none', cursor: 'pointer', padding: '0.35rem 0.4rem',
+                    background: expandedPlatform === pf.name ? `${pf.color}08` : 'var(--bg)',
+                    cursor: 'pointer', padding: '0.45rem 0.6rem',
                     borderRadius: '6px',
-                    backgroundColor: expandedPlatform === pf.name ? `${pf.color}12` : 'transparent',
+                    border: `1px solid ${expandedPlatform === pf.name ? pf.color : 'var(--border)'}`,
+                    borderLeft: `3px solid ${pf.color}`,
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  <span style={{ fontSize: '0.74rem', fontWeight: 600, color: pf.color }}>{pf.name}</span>
-                  <span style={{ opacity: 0.4, fontSize: '0.65rem', color: 'var(--text)' }}>
+                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: pf.color }}>{pf.name}</span>
+                  <span style={{ opacity: 0.6, fontSize: '0.65rem', color: 'var(--text-muted)' }}>
                     {expandedPlatform === pf.name ? '▲' : '▼'}
                   </span>
                 </button>
