@@ -180,7 +180,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
                 onClick={() => setActiveBatch(item.value)}
                 style={{
                   padding: '1rem',
-                  background: 'var(--bg)',
+                  background: 'var(--bg-secondary)',
                   border: '1px solid var(--border)',
                   borderRadius: '12px',
                   color: 'var(--text-primary)',
@@ -191,11 +191,13 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = 'var(--accent)';
-                  e.currentTarget.style.background = 'var(--bg-tertiary)';
+                  e.currentTarget.style.background = 'var(--accent-bg)';
+                  e.currentTarget.style.color = 'var(--accent)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = 'var(--border)';
-                  e.currentTarget.style.background = 'var(--bg)';
+                  e.currentTarget.style.background = 'var(--bg-secondary)';
+                  e.currentTarget.style.color = 'var(--text-primary)';
                 }}
               >
                 {item.label} Batch
@@ -262,7 +264,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
           {selectedIds.size > 0 && (
             <button 
               className="btn btn-primary" 
-              style={{ backgroundColor: '#ef4444', borderColor: '#ef4444' }}
+              style={{ backgroundColor: '#991111', borderColor: '#991111' }}
               onClick={handleDeleteSelected}
               disabled={deleting}
             >

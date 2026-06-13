@@ -19,7 +19,7 @@ interface Props {
 const FORMULAS: Record<ScoringMode, { title: string; color: string; lines: string[] }> = {
   dsa_mode: {
     title: 'DSA Mode',
-    color: '#60A5FA',
+    color: 'var(--accent)',
     lines: [
       'OVERALL_DSA_MODE =',
       '  (DSA_SCORE × 0.60)',
@@ -33,7 +33,7 @@ const FORMULAS: Record<ScoringMode, { title: string; color: string; lines: strin
   },
   github_mode: {
     title: 'GitHub Mode',
-    color: '#A78BFA',
+    color: 'var(--accent)',
     lines: [
       'OVERALL_GITHUB_MODE =',
       '  (GITHUB_SCORE × 0.60)',
@@ -48,7 +48,7 @@ const FORMULAS: Record<ScoringMode, { title: string; color: string; lines: strin
   },
   custom: {
     title: 'Custom Mode',
-    color: '#34D399',
+    color: 'var(--accent)',
     lines: [
       'CUSTOM_SCORE =',
       '  (LC×LC_W + CC×CC_W',
@@ -62,7 +62,7 @@ const FORMULAS: Record<ScoringMode, { title: string; color: string; lines: strin
 const PLATFORM_FORMULAS = [
   {
     name: 'LeetCode (LC)',
-    color: '#F59E0B',
+    color: 'var(--accent)',
     formula: [
       'DiffPts = (Easy×1)+(Med×3)+(Hard×8)',
       'DiffScore = MIN(DiffPts/3000,1)×60',
@@ -74,7 +74,7 @@ const PLATFORM_FORMULAS = [
   },
   {
     name: 'CodeChef (CC)',
-    color: '#EF4444',
+    color: 'var(--accent)',
     formula: [
       '1★=10  2★=25  3★=40  4★=60',
       '5★=80  6★=95  7★=100',
@@ -87,7 +87,7 @@ const PLATFORM_FORMULAS = [
   },
   {
     name: 'Codeforces (CF)',
-    color: '#3B82F6',
+    color: 'var(--accent)',
     formula: [
       'CF = MIN(Rating/3500,1)×50',
       '   + MIN(MaxRating/3500,1)×20',
@@ -98,7 +98,7 @@ const PLATFORM_FORMULAS = [
   },
   {
     name: 'GitHub (GH)',
-    color: '#10B981',
+    color: 'var(--accent)',
     formula: [
       'GH = MIN(Repos/50,1)×15',
       '   + MIN(Stars/500,1)×20',
@@ -206,14 +206,14 @@ export default function ScoringSettings({ mode, onModeChange, weights, onWeights
                 color: 'var(--text)',
                 textTransform: 'uppercase',
                 marginBottom: '0.6rem',
-                borderLeft: '3px solid #34D399',
+                borderLeft: '3px solid var(--accent)',
                 paddingLeft: '0.5rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
                 <span>Custom Weights</span>
-                <span style={{ color: validWeights ? '#34D399' : '#EF4444', fontWeight: 800 }}>{weightSum}%</span>
+                <span style={{ color: validWeights ? 'var(--accent)' : 'var(--color-danger)', fontWeight: 800 }}>{weightSum}%</span>
               </div>
               
               {(['lc', 'cc', 'cf', 'gh'] as (keyof CustomWeights)[]).map(k => {
@@ -228,13 +228,13 @@ export default function ScoringSettings({ mode, onModeChange, weights, onWeights
                       type="range" min={0} max={100} step={1}
                       value={weights[k]}
                       onChange={e => setWeight(k, Number(e.target.value))}
-                      style={{ width: '100%', accentColor: '#34D399' }}
+                      style={{ width: '100%', accentColor: 'var(--accent)' }}
                     />
                   </div>
                 );
               })}
               {!validWeights && (
-                <div style={{ fontSize: '0.68rem', color: '#EF4444', marginTop: '0.25rem' }}>
+                <div style={{ fontSize: '0.68rem', color: 'var(--color-danger)', marginTop: '0.25rem' }}>
                   ⚠ Weights must sum to exactly 100
                 </div>
               )}
