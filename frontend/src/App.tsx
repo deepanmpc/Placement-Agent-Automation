@@ -43,11 +43,39 @@ export default function App() {
   const [customWeights, setCustomWeights] = useState<CustomWeights>(getInitialCustomWeights);
 
   useEffect(() => {
+    fetch('http://localhost:9090/api/config')
+      .then(r => r.json())
+      .then(res => {
+        if (res.data) {
+          if (res.data.SCORING_MODE) {
+            setScoringMode(res.data.SCORING_MODE as ScoringMode);
+          }
+          if (res.data.CUSTOM_WEIGHTS) {
+            try {
+              setCustomWeights(JSON.parse(res.data.CUSTOM_WEIGHTS));
+            } catch (e) {}
+          }
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('scoringMode', scoringMode);
+    fetch('http://localhost:9090/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ SCORING_MODE: scoringMode })
+    }).catch(console.error);
   }, [scoringMode]);
 
   useEffect(() => {
     localStorage.setItem('customWeights', JSON.stringify(customWeights));
+    fetch('http://localhost:9090/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ CUSTOM_WEIGHTS: JSON.stringify(customWeights) })
+    }).catch(console.error);
   }, [customWeights]);
   
   const [isAuthenticated, setIsAuthenticated] = useState(() => {

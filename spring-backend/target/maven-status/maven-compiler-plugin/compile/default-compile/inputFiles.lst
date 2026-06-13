@@ -12,6 +12,7 @@
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/controller/JobController.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/controller/RankingController.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/controller/StudentController.java
+/Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/controller/SystemConfigController.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/dto/ApiResponse.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/dto/AuthRequest.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/dto/AuthResponse.java
@@ -26,6 +27,7 @@
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/dto/StudentDTO.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/entity/audit/AdminUser.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/entity/audit/AuditLog.java
+/Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/entity/config/SystemConfig.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/entity/job/JobDescription.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/entity/platform/CodeChefSnapshot.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/entity/platform/CodeforcesSnapshot.java
@@ -46,6 +48,7 @@
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/repository/RankingResultRepository.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/repository/ResumeDataRepository.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/repository/StudentRepository.java
+/Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/repository/SystemConfigRepository.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/scheduler/CleanupScheduler.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/service/AuditService.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/service/AuthService.java
@@ -54,4 +57,5 @@
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/service/JobService.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/service/RankingService.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/service/StudentService.java
+/Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/service/SystemConfigService.java
 /Users/deepandee/Desktop/Placement-Agent-Automation/spring-backend/src/main/java/com/placement/util/DateUtil.java

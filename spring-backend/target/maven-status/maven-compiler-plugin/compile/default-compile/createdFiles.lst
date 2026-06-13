@@ -22,6 +22,7 @@ com/placement/entity/student/Student.class
 com/placement/entity/platform/CodeforcesSnapshot.class
 com/placement/dto/DashboardStatsDTO.class
 com/placement/config/AdminSeeder.class
+com/placement/controller/SystemConfigController.class
 com/placement/dto/ImportCodeChefDTO$ImportCodeChefDTOBuilder.class
 com/placement/exception/ResourceNotFoundException.class
 com/placement/dto/AuthResponse$AuthResponseBuilder.class
@@ -42,6 +43,7 @@ com/placement/controller/JobController.class
 com/placement/repository/GitHubSnapshotRepository.class
 com/placement/dto/ApiResponse.class
 com/placement/repository/AdminUserRepository.class
+com/placement/service/SystemConfigService.class
 com/placement/dto/AuthRequest$AuthRequestBuilder.class
 com/placement/config/CustomUserDetailsService.class
 com/placement/dto/ImportLeetCodeDTO.class
@@ -59,10 +61,13 @@ com/placement/entity/job/JobDescription$JobDescriptionBuilder.class
 com/placement/entity/audit/AdminUser$AdminUserBuilder.class
 com/placement/entity/platform/CodeChefSnapshot$CodeChefSnapshotBuilder.class
 com/placement/dto/StudentDTO$StudentDTOBuilder.class
+com/placement/entity/config/SystemConfig$SystemConfigBuilder.class
 com/placement/service/StudentService.class
 com/placement/dto/StudentDTO.class
+com/placement/repository/SystemConfigRepository.class
 com/placement/entity/ranking/RankingResult$RankingResultBuilder.class
 com/placement/dto/ImportLeetCodeDTO$ImportLeetCodeDTOBuilder.class
+com/placement/entity/config/SystemConfig.class
 com/placement/dto/ImportStudentProfileDTO$ImportStudentProfileDTOBuilder.class
 com/placement/config/JwtTokenProvider.class
 com/placement/dto/ImportRankingDTO.class
