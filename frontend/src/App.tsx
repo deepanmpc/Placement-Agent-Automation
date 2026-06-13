@@ -24,14 +24,25 @@ export default function App() {
   const [scoringMode, setScoringMode] = useState<ScoringMode>('dsa_mode');
   const [customWeights, setCustomWeights] = useState<CustomWeights>({ lc: 25, cc: 25, cf: 25, gh: 25 });
   
-  const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('jwt'));
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const jwt = localStorage.getItem('jwt');
+    const expires = localStorage.getItem('jwt_expires');
+    if (jwt && expires && Date.now() < Number(expires)) {
+      return true;
+    }
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('jwt_expires');
+    return false;
+  });
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
 
   const handleLogin = () => {
     if (password === 'Mpc@99949') {
       const dummyJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2ODAwMDAwMDB9.x_some_dummy_signature";
+      const expires = Date.now() + 60 * 60 * 1000; // 1 hour from now
       localStorage.setItem('jwt', dummyJwt);
+      localStorage.setItem('jwt_expires', expires.toString());
       setIsAuthenticated(true);
       setAuthError('');
     } else {

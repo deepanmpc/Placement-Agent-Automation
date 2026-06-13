@@ -127,7 +127,7 @@ export default function ResumeUpload() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div className="form-group" style={{ gridColumn: 'span 2' }}>
+          <div className="form-group">
             <label className="form-label">Full Name</label>
             <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="Varun Reddy" />
           </div>
@@ -166,12 +166,12 @@ export default function ResumeUpload() {
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">GitHub Profile URL</label>
-            <input type="text" className="form-input" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username" />
-          </div>
-          <div className="form-group">
             <label className="form-label">LinkedIn URL</label>
             <input type="text" className="form-input" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/username" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">GitHub Profile URL</label>
+            <input type="text" className="form-input" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username" />
           </div>
           <div className="form-group">
             <label className="form-label">LeetCode Username</label>
