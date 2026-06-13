@@ -26,7 +26,7 @@ class CodeforcesRanker:
         rating     = _safe_int(data.get("rating", 0))
         max_rating = _safe_int(data.get("max_rating", 0))
         solved     = _safe_int(data.get("solved_count", data.get("solved", 0)))
-        contests   = _safe_int(data.get("contests", data.get("contest_count", 0)))
+        contests   = _safe_int(data.get("contests")) or _safe_int(data.get("contest_count", 0))
         active90   = _safe_int(data.get("active_days_90", 0))
 
         rating_component     = min(rating / 3500, 1) * 50

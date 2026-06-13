@@ -237,8 +237,8 @@ class LeetCodeCollector:
             medium_solved=medium_solved,
             hard_solved=hard_solved,
             ranking=ranking,
-            contest_rating=round(contest_rating, 2),
-            contests_attended=contests_attended,
+            rating=round(contest_rating, 2),
+            contests_participated=contests_attended,
         )
         logger.info(
             "LeetCode collection complete for {} – {} solved (E:{} M:{} H:{})",

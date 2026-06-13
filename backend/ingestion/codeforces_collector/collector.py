@@ -67,6 +67,7 @@ class CodeforcesCollector:
             rank=str(user_info.get("rank", "") or ""),
             solved_count=solved_count,
             contest_count=contest_count,
+            contests=contest_count,
         )
         logger.info(
             "Codeforces collection complete for {} – rating {} (max {}), "

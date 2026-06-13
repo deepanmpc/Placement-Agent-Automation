@@ -86,23 +86,27 @@ class PlatformSyncService:
         if isinstance(codeforces_result, Exception):
             logger.error(f"Codeforces collection exception: {codeforces_result}")
             failed_platforms.append("codeforces")
-        elif codeforces_result is not None:
+        elif codeforces_result is not None and codeforces_result.username and (codeforces_result.rating > 0 or codeforces_result.contest_count > 0 or codeforces_result.solved_count > 0):
             old_snapshots = record.codeforces_profile.get("snapshots", []) if record.codeforces_profile else []
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": codeforces_result.rating, "solved_count": codeforces_result.solved_count})
             codeforces_result.snapshots = old_snapshots
             record.codeforces_profile = codeforces_result.model_dump(mode="json")
+        elif codeforces_result is not None:
+            logger.warning(f"Codeforces returned empty profile for {record.codeforces_username}, keeping existing data")
             
         # Process CodeChef
         if isinstance(codechef_result, Exception):
             logger.error(f"CodeChef collection exception: {codechef_result}")
             failed_platforms.append("codechef")
-        elif codechef_result is not None:
+        elif codechef_result is not None and codechef_result.username and (codechef_result.rating > 0 or codechef_result.contest_count > 0 or codechef_result.solved_count > 0):
             old_snapshots = record.codechef_profile.get("snapshots", []) if record.codechef_profile else []
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": codechef_result.rating, "solved_count": codechef_result.solved_count})
             codechef_result.snapshots = old_snapshots
             record.codechef_profile = codechef_result.model_dump(mode="json")
+        elif codechef_result is not None:
+            logger.warning(f"CodeChef returned empty profile for {record.codechef_username}, keeping existing data")
             
         # 4. Update sync metadata
         sync_status = "success" if not failed_platforms else ("partial" if len(failed_platforms) < 4 else "failed")

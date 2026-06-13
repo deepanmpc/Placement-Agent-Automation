@@ -1,7 +1,7 @@
 """CodeChef profile data collector.
 
-Uses the community Vercel proxy API for structured JSON. Falls back to
-returning a minimal profile (username only) when the API is unavailable.
+Uses BeautifulSoup to scrape structured data directly from CodeChef profile page.
+Falls back to returning a minimal profile (username only) when the page is unavailable.
 Does **not** calculate any scores or rankings.
 """
 
@@ -17,21 +17,17 @@ from backend.ingestion.models.student_profile import CodeChefProfile
 
 
 class CodeChefCollector:
-    """Collects CodeChef profile data via a community JSON API.
+    """Collects CodeChef profile data via web scraping.
 
-    The official CodeChef API requires OAuth and is limited. This collector
-    uses the ``codechef-api.vercel.app`` proxy which returns structured JSON
-    for public profiles.  Because this third‑party proxy can be unreliable,
-    the collector is designed to degrade gracefully — returning a minimal
+    Because third-party APIs can be unreliable, this collector directly scrapes
+    the public profile. It is designed to degrade gracefully — returning a minimal
     profile with just the username on any failure.
 
     Attributes:
-        API_URL: Root endpoint for the Vercel proxy API.
         MAX_RETRIES: Number of retry attempts for transient failures.
         BACKOFF_BASE: Base delay (seconds) for exponential back‑off.
     """
 
-    API_URL: str = "https://codechef-api.vercel.app/handle"
     MAX_RETRIES: int = 3
     BACKOFF_BASE: float = 1.0
 
@@ -53,20 +49,21 @@ class CodeChefCollector:
 
         logger.info("Collecting CodeChef data for user: {}", username)
 
+        # Use an async client without strict redirects or custom API constraints
         async with httpx.AsyncClient(
             timeout=httpx.Timeout(30.0),
             follow_redirects=True,
         ) as client:
-            data = await self._fetch_profile(client, username)
+            html = await self._fetch_profile(client, username)
 
-        if data is None:
+        if html is None:
             logger.warning(
-                "CodeChef API unavailable for {} – returning minimal profile",
+                "CodeChef profile unavailable for {} – returning minimal profile",
                 username,
             )
             return CodeChefProfile(username=username)
 
-        return self._parse_response(username, data)
+        return self._parse_response(username, html)
 
     # ── HTTP helper with retry ───────────────────────────────────────────
 
@@ -74,52 +71,30 @@ class CodeChefCollector:
         self,
         client: httpx.AsyncClient,
         username: str,
-    ) -> dict[str, Any] | None:
-        """GET the profile JSON with retry + exponential back‑off.
-
-        Returns:
-            The parsed JSON dict on success, or ``None`` after all retries
-            are exhausted.
-        """
-        url = f"{self.API_URL}/{username}"
+    ) -> str | None:
+        """GET the profile HTML with retry + exponential back‑off."""
+        url = f"https://www.codechef.com/users/{username}"
 
         for attempt in range(1, self.MAX_RETRIES + 1):
             try:
                 response = await client.get(url)
                 response.raise_for_status()
-                body: dict[str, Any] = response.json()
-
-                if not body.get("success", False):
-                    logger.warning(
-                        "CodeChef API returned success=false for {} "
-                        "(attempt {}/{})",
-                        username,
-                        attempt,
-                        self.MAX_RETRIES,
-                    )
-                    await self._backoff(attempt)
-                    continue
-
-                return body
+                return response.text
 
             except httpx.HTTPStatusError as exc:
+                if exc.response.status_code == 404:
+                    logger.warning("CodeChef user {} not found", username)
+                    return None
                 logger.warning(
-                    "HTTP {} from CodeChef API (attempt {}/{}): {}",
+                    "HTTP {} from CodeChef (attempt {}/{}): {}",
                     exc.response.status_code,
-                    attempt,
-                    self.MAX_RETRIES,
-                    exc,
-                )
-            except httpx.RequestError as exc:
-                logger.warning(
-                    "Request error to CodeChef API (attempt {}/{}): {}",
                     attempt,
                     self.MAX_RETRIES,
                     exc,
                 )
             except Exception as exc:
                 logger.warning(
-                    "Unexpected error querying CodeChef API (attempt {}/{}): {}",
+                    "Unexpected error querying CodeChef (attempt {}/{}): {}",
                     attempt,
                     self.MAX_RETRIES,
                     exc,
@@ -128,7 +103,7 @@ class CodeChefCollector:
             await self._backoff(attempt)
 
         logger.error(
-            "All {} retries exhausted for CodeChef API (user: {})",
+            "All {} retries exhausted for CodeChef (user: {})",
             self.MAX_RETRIES,
             username,
         )
@@ -145,54 +120,64 @@ class CodeChefCollector:
     @staticmethod
     def _parse_response(
         username: str,
-        data: dict[str, Any],
+        html: str,
     ) -> CodeChefProfile:
-        """Map the raw API JSON to a :class:`CodeChefProfile`.
+        """Parse the CodeChef profile HTML into a :class:`CodeChefProfile`."""
+        from bs4 import BeautifulSoup
+        import re
 
-        Args:
-            username: The queried handle (used as fallback).
-            data: The full JSON response dict from the Vercel proxy.
+        soup = BeautifulSoup(html, "html.parser")
 
-        Returns:
-            A populated :class:`CodeChefProfile`.
-        """
-        current_rating = CodeChefCollector._safe_int(
-            data.get("currentRating", 0)
-        )
-        highest_rating = CodeChefCollector._safe_int(
-            data.get("highestRating", 0)
-        )
-        stars = str(data.get("stars", "") or "")
-        global_rank = CodeChefCollector._safe_int(data.get("globalRank", 0))
-        country_rank = CodeChefCollector._safe_int(data.get("countryRank", 0))
+        # 1. Rating
+        rating = 0
+        rating_elem = soup.find('div', class_='rating-number')
+        if rating_elem:
+            m = re.search(r'\d+', rating_elem.text)
+            if m: rating = int(m.group())
+
+        # 2. Stars
+        stars_str = "1★"
+        star_elem = soup.find('div', class_='rating-star')
+        if star_elem:
+            star_count = star_elem.text.count('★')
+            if star_count > 0:
+                stars_str = f"{star_count}★"
+
+        # 3. Highest Rating
+        highest_rating = rating
+        highest_elem = soup.find('small')
+        if highest_elem and 'Highest Rating' in highest_elem.text:
+            m = re.search(r'\d+', highest_elem.text)
+            if m: highest_rating = int(m.group())
+
+        # 4. Problems Solved
+        solved = 0
+        solved_section = soup.find('section', class_='rating-data-section problems-solved')
+        if solved_section:
+            match = re.search(r'Total Problems Solved:\s*(\d+)', solved_section.text)
+            if match: solved = int(match.group(1))
+
+        # 5. Contests Participated
+        contests = 0
+        contests_section = soup.find('div', class_='contest-participated-count')
+        if contests_section:
+            m = re.search(r'\d+', contests_section.text)
+            if m: contests = int(m.group())
 
         profile = CodeChefProfile(
             username=username,
-            current_rating=current_rating,
+            rating=rating,
             highest_rating=highest_rating,
-            stars=stars,
-            global_rank=global_rank,
-            country_rank=country_rank,
+            stars=stars_str,
+            contests=contests,
+            contest_count=contests,  # legacy mapping
+            solved_count=solved,
         )
+
         logger.info(
-            "CodeChef collection complete for {} – {} (rating {})",
+            "CodeChef collection complete for {} – rating: {}, stars: {}",
             profile.username,
-            profile.stars or "unrated",
-            profile.current_rating,
+            profile.rating,
+            profile.stars,
         )
         return profile
-
-    # ── Utilities ────────────────────────────────────────────────────────
-
-    @staticmethod
-    def _safe_int(value: Any) -> int:
-        """Coerce *value* to ``int``, returning ``0`` on failure.
-
-        The Vercel API sometimes returns stringified numbers or ``None``.
-        """
-        if value is None:
-            return 0
-        try:
-            return int(value)
-        except (ValueError, TypeError):
-            return 0
