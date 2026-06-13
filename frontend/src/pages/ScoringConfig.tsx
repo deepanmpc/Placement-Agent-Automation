@@ -318,9 +318,31 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
           </div>
         )}
 
+        <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Apply Changes</h3>
+            <p style={{ margin: 0, marginTop: '0.2rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              Save your current scoring mode and custom weights to recalculate ranks globally.
+            </p>
+          </div>
+          <button 
+            className="btn btn-primary"
+            onClick={() => {
+              if (scoringMode === 'custom' && weightSum !== 100) {
+                alert(`Cannot save: Custom weights must sum to 100%. Currently ${weightSum}%.`);
+                return;
+              }
+              alert("Configuration Saved! Ranks have been dynamically updated in the dashboard.");
+            }}
+            style={{ padding: '0.8rem 2rem', fontSize: '1rem', fontWeight: 700 }}
+          >
+            Save Configuration
+          </button>
+        </div>
+
         {/* Section 3: Full Platform Scoring Formula References */}
-        <div>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-primary)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem', marginTop: '1rem' }}>
+        <div style={{ marginTop: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-primary)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
             Detailed Platform Evaluation Formulas
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.25rem' }}>

@@ -257,9 +257,19 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1>Ingested Profiles Dashboard</h1>
-          <p className="page-subtitle">
+          <p className="page-subtitle" style={{ marginBottom: '0.4rem' }}>
             {profiles.length} total students ingested in {activeBatch === 'all' ? 'All Batches' : activeBatch}
           </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            <span style={{ padding: '0.2rem 0.5rem', background: 'var(--bg)', borderRadius: '4px', border: '1px solid var(--border)' }}>
+              Mode: <span style={{ color: 'var(--accent)' }}>{MODE_LABELS[scoringMode] || scoringMode}</span>
+            </span>
+            {scoringMode === 'custom' && (
+              <span style={{ padding: '0.2rem 0.5rem', background: 'var(--bg)', borderRadius: '4px', border: '1px solid var(--border)' }}>
+                Weights: LC {customWeights.lc}% &middot; CC {customWeights.cc}% &middot; CF {customWeights.cf}% &middot; GH {customWeights.gh}%
+              </span>
+            )}
+          </div>
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
           <button

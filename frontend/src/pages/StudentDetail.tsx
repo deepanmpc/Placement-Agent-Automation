@@ -121,9 +121,13 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
             </div>
             {s.ranking && (
               <div style={{ padding: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '12px', textAlign: 'right' }}>
-                <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Intelligence Score</div>
+                <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>
+                  {scoringMode === 'dsa_mode' ? 'DSA Mode' : scoringMode === 'github_mode' ? 'GitHub Mode' : 'Custom Weights'} Score
+                </div>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent)' }}>
-                  {s.ranking.total_technical_score}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/100</span>
+                  {scoringMode === 'dsa_mode' ? s.ranking.overall_dsa_mode 
+                   : scoringMode === 'github_mode' ? s.ranking.overall_github_mode 
+                   : (s.ranking.custom_score ?? s.ranking.total_technical_score)}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/100</span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>
                   {s.ranking.github_score.total_score > 0 && <span>GH: {s.ranking.github_score.total_score}</span>}
