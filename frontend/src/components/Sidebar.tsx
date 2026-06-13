@@ -3,7 +3,6 @@ import type { PageView } from '../types';
 interface Props {
   active: PageView;
   onNavigate: (page: PageView) => void;
-  selectedStudentId: string | null;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
 }
@@ -18,7 +17,7 @@ const NAV_ITEMS: { id: PageView; label: string }[] = [
 ];
 
 export default function Sidebar({
-  active, onNavigate, selectedStudentId, theme, onToggleTheme
+  active, onNavigate, theme, onToggleTheme
 }: Props) {
   return (
     <aside className="sidebar" style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>

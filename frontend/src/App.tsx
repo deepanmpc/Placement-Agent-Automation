@@ -35,13 +35,8 @@ export default function App() {
     <Layout
       activePage={page}
       onNavigate={setPage}
-      selectedStudentId={selectedStudent}
       theme={theme}
       onToggleTheme={toggleTheme}
-      scoringMode={scoringMode}
-      onScoringModeChange={setScoringMode}
-      customWeights={customWeights}
-      onCustomWeightsChange={setCustomWeights}
     >
       {page === 'upload' && <ResumeUpload />}
       {page === 'dashboard' && <Dashboard />}

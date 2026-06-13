@@ -11,6 +11,7 @@ export interface Profile {
     leetcode_username: string;
     codeforces_username: string;
     codechef_username: string;
+    id_number?: string;
   };
   education: {
     college: string;
@@ -52,6 +53,7 @@ export interface Profile {
     medium_solved: number;
     hard_solved: number;
     total_solved: number;
+    contests_participated?: number;
   };
   codeforces: {
     username: string;

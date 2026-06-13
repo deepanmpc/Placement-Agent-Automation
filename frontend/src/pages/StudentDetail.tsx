@@ -194,6 +194,9 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                   <div style={{ fontSize: '3rem', fontWeight: 900, color: activeColor, lineHeight: 1 }}>
                     {activeScore}<span style={{ fontSize: '1.3rem', opacity: 0.6 }}>/100</span>
                   </div>
+                  <div style={{ fontSize: '0.68rem', fontFamily: 'monospace', color: 'var(--text-muted)', marginTop: '0.5rem', background: 'var(--bg-secondary)', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border)', maxWidth: '100%', overflowX: 'auto' }}>
+                    {activeFormula}
+                  </div>
                 </div>
 
                 {/* All 3 Mode Comparison */}
