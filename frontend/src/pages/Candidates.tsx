@@ -183,19 +183,10 @@ export default function Candidates({ onSelect, onNavigate, scoringMode }: Props)
                 onNavigate('student');
               }}
             >
-              <div className="candidate-info">
-                <h3 className="candidate-name">
+              <div className="candidate-info" style={{ display: 'flex', alignItems: 'center' }}>
+                <h3 className="candidate-name" style={{ margin: 0 }}>
                   {p.personal_info.name || 'Unknown Candidate'} {p.personal_info.id_number ? `(${p.personal_info.id_number})` : ''}
                 </h3>
-                <p className="candidate-meta">
-                  {p.education.college} &middot; {p.education.branch} &middot;
-                  CGPA {p.education.cgpa || 'N/A'}
-                </p>
-                <div className="candidate-tags">
-                  {p.skills.all_skills.slice(0, 5).map((s) => (
-                    <span key={s} className="tag tag-match">{s}</span>
-                  ))}
-                </div>
               </div>
               <div className="candidate-scores" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
                 {p.ranking ? (
