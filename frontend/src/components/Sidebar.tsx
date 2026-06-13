@@ -1,5 +1,4 @@
 import type { PageView } from '../types';
-import ScoringSettings, { type ScoringMode, type CustomWeights } from './ScoringSettings';
 
 interface Props {
   active: PageView;
@@ -7,10 +6,6 @@ interface Props {
   selectedStudentId: string | null;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
-  scoringMode: ScoringMode;
-  onScoringModeChange: (m: ScoringMode) => void;
-  customWeights: CustomWeights;
-  onCustomWeightsChange: (w: CustomWeights) => void;
 }
 
 const NAV_ITEMS: { id: PageView; label: string }[] = [
@@ -19,11 +14,11 @@ const NAV_ITEMS: { id: PageView; label: string }[] = [
   { id: 'jd-input', label: 'Job Description' },
   { id: 'candidates', label: 'Candidates' },
   { id: 'analytics', label: 'Analytics' },
+  { id: 'scoring-config', label: 'Scoring Engine' },
 ];
 
 export default function Sidebar({
-  active, onNavigate, selectedStudentId, theme, onToggleTheme,
-  scoringMode, onScoringModeChange, customWeights, onCustomWeightsChange
+  active, onNavigate, selectedStudentId, theme, onToggleTheme
 }: Props) {
   return (
     <aside className="sidebar" style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
@@ -46,16 +41,6 @@ export default function Sidebar({
           </button>
         ))}
       </nav>
-
-      {/* ⚙ Scoring Settings panel */}
-      <div style={{ padding: '0 1rem', flex: 1 }}>
-        <ScoringSettings
-          mode={scoringMode}
-          onModeChange={onScoringModeChange}
-          weights={customWeights}
-          onWeightsChange={onCustomWeightsChange}
-        />
-      </div>
 
       <div className="sidebar-footer">
         <div className="theme-toggle-row">

@@ -7,6 +7,7 @@ import Candidates from './pages/Candidates';
 import StudentDetail from './pages/StudentDetail';
 import Analytics from './pages/Analytics';
 import ResumeUpload from './pages/ResumeUpload';
+import ScoringConfig from './pages/ScoringConfig';
 import type { ScoringMode, CustomWeights } from './components/ScoringSettings';
 import './App.css';
 
@@ -59,6 +60,14 @@ export default function App() {
           scoringMode={scoringMode}
           onScoringModeChange={setScoringMode}
           customWeights={customWeights}
+        />
+      )}
+      {page === 'scoring-config' && (
+        <ScoringConfig
+          scoringMode={scoringMode}
+          onScoringModeChange={setScoringMode}
+          customWeights={customWeights}
+          onCustomWeightsChange={setCustomWeights}
         />
       )}
       {page === 'analytics' && <Analytics />}

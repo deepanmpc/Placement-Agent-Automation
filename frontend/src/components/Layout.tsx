@@ -28,10 +28,6 @@ export default function Layout({
         selectedStudentId={selectedStudentId}
         theme={theme}
         onToggleTheme={onToggleTheme}
-        scoringMode={scoringMode}
-        onScoringModeChange={onScoringModeChange}
-        customWeights={customWeights}
-        onCustomWeightsChange={onCustomWeightsChange}
       />
       <main className="main-content">
         {children}
