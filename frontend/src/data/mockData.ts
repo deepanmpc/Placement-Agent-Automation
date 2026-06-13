@@ -80,7 +80,7 @@ const BASE_STUDENTS: Student[] = [
       startYear: 2022,
       endYear: 2026,
     },
-    skills: ['Python', 'JavaScript'],
+    skills: ['Python', 'JavaScript', 'Data Structures', 'Algorithms', 'SQL'],
     projects: [
       {
         title: 'E-Commerce Platform',
@@ -154,7 +154,7 @@ const BASE_STUDENTS: Student[] = [
       startYear: 2022,
       endYear: 2026,
     },
-    skills: ['Python', 'JavaScript'],
+    skills: ['Python', 'JavaScript', 'Data Structures', 'Algorithms', 'SQL'],
     projects: [
       {
         title: 'Inventory Management System',
@@ -213,7 +213,7 @@ const BASE_STUDENTS: Student[] = [
       startYear: 2022,
       endYear: 2026,
     },
-    skills: ['Python', 'JavaScript'],
+    skills: ['Python', 'JavaScript', 'Data Structures', 'Algorithms', 'SQL'],
     projects: [
       {
         title: 'Code Review Bot',
@@ -300,7 +300,7 @@ const BASE_STUDENTS: Student[] = [
       startYear: 2022,
       endYear: 2026,
     },
-    skills: ['Python', 'JavaScript'],
+    skills: ['Python', 'JavaScript', 'Data Structures', 'Algorithms', 'SQL'],
     projects: [
       {
         title: 'IoT Weather Station',
@@ -353,7 +353,7 @@ const BASE_STUDENTS: Student[] = [
       startYear: 2022,
       endYear: 2026,
     },
-    skills: ['Python', 'JavaScript'],
+    skills: ['Python', 'JavaScript', 'Data Structures', 'Algorithms', 'SQL'],
     projects: [
       {
         title: 'Todo App',

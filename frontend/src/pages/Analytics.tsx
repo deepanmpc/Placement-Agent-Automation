@@ -2,14 +2,14 @@ import { MOCK_RANKINGS } from '../data/mockData';
 
 export default function Analytics() {
   const scores = MOCK_RANKINGS.map((r) => r.scores.finalScore);
-  const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  const maxScore = Math.max(...scores);
-  const minScore = Math.min(...scores);
+  const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  const maxScore = scores.length > 0 ? Math.max(...scores) : 0;
+  const minScore = scores.length > 0 ? Math.min(...scores) : 0;
 
   const ruleScores = MOCK_RANKINGS.map((r) => r.scores.ruleScore);
   const semScores = MOCK_RANKINGS.map((r) => r.scores.semanticScore);
-  const avgRule = Math.round(ruleScores.reduce((a, b) => a + b, 0) / ruleScores.length);
-  const avgSem = Math.round(semScores.reduce((a, b) => a + b, 0) / semScores.length);
+  const avgRule = ruleScores.length > 0 ? Math.round(ruleScores.reduce((a, b) => a + b, 0) / ruleScores.length) : 0;
+  const avgSem = semScores.length > 0 ? Math.round(semScores.reduce((a, b) => a + b, 0) / semScores.length) : 0;
 
   const bucket3 = scores.filter((s) => s >= 80).length;
   const bucket2 = scores.filter((s) => s >= 60 && s < 80).length;
@@ -105,16 +105,22 @@ export default function Analytics() {
 
         <div className="analytics-card">
           <h3>Top Candidate</h3>
-          <div className="top-candidate">
-            <div className="top-candidate-rank">{MOCK_RANKINGS[0].rank}</div>
-            <div>
-              <div className="top-candidate-name">{MOCK_RANKINGS[0].student.personalInfo.name}</div>
-              <div className="top-candidate-score">Score: {MOCK_RANKINGS[0].scores.finalScore}</div>
-              <div className="top-candidate-meta">
-                {MOCK_RANKINGS[0].student.education.institution} &middot; CGPA {MOCK_RANKINGS[0].student.education.cgpa}
+          {MOCK_RANKINGS.length > 0 ? (
+            <div className="top-candidate">
+              <div className="top-candidate-rank">{MOCK_RANKINGS[0].rank}</div>
+              <div>
+                <div className="top-candidate-name">{MOCK_RANKINGS[0].student.personalInfo.name}</div>
+                <div className="top-candidate-score">Score: {MOCK_RANKINGS[0].scores.finalScore}</div>
+                <div className="top-candidate-meta">
+                  {MOCK_RANKINGS[0].student.education.institution} &middot; CGPA {MOCK_RANKINGS[0].student.education.cgpa}
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '1rem 0' }}>
+              No eligible candidates found.
+            </div>
+          )}
         </div>
       </div>
     </div>
