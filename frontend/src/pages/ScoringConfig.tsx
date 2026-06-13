@@ -102,12 +102,22 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
 
   const setWeight = (key: keyof CustomWeights, val: number) => {
     let newVal = val;
+
+    // Budget check: Total sum of all weights cannot exceed 100%
+    const sumOfOthers = (Object.keys(customWeights) as (keyof CustomWeights)[])
+      .filter(k => k !== key)
+      .reduce((sum, k) => sum + customWeights[k], 0);
+    const maxAllowedByBudget = 100 - sumOfOthers;
+
+    if (newVal > maxAllowedByBudget) {
+      newVal = maxAllowedByBudget;
+    }
     
     // Hard rule check: If another slider is already >= 60%, cap this input at 40%
     const otherKeyIsAtLeast60 = (Object.keys(customWeights) as (keyof CustomWeights)[])
       .find(k => k !== key && customWeights[k] >= 60);
       
-    if (otherKeyIsAtLeast60 && val > 40) {
+    if (otherKeyIsAtLeast60 && newVal > 40) {
       newVal = 40;
     }
 
@@ -250,6 +260,12 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                   .find(k => k !== item.key && customWeights[k] >= 60);
                 const isCapped = !!otherKeyIsAtLeast60;
 
+                const sumOfOthers = (Object.keys(customWeights) as (keyof CustomWeights)[])
+                  .filter(k => k !== item.key)
+                  .reduce((sum, k) => sum + customWeights[k], 0);
+
+                const maxVal = Math.max(0, Math.min(isCapped ? 40 : 100, 100 - sumOfOthers));
+
                 return (
                   <div key={item.key} style={{
                     padding: '1.25rem', background: 'var(--bg-secondary)', border: `1px solid ${isCapped ? 'rgba(239, 68, 68, 0.25)' : 'var(--border)'}`,
@@ -269,15 +285,15 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                       <strong style={{ fontSize: '1.2rem', fontWeight: 800, color: item.color }}>{customWeights[item.key as keyof CustomWeights]}%</strong>
                     </div>
                     <input
-                      type="range" min={0} max={isCapped ? 40 : 100} step={1}
+                      type="range" min={0} max={maxVal} step={1}
                       value={customWeights[item.key as keyof CustomWeights]}
                       onChange={e => setWeight(item.key as keyof CustomWeights, Number(e.target.value))}
                       style={{ width: '100%', accentColor: isCapped ? '#EF4444' : item.color, cursor: 'pointer' }}
                     />
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
                       <span>0%</span>
-                      <span>{isCapped ? '20%' : '50%'}</span>
-                      <span>{isCapped ? '40% Max' : '100%'}</span>
+                      <span>{Math.round(maxVal / 2)}%</span>
+                      <span>{maxVal}% Max</span>
                     </div>
                   </div>
                 );
