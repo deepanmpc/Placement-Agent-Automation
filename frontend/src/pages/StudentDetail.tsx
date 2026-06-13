@@ -186,7 +186,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
               </h2>
 
               {/* Row 1: Active mode score + all 3 modes comparison */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
                 {/* Active Mode Big Score */}
                 <div className="detail-card" style={{ background: `linear-gradient(135deg, ${activeColor}18 0%, transparent 100%)`, borderColor: `${activeColor}40`, textAlign: 'center' }}>
                   <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: activeColor, marginBottom: '0.4rem' }}>{activeLabel} Score</div>
@@ -230,14 +230,14 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
               </div>
 
               {/* Row 2: Platform scores in detail */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
 
                 {/* DSA Aggregate */}
                 <div className="detail-card" style={{ borderColor: 'rgba(96,165,250,0.3)' }}>
                   <h3 style={{ color: '#60A5FA', borderBottom: '1px solid rgba(96,165,250,0.2)', paddingBottom: '0.5rem' }}>DSA Score</h3>
                   <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.dsa_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
                   <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>LC×0.33 + CC×0.34 + CF×0.33</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.82rem' }}>
                     {[
                       { name: 'LeetCode (33%)', val: r.lc_score, color: '#F59E0B' },
                       { name: 'CodeChef (34%)', val: r.cc_score, color: '#EF4444' },
@@ -261,15 +261,20 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
                   <h3 style={{ color: '#A78BFA', borderBottom: '1px solid rgba(167,139,250,0.2)', paddingBottom: '0.5rem' }}>GitHub Score</h3>
                   <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.github_score_total}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
                   <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>Repos+Stars+Commits+Activity+…</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.82rem' }}>
                     {Object.entries(r.github_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
-                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.1rem 0' }}>
+                        <span style={{ color: 'var(--text)', textTransform: 'capitalize', fontWeight: 500 }}>
+                          {key.replace(/_score/g, '').replace(/_/g, ' ')}
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 400, marginLeft: '0.35rem' }}>
+                            ({bd.raw_value})
+                          </span>
+                        </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <div style={{ width: 50, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                          <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${Math.min((bd.contribution / (r.github_score?.total_score || 1)) * 100, 100)}%`, background: '#A78BFA', borderRadius: 3 }} />
                           </div>
-                          <strong style={{ minWidth: 28, textAlign: 'right' }}>{bd.contribution}</strong>
+                          <strong style={{ color: '#A78BFA', minWidth: 28, textAlign: 'right' }}>{bd.contribution}</strong>
                         </div>
                       </div>
                     ))}
@@ -281,14 +286,16 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
                   <h3 style={{ color: '#F59E0B', borderBottom: '1px solid rgba(245,158,11,0.2)', paddingBottom: '0.5rem' }}>LeetCode Breakdown</h3>
                   <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.lc_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
                   <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>DiffScore(60)+Contest(25)+Part(5)+Activity(10)</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.82rem' }}>
                     {Object.entries(r.leetcode_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
-                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span style={{ fontSize: '0.65rem', opacity: 0.5, fontFamily: 'monospace' }}>{bd.formula}</span>
-                          <strong>{bd.contribution}</strong>
-                        </div>
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.1rem 0' }}>
+                        <span style={{ color: 'var(--text)', textTransform: 'capitalize', fontWeight: 500 }}>
+                          {key.replace(/_score/g, '').replace(/_/g, ' ')}
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 400, marginLeft: '0.35rem' }}>
+                            ({bd.raw_value})
+                          </span>
+                        </span>
+                        <strong style={{ color: '#F59E0B' }}>{bd.contribution}</strong>
                       </div>
                     ))}
                   </div>
@@ -297,19 +304,21 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
               </div>
 
               {/* Row 3: CodeChef + Codeforces */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
                 <div className="detail-card" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
                   <h3 style={{ color: '#EF4444', borderBottom: '1px solid rgba(239,68,68,0.2)', paddingBottom: '0.5rem' }}>CodeChef Breakdown</h3>
                   <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.cc_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
                   <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>Stars(40)+Rating(30)+Solved(15)+Contests(10)+Activity(5)</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.82rem' }}>
                     {Object.entries(r.codechef_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
-                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span style={{ fontSize: '0.65rem', opacity: 0.5, fontFamily: 'monospace' }}>{bd.formula}</span>
-                          <strong>{bd.contribution}</strong>
-                        </div>
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.1rem 0' }}>
+                        <span style={{ color: 'var(--text)', textTransform: 'capitalize', fontWeight: 500 }}>
+                          {key.replace(/_score/g, '').replace(/_/g, ' ')}
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 400, marginLeft: '0.35rem' }}>
+                            ({bd.raw_value})
+                          </span>
+                        </span>
+                        <strong style={{ color: '#EF4444' }}>{bd.contribution}</strong>
                       </div>
                     ))}
                   </div>
@@ -319,19 +328,203 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, cust
                   <h3 style={{ color: '#3B82F6', borderBottom: '1px solid rgba(59,130,246,0.2)', paddingBottom: '0.5rem' }}>Codeforces Breakdown</h3>
                   <div style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', margin: '0.4rem 0 0' }}>{r.cf_score}<span style={{ fontSize: '0.9rem', opacity: 0.6 }}>/100</span></div>
                   <div style={{ fontSize: '0.66rem', fontFamily: 'monospace', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.75rem' }}>Rating(50)+MaxRating(20)+Solved(15)+Contests(10)+Activity(5)</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.82rem' }}>
                     {Object.entries(r.codeforces_score?.breakdown ?? {}).map(([key, bd]: [string, any]) => (
-                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{key.replace(/_/g,' ')}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span style={{ fontSize: '0.65rem', opacity: 0.5, fontFamily: 'monospace' }}>{bd.formula}</span>
-                          <strong>{bd.contribution}</strong>
-                        </div>
+                      <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.1rem 0' }}>
+                        <span style={{ color: 'var(--text)', textTransform: 'capitalize', fontWeight: 500 }}>
+                          {key.replace(/_score/g, '').replace(/_/g, ' ')}
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 400, marginLeft: '0.35rem' }}>
+                            ({bd.raw_value})
+                          </span>
+                        </span>
+                        <strong style={{ color: '#3B82F6' }}>{bd.contribution}</strong>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
+
+              {/* Row 4: Detailed Extracted Live Metrics Container */}
+              <div style={{ marginTop: '2rem' }}>
+                <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
+                  Extracted Platform Data Metrics & Calculations
+                </h2>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.25rem' }}>
+                  
+                  {/* LeetCode Live Card */}
+                  <div className="detail-card" style={{ borderColor: 'rgba(245,158,11,0.25)', display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#F59E0B', borderBottom: '1px solid rgba(245,158,11,0.15)', paddingBottom: '0.55rem', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>LeetCode Extracted Metrics</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>@{s.personal_info.leetcode_username || 'n/a'}</span>
+                    </h3>
+                    {s.metadata.sources_collected.includes('leetcode') ? (
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>Metric</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right' }}>Raw Value</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right', paddingLeft: '0.5rem' }}>Contribution</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, paddingLeft: '0.75rem' }}>Formula & Limits</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { name: 'Difficulty Points', val: `${r.leetcode_score?.breakdown?.difficulty_score?.raw_value || 0} (E:${s.leetcode.easy_solved}/M:${s.leetcode.medium_solved}/H:${s.leetcode.hard_solved})`, score: `${r.leetcode_score?.breakdown?.difficulty_score?.contribution || 0} / 60`, formula: r.leetcode_score?.breakdown?.difficulty_score?.formula },
+                              { name: 'Contest Rating', val: s.leetcode.rating?.toFixed(0) || '0', score: `${r.leetcode_score?.breakdown?.contest_score?.contribution || 0} / 25`, formula: r.leetcode_score?.breakdown?.contest_score?.formula },
+                              { name: 'Contests Attended', val: s.leetcode.contests_participated || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 5`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
+                              { name: 'Active Days (90d)', val: r.leetcode_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.leetcode_score?.breakdown?.activity_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.activity_score?.formula },
+                            ].map((row, idx) => (
+                              <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: 0.9 }}>
+                                <td style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>{row.name}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontWeight: 600, color: '#F59E0B', paddingLeft: '0.5rem' }}>{row.score}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', paddingLeft: '0.75rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '0.75rem', backgroundColor: 'rgba(245, 158, 11, 0.05)', border: '1px dashed rgba(245, 158, 11, 0.3)', borderRadius: '6px', color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center' }}>
+                        No LeetCode data sync'd.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CodeChef Live Card */}
+                  <div className="detail-card" style={{ borderColor: 'rgba(239,68,68,0.25)', display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#EF4444', borderBottom: '1px solid rgba(239,68,68,0.15)', paddingBottom: '0.55rem', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>CodeChef Extracted Metrics</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>@{s.personal_info.codechef_username || 'n/a'}</span>
+                    </h3>
+                    {s.metadata.sources_collected.includes('codechef') ? (
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>Metric</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right' }}>Raw Value</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right', paddingLeft: '0.5rem' }}>Contribution</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, paddingLeft: '0.75rem' }}>Formula & Limits</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { name: 'Stars Rating', val: s.codechef.stars || 'Unrated', score: `${r.codechef_score?.breakdown?.star_score?.contribution || 0} / 40`, formula: r.codechef_score?.breakdown?.star_score?.formula },
+                              { name: 'Current Rating', val: s.codechef.rating || '0', score: `${r.codechef_score?.breakdown?.rating_score?.contribution || 0} / 30`, formula: r.codechef_score?.breakdown?.rating_score?.formula },
+                              { name: 'Problems Solved', val: s.codechef.solved_count || '0', score: `${r.codechef_score?.breakdown?.solved_score?.contribution || 0} / 15`, formula: r.codechef_score?.breakdown?.solved_score?.formula },
+                              { name: 'Contests Count', val: r.codechef_score?.breakdown?.contest_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.contest_score?.contribution || 0} / 10`, formula: r.codechef_score?.breakdown?.contest_score?.formula },
+                              { name: 'Active Days (90d)', val: r.codechef_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.activity_score?.contribution || 0} / 5`, formula: r.codechef_score?.breakdown?.activity_score?.formula },
+                            ].map((row, idx) => (
+                              <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: 0.9 }}>
+                                <td style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>{row.name}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontWeight: 600, color: '#EF4444', paddingLeft: '0.5rem' }}>{row.score}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', paddingLeft: '0.75rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '0.75rem', backgroundColor: 'rgba(239, 68, 68, 0.05)', border: '1px dashed rgba(239, 68, 68, 0.3)', borderRadius: '6px', color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center' }}>
+                        No CodeChef data sync'd.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Codeforces Live Card */}
+                  <div className="detail-card" style={{ borderColor: 'rgba(59,130,246,0.25)', display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#3B82F6', borderBottom: '1px solid rgba(59,130,246,0.15)', paddingBottom: '0.55rem', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Codeforces Extracted Metrics</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>@{s.personal_info.codeforces_username || 'n/a'}</span>
+                    </h3>
+                    {s.metadata.sources_collected.includes('codeforces') ? (
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>Metric</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right' }}>Raw Value</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right', paddingLeft: '0.5rem' }}>Contribution</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, paddingLeft: '0.75rem' }}>Formula & Limits</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { name: 'Current Rating', val: s.codeforces.rating || '0', score: `${r.codeforces_score?.breakdown?.rating_score?.contribution || 0} / 50`, formula: r.codeforces_score?.breakdown?.rating_score?.formula },
+                              { name: 'Max Rating', val: s.codeforces.max_rating || '0', score: `${r.codeforces_score?.breakdown?.max_rating_score?.contribution || 0} / 20`, formula: r.codeforces_score?.breakdown?.max_rating_score?.formula },
+                              { name: 'Problems Solved', val: s.codeforces.solved_count || '0', score: `${r.codeforces_score?.breakdown?.solved_score?.contribution || 0} / 15`, formula: r.codeforces_score?.breakdown?.solved_score?.formula },
+                              { name: 'Contests Count', val: r.codeforces_score?.breakdown?.contest_score?.raw_value || '0', score: `${r.codeforces_score?.breakdown?.contest_score?.contribution || 0} / 10`, formula: r.codeforces_score?.breakdown?.contest_score?.formula },
+                              { name: 'Active Days (90d)', val: r.codeforces_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.codeforces_score?.breakdown?.activity_score?.contribution || 0} / 5`, formula: r.codeforces_score?.breakdown?.activity_score?.formula },
+                            ].map((row, idx) => (
+                              <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: 0.9 }}>
+                                <td style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>{row.name}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontWeight: 600, color: '#3B82F6', paddingLeft: '0.5rem' }}>{row.score}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', paddingLeft: '0.75rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '0.75rem', backgroundColor: 'rgba(59, 130, 246, 0.05)', border: '1px dashed rgba(59, 130, 246, 0.3)', borderRadius: '6px', color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center' }}>
+                        No Codeforces data sync'd.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* GitHub Live Card */}
+                  <div className="detail-card" style={{ borderColor: 'rgba(167,139,250,0.25)', display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#A78BFA', borderBottom: '1px solid rgba(167,139,250,0.15)', paddingBottom: '0.55rem', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>GitHub Extracted Metrics</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{s.personal_info.github_url ? '@' + s.personal_info.github_url.split('/').pop() : 'n/a'}</span>
+                    </h3>
+                    {s.metadata.sources_collected.includes('github') ? (
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>Metric</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right' }}>Raw Value</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, textAlign: 'right', paddingLeft: '0.5rem' }}>Contribution</th>
+                              <th style={{ padding: '0.5rem 0.25rem', fontWeight: 500, paddingLeft: '0.75rem' }}>Formula & Limits</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { name: 'Public Repos', val: s.github.public_repos || '0', score: `${r.github_score?.breakdown?.repos_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.repos_score?.formula },
+                              { name: 'Total Stars', val: s.github.total_stars || '0', score: `${r.github_score?.breakdown?.stars_score?.contribution || 0} / 20`, formula: r.github_score?.breakdown?.stars_score?.formula },
+                              { name: 'Followers', val: s.github.followers || '0', score: `${r.github_score?.breakdown?.followers_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.followers_score?.formula },
+                              { name: 'Commits (Year)', val: r.github_score?.breakdown?.commits_score?.raw_value || '0', score: `${r.github_score?.breakdown?.commits_score?.contribution || 0} / 20`, formula: r.github_score?.breakdown?.commits_score?.formula },
+                              { name: 'Consistency', val: `${r.github_score?.breakdown?.contribution_days_score?.raw_value || 0} days`, score: `${r.github_score?.breakdown?.contribution_days_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.contribution_days_score?.formula },
+                              { name: 'Merged PRs', val: r.github_score?.breakdown?.merged_prs_score?.raw_value || '0', score: `${r.github_score?.breakdown?.merged_prs_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.merged_prs_score?.formula },
+                              { name: 'Issues Closed', val: r.github_score?.breakdown?.issues_score?.raw_value || '0', score: `${r.github_score?.breakdown?.issues_score?.contribution || 0} / 5`, formula: r.github_score?.breakdown?.issues_score?.formula },
+                              { name: 'Active Days (90d)', val: r.github_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.github_score?.breakdown?.activity_score?.contribution || 0} / 5`, formula: r.github_score?.breakdown?.activity_score?.formula },
+                            ].map((row, idx) => (
+                              <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: 0.9 }}>
+                                <td style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>{row.name}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', textAlign: 'right', fontWeight: 600, color: '#A78BFA', paddingLeft: '0.5rem' }}>{row.score}</td>
+                                <td style={{ padding: '0.5rem 0.25rem', paddingLeft: '0.75rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '0.75rem', backgroundColor: 'rgba(167, 139, 250, 0.05)', border: '1px dashed rgba(167, 139, 250, 0.3)', borderRadius: '6px', color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center' }}>
+                        No GitHub data sync'd.
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+
             </div>
           );
         })()}
