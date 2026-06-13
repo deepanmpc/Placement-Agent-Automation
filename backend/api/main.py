@@ -365,6 +365,10 @@ async def get_qdrant_docs(
 @app.post("/candidates/{student_uuid}/sync-platforms")
 async def sync_platforms(
     student_uuid: str,
+    lc_w: Optional[float] = None,
+    cc_w: Optional[float] = None,
+    cf_w: Optional[float] = None,
+    gh_w: Optional[float] = None,
     db: AsyncSession = Depends(get_db)
 ):
     from backend.collection.service import PlatformSyncService
@@ -375,7 +379,12 @@ async def sync_platforms(
         raise HTTPException(404, "Student profile not found")
         
     profile = StudentProfile.model_validate(updated_record.profile_data)
-    attach_ranking(profile)
+    
+    custom_weights = None
+    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
+        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+        
+    attach_ranking(profile, custom_weights=custom_weights)
         
     return {
         "status": "success",

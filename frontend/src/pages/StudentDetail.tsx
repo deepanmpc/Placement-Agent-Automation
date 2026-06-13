@@ -48,7 +48,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
     if (!studentId) return;
     setEnriching(true);
     try {
-      const response = await fetch(`http://localhost:8000/candidates/${studentId}/sync-platforms`, { method: 'POST' });
+      const response = await fetch(`http://localhost:8000/candidates/${studentId}/sync-platforms?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`, { method: 'POST' });
       if (!response.ok) throw new Error('Failed to enrich');
       const data = await response.json();
       
