@@ -138,15 +138,15 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
   return (
     <div className="page" style={{ paddingBottom: '3rem' }}>
       <div className="page-header" style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', marginBottom: '0.4rem' }}>Scoring Engine Settings</h1>
-        <p className="page-subtitle" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Configure overall candidate ranking modes, custom platform evaluation weights, and review scoring formulas.</p>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>Scoring Engine Settings</h1>
+        <p className="page-subtitle" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Configure overall candidate ranking modes, custom platform evaluation weights, and review scoring formulas.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         
         {/* Section 1: Ranking Modes */}
         <div>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-primary)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
             Overall Ranking Mode Selection
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
@@ -186,7 +186,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <div style={{ width: 10, height: 10, borderRadius: '50%', background: f.color }} />
-                      <strong style={{ fontSize: '1rem', fontWeight: 700, color: isActive ? f.color : 'var(--text)' }}>{f.title}</strong>
+                      <strong style={{ fontSize: '1rem', fontWeight: 700, color: isActive ? f.color : 'var(--text-primary)' }}>{f.title}</strong>
                     </div>
                     {isActive && (
                       <span style={{
@@ -197,7 +197,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                       </span>
                     )}
                   </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1.25rem', lineHeight: 1.5, height: '40px', overflow: 'hidden' }}>{f.desc}</p>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: 1.5, height: '40px', overflow: 'hidden' }}>{f.desc}</p>
                   
                   {/* Styled Math Equation Block */}
                   <div style={{
@@ -205,13 +205,13 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                     background: 'var(--bg-secondary)', border: '1px solid var(--border)',
                     borderRadius: '8px', padding: '0.85rem 1rem'
                   }}>
-                    <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)', paddingBottom: '0.35rem', fontFamily: 'monospace' }}>
+                    <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.35rem', fontFamily: 'monospace' }}>
                       {f.formula}
                     </div>
                     {f.components.map((c, i) => (
                       <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>{c.name}</span>
-                        <strong style={{ color: isActive ? f.color : 'var(--text)' }}>{c.weight}</strong>
+                        <strong style={{ color: isActive ? f.color : 'var(--text-primary)' }}>{c.weight}</strong>
                       </div>
                     ))}
                   </div>
@@ -230,10 +230,10 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
               <div>
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#34D399', margin: 0 }}>Custom Mode Scoring Allocations</h3>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>Configure weights for each developer platform. The total allocations must sum to exactly 100%.</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0.2rem 0 0' }}>Configure weights for each developer platform. The total allocations must sum to exactly 100%.</p>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Current Total Allocation</span>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>Current Total Allocation</span>
                 <div style={{ fontSize: '2rem', fontWeight: 900, color: validWeights ? '#34D399' : '#EF4444', lineHeight: 1 }}>
                   {weightSum}<span style={{ fontSize: '1.2rem', fontWeight: 500 }}>%</span>
                 </div>
@@ -290,10 +290,45 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                       onChange={e => setWeight(item.key as keyof CustomWeights, Number(e.target.value))}
                       style={{ width: '100%', accentColor: isCapped ? '#EF4444' : item.color, cursor: 'pointer' }}
                     />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
                       <span>0%</span>
                       <span>{Math.round(maxVal / 2)}%</span>
                       <span>{maxVal}% Max</span>
+                    </div>
+
+                    {/* Manual input number field */}
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      marginTop: '0.35rem', paddingTop: '0.65rem', borderTop: '1px solid var(--border)',
+                      fontSize: '0.75rem'
+                    }}>
+                      <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Manual Value:</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <input
+                          type="number"
+                          min={0}
+                          max={maxVal}
+                          value={customWeights[item.key as keyof CustomWeights]}
+                          onChange={e => {
+                            let val = Number(e.target.value);
+                            if (val < 0) val = 0;
+                            if (val > maxVal) val = maxVal;
+                            setWeight(item.key as keyof CustomWeights, val);
+                          }}
+                          style={{
+                            width: '60px',
+                            padding: '0.25rem 0.4rem',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border)',
+                            background: 'var(--bg)',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.78rem',
+                            textAlign: 'center',
+                            outline: 'none',
+                          }}
+                        />
+                        <span style={{ color: 'var(--text-secondary)' }}>%</span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -315,7 +350,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
 
         {/* Section 3: Full Platform Scoring Formula References */}
         <div>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem', marginTop: '1rem' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-primary)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem', marginTop: '1rem' }}>
             Detailed Platform Evaluation Formulas
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.25rem' }}>
