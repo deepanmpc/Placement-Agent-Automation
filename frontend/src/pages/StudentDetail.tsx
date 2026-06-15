@@ -443,9 +443,13 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               </thead>
                               <tbody>
                                 {[
+                                  { name: 'Total Solved', val: s.leetcode.total_solved?.toString() || '0', score: '-', formula: 'Informational' },
+                                  { name: 'Easy Solved', val: s.leetcode.easy_solved?.toString() || '0', score: '-', formula: '1 point per problem' },
+                                  { name: 'Medium Solved', val: s.leetcode.medium_solved?.toString() || '0', score: '-', formula: '5 points per problem' },
+                                  { name: 'Hard Solved', val: s.leetcode.hard_solved?.toString() || '0', score: '-', formula: '15 points per problem' },
                                   { name: 'Difficulty Points', val: `${r.leetcode_score?.breakdown?.difficulty_score?.raw_value || 0}`, score: `${r.leetcode_score?.breakdown?.difficulty_score?.contribution || 0} / 55`, formula: r.leetcode_score?.breakdown?.difficulty_score?.formula },
                                   { name: 'Contest Rating', val: s.leetcode.rating?.toFixed(0) || '0', score: `${r.leetcode_score?.breakdown?.contest_score?.contribution || 0} / 25`, formula: r.leetcode_score?.breakdown?.contest_score?.formula },
-                                  { name: 'Contests Attended', val: s.leetcode.contests_participated || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
+                                  { name: 'Contests Attended', val: s.leetcode.contests_participated?.toString() || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
                                   { name: 'Global Ranking', val: r.leetcode_score?.breakdown?.global_rank_score?.raw_value || 'Unranked', score: `${r.leetcode_score?.breakdown?.global_rank_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.global_rank_score?.formula },
                                 ].map((row, idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
