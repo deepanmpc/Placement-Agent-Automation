@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     """Root settings for the Placement Agent backend.
 
     Attributes:
-        database_url: Async PostgreSQL connection string (asyncpg driver).
+        database_url: Async MySQL connection string (aiomysql driver).
         qdrant_host: Hostname for the Qdrant vector-database instance.
         qdrant_port: Port for the Qdrant gRPC / HTTP API.
         github_api_token: Personal-access token for GitHub API calls.

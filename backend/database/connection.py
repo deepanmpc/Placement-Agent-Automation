@@ -2,7 +2,7 @@
 
 Provides:
 * A module-level :pydata:`async_engine` bound to the configured
-  PostgreSQL DSN (asyncpg driver).
+  MySQL DSN (aiomysql driver).
 * An :pydata:`async_session_factory` that produces
   :class:`~sqlalchemy.ext.asyncio.AsyncSession` instances.
 * A :func:`get_db` async generator suitable for FastAPI's
