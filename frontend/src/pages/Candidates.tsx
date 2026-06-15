@@ -42,6 +42,8 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const [minScore, setMinScore] = useState<number>(0);
   const [activeBatch, setActiveBatch] = useState<string | null>(null);
   const [missingFilter, setMissingFilter] = useState<string | null>(null);
+  const [showExportPreview, setShowExportPreview] = useState(false);
+  const [exportPreviewData, setExportPreviewData] = useState<any[]>([]);
 
   const getCandidateScore = (p: Profile): number => {
     if (!p.ranking) return 0;
@@ -115,7 +117,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     }
   };
 
-  const handleExportData = () => {
+  const handlePreviewExport = () => {
     const exportData = filteredProfiles.map(p => {
       const missing = [];
       if (!(p.github?.public_repos > 0 || p.github?.total_stars > 0)) missing.push('GitHub');
@@ -129,11 +131,16 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         'Missing Platforms': missing.join(', ') || 'None'
       };
     });
+    setExportPreviewData(exportData);
+    setShowExportPreview(true);
+  };
 
-    const worksheet = utils.json_to_sheet(exportData);
+  const handleConfirmExport = () => {
+    const worksheet = utils.json_to_sheet(exportPreviewData);
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, 'Students Data');
     writeFile(workbook, 'Student_Extract.xlsx');
+    setShowExportPreview(false);
   };
 
   const handleSelectAll = () => {
@@ -329,7 +336,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
           )}
           <button 
             className="btn btn-primary" 
-            onClick={handleExportData} 
+            onClick={handlePreviewExport} 
             style={{ fontSize: '0.85rem', backgroundColor: '#ef4444', borderColor: '#ef4444' }}
           >
             Export Displayed Data
@@ -689,6 +696,71 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
           </p>
         ) : null}
       </div>
+
+      {showExportPreview && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '16px',
+            width: '90%',
+            maxWidth: '600px',
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: 'var(--shadow-lg)'
+          }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Export Preview</h2>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{exportPreviewData.length} records</span>
+            </div>
+            <div style={{ padding: '1rem 1.5rem', overflowY: 'auto', flex: 1 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--border)', textAlign: 'left' }}>
+                    <th style={{ padding: '0.5rem', color: 'var(--text-secondary)' }}>Name</th>
+                    <th style={{ padding: '0.5rem', color: 'var(--text-secondary)' }}>ID Number</th>
+                    <th style={{ padding: '0.5rem', color: 'var(--text-secondary)' }}>Missing Platforms</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {exportPreviewData.slice(0, 10).map((row, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '0.5rem' }}>{row['Student Name']}</td>
+                      <td style={{ padding: '0.5rem' }}>{row['ID Number']}</td>
+                      <td style={{ padding: '0.5rem', color: row['Missing Platforms'] === 'None' ? 'var(--text-tertiary)' : 'var(--color-danger)' }}>
+                        {row['Missing Platforms']}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {exportPreviewData.length > 10 && (
+                <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-tertiary)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                  ... and {exportPreviewData.length - 10} more records
+                </div>
+              )}
+            </div>
+            <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', justifyContent: 'flex-end', background: 'var(--bg-secondary)', borderRadius: '0 0 16px 16px' }}>
+              <button className="btn btn-ghost" onClick={() => setShowExportPreview(false)}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" onClick={handleConfirmExport} style={{ backgroundColor: '#10b981', borderColor: '#10b981' }}>
+                Download Excel ({exportPreviewData.length})
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
