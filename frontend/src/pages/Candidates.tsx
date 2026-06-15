@@ -347,11 +347,13 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             disabled={enriching}
             style={{ 
               fontSize: '0.85rem', 
-              background: 'linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #06b6d4 100%)', 
+              background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 20%, #d946ef 40%, #8b5cf6 60%, #3b82f6 80%, #06b6d4 100%)', 
               border: 'none',
-              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+              boxShadow: '0 4px 15px rgba(217, 70, 239, 0.4)',
               color: 'white',
-              fontWeight: 700
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
             }}
           >
             {enriching ? 'Enriching...' : 'Extract Coding & GitHub Data'}
