@@ -312,15 +312,15 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
           <button
             onClick={() => setActiveBatch(null)}
-            className="btn btn-ghost"
-            style={{ fontSize: '0.85rem' }}
+            className="btn btn-primary"
+            style={{ fontSize: '0.85rem', backgroundColor: '#f97316', borderColor: '#f97316' }}
           >
             Switch Batch
           </button>
           <button
             onClick={() => onNavigate('scoring-config')}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.85rem' }}
+            className="btn btn-primary"
+            style={{ fontSize: '0.85rem', backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }}
           >
             Configure Scoring
           </button>
