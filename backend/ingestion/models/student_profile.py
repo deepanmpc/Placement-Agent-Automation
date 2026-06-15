@@ -125,6 +125,9 @@ class GitHubProfile(BaseModel):
     merged_prs: int = 0
     issues_closed: int = 0
     active_days_90: int = 0
+    active_days_30: int = 0
+    original_repos: int = 0
+    project_depth: float = 0.0
     repository_growth: float = 0.0
     snapshots: List[Dict[str, Any]] = Field(default_factory=list)
     collected_at: Optional[datetime] = None

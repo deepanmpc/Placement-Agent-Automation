@@ -100,8 +100,10 @@ class GitHubCollector:
         commits_last_365 = 0
         contribution_days_365 = 0
         active_days_90 = 0
+        active_days_30 = 0
         merged_prs = 0
         issues_closed = 0
+        original_repos = sum(1 for r in repositories if not r.get("fork", False))
         
         # Scrape Contributions graph
         try:
@@ -127,8 +129,12 @@ class GitHubCollector:
                         contribution_days_365 = sum(1 for d, l in days if l != '0')
                         last_90 = days[-90:]
                         active_days_90 = sum(1 for d, l in last_90 if l != '0')
+                        last_30 = days[-30:]
+                        active_days_30 = sum(1 for d, l in last_30 if l != '0')
         except Exception as e:
             logger.warning(f"Failed to scrape contributions for {username}: {e}")
+
+        project_depth = round(commits_last_365 / original_repos, 2) if original_repos > 0 else float(commits_last_365)
 
         async with httpx.AsyncClient(headers=self.headers, timeout=httpx.Timeout(15.0)) as client:
             async def fetch_count(query: str) -> int:
@@ -168,6 +174,9 @@ class GitHubCollector:
             commits_last_365=commits_last_365,
             contribution_days_365=contribution_days_365,
             active_days_90=active_days_90,
+            active_days_30=active_days_30,
+            original_repos=original_repos,
+            project_depth=project_depth,
             merged_prs=merged_prs,
             issues_closed=issues_closed,
             profile_url=user_data.get("html_url", f"https://github.com/{username}"),
