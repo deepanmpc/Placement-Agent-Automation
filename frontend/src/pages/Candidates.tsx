@@ -329,65 +329,40 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         </div>
       </div>
 
-      {/* Batch Switcher Bar */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border)',
-        borderRadius: '12px',
-        padding: '0.4rem',
-        marginBottom: '1.25rem',
-        width: 'fit-content'
-      }}>
-        {[
-          { value: 'all', label: 'All Batches' },
-          { value: '2023', label: 'Y23' },
-          { value: '2024', label: 'Y24' },
-          { value: '2025', label: 'Y25' },
-          { value: '2026', label: 'Y26' }
-        ].map(item => {
-          const isSelected = activeBatch === item.value;
-          return (
-            <button
-              key={item.value}
-              onClick={() => setActiveBatch(item.value)}
-              style={{
-                padding: '0.45rem 1rem',
-                borderRadius: '8px',
-                border: 'none',
-                background: isSelected ? 'var(--accent)' : 'transparent',
-                color: isSelected ? '#fff' : 'var(--text-secondary)',
-                fontSize: '0.82rem',
-                fontWeight: isSelected ? 700 : 600,
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Search & Filter Section */}
+      {/* Symmetric Control Panel (Search, Batch, Score) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1.25rem',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '1.5rem',
         background: 'var(--bg-secondary)',
         border: '1px solid var(--border)',
         borderRadius: '12px',
         padding: '1.25rem',
         marginBottom: '1.5rem',
-        boxShadow: 'var(--shadow-sm)'
+        boxShadow: 'var(--shadow-sm)',
+        alignItems: 'flex-start'
       }}>
-        {/* Search */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Search Candidate
-          </label>
+        {/* Column 1: Search */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Search Candidate
+            </label>
+            {(searchQuery !== '' || minScore > 0) && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setMinScore(0);
+                }}
+                style={{
+                  background: 'none', border: 'none', color: 'var(--color-danger)',
+                  fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em'
+                }}
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
           <input 
             type="text"
             placeholder="Search name or ID..."
@@ -401,12 +376,60 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
               color: 'var(--text-primary)',
               fontSize: '0.82rem',
               outline: 'none',
+              width: '100%'
             }}
           />
         </div>
 
-        {/* Score filter */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        {/* Column 2: Batch Switcher */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Graduation Batch
+          </label>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            padding: '0.2rem',
+            width: '100%',
+            justifyContent: 'space-between'
+          }}>
+            {[
+              { value: 'all', label: 'All' },
+              { value: '2023', label: 'Y23' },
+              { value: '2024', label: 'Y24' },
+              { value: '2025', label: 'Y25' },
+              { value: '2026', label: 'Y26' }
+            ].map(item => {
+              const isSelected = activeBatch === item.value;
+              return (
+                <button
+                  key={item.value}
+                  onClick={() => setActiveBatch(item.value)}
+                  style={{
+                    flex: 1,
+                    padding: '0.35rem 0',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: isSelected ? 'var(--accent)' : 'transparent',
+                    color: isSelected ? '#fff' : 'var(--text-secondary)',
+                    fontSize: '0.8rem',
+                    fontWeight: isSelected ? 700 : 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Column 3: Score Filter */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Min Score
@@ -426,36 +449,10 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
               width: '100%',
               accentColor: 'var(--accent)',
               cursor: 'pointer',
-              marginTop: '0.35rem'
+              marginTop: '0.45rem'
             }}
           />
         </div>
-
-        {/* Clear Filters Button */}
-        {(searchQuery !== '' || minScore > 0) && (
-          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setMinScore(0);
-              }}
-              style={{
-                width: '100%',
-                padding: '0.5rem 0.75rem',
-                background: 'transparent',
-                border: '1px dashed var(--color-danger)',
-                color: 'var(--color-danger)',
-                borderRadius: '8px',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Clear Filters
-            </button>
-          </div>
-        )}
       </div>
 
       <div 
