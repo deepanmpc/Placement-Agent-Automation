@@ -310,20 +310,22 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
           </div>
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-          <button
-            onClick={() => setActiveBatch(null)}
-            className="btn btn-ghost"
-            style={{ fontSize: '0.85rem' }}
+          <a
+            onClick={(e) => { e.preventDefault(); setActiveBatch(null); }}
+            style={{ fontSize: '0.85rem', color: 'var(--accent)', cursor: 'pointer', textDecoration: 'none', fontWeight: 700, marginRight: '0.5rem' }}
+            onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+            onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
           >
             Switch Batch
-          </button>
-          <button
-            onClick={() => onNavigate('scoring-config')}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.85rem' }}
+          </a>
+          <a
+            onClick={(e) => { e.preventDefault(); onNavigate('scoring-config'); }}
+            style={{ fontSize: '0.85rem', color: 'var(--accent)', cursor: 'pointer', textDecoration: 'none', fontWeight: 700, marginRight: '1rem' }}
+            onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+            onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
           >
             Configure Scoring
-          </button>
+          </a>
           {selectedIds.size > 0 && (
             <button 
               className="btn btn-primary" 
