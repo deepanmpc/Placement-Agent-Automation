@@ -262,6 +262,13 @@ async def list_profiles(
     custom_weights = None
     if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
         custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+    else:
+        from backend.database.models import ScoringRule
+        from sqlalchemy.future import select
+        result = await db.execute(select(ScoringRule).where(ScoringRule.is_active == True))
+        active_rule = result.scalars().first()
+        if active_rule and "platform_weights" in active_rule.config:
+            custom_weights = active_rule.config["platform_weights"]
         
     for p in profiles:
         try:
@@ -289,6 +296,13 @@ async def get_profile(
     custom_weights = None
     if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
         custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+    else:
+        from backend.database.models import ScoringRule
+        from sqlalchemy.future import select
+        result = await db.execute(select(ScoringRule).where(ScoringRule.is_active == True))
+        active_rule = result.scalars().first()
+        if active_rule and "platform_weights" in active_rule.config:
+            custom_weights = active_rule.config["platform_weights"]
         
     try:
         attach_ranking(profile, custom_weights=custom_weights)
@@ -395,6 +409,13 @@ async def sync_platforms(
     custom_weights = None
     if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
         custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+    else:
+        from backend.database.models import ScoringRule
+        from sqlalchemy.future import select
+        result = await db.execute(select(ScoringRule).where(ScoringRule.is_active == True))
+        active_rule = result.scalars().first()
+        if active_rule and "platform_weights" in active_rule.config:
+            custom_weights = active_rule.config["platform_weights"]
         
     attach_ranking(profile, custom_weights=custom_weights)
         
@@ -407,3 +428,53 @@ async def sync_platforms(
         "platform_sync_metadata": updated_record.platform_sync_metadata,
         "ranking": profile.ranking
     }
+
+from pydantic import BaseModel
+from sqlalchemy.future import select
+
+class ScoringRuleCreate(BaseModel):
+    name: str
+    is_active: bool = False
+    config: dict
+
+@app.get("/scoring-rules")
+async def get_scoring_rules(db: AsyncSession = Depends(get_db)):
+    from backend.database.models import ScoringRule
+    result = await db.execute(select(ScoringRule).order_by(ScoringRule.id.desc()))
+    rules = result.scalars().all()
+    if not rules:
+        # Default config if db is empty
+        default_config = {
+            "platform_weights": {"lc": 25.0, "cc": 25.0, "cf": 25.0, "gh": 25.0},
+            "leetcode": {"rating_divisor": 3000, "rating_weight": 60, "contest_divisor": 2500, "contest_weight": 25, "active_days_divisor": 90, "active_days_weight": 10},
+            "codechef": {"rating_divisor": 3000, "rating_weight": 30, "highest_rating_divisor": 3000, "highest_rating_weight": 0, "solved_divisor": 1000, "solved_weight": 15, "contest_divisor": 50, "contest_weight": 10},
+            "codeforces": {"rating_divisor": 3500, "rating_weight": 50, "max_rating_divisor": 3500, "max_rating_weight": 20, "solved_divisor": 3000, "solved_weight": 15, "contest_divisor": 100, "contest_weight": 10},
+            "github": {"repos_divisor": 50, "repos_weight": 15, "stars_divisor": 500, "stars_weight": 20, "followers_divisor": 250, "followers_weight": 10, "commits_divisor": 1500, "commits_weight": 20, "merged_pr_divisor": 100, "merged_pr_weight": 10}
+        }
+        return {"id": 0, "name": "Default Configuration", "is_active": True, "config": default_config}
+    active_rule = next((r for r in rules if r.is_active), rules[0])
+    return {
+        "id": active_rule.id,
+        "name": active_rule.name,
+        "is_active": active_rule.is_active,
+        "config": active_rule.config
+    }
+
+@app.post("/scoring-rules")
+async def save_scoring_rule(rule: ScoringRuleCreate, db: AsyncSession = Depends(get_db)):
+    from backend.database.models import ScoringRule
+    from sqlalchemy import update
+    
+    if rule.is_active:
+        await db.execute(update(ScoringRule).values(is_active=False))
+        
+    new_rule = ScoringRule(
+        name=rule.name,
+        is_active=rule.is_active,
+        config=rule.config
+    )
+    db.add(new_rule)
+    await db.commit()
+    await db.refresh(new_rule)
+    
+    return {"status": "success", "id": new_rule.id}

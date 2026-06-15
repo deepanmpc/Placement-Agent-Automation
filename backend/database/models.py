@@ -112,3 +112,47 @@ class StudentProfileRecord(Base):
             f"<StudentProfileRecord(id={self.id}, "
             f"uuid={self.student_uuid!r})>"
         )
+
+
+class ScoringRule(Base):
+    """Stores scoring formulas and platform weights in the database.
+    
+    Attributes:
+        id: Surrogate primary key.
+        name: Name of the configuration (e.g., 'Default Engineer').
+        is_active: Whether this is the currently active scoring configuration.
+        config: JSON payload containing platform weights and internal formula parameters.
+        updated_at: Timestamp of the last configuration update.
+    """
+
+    __tablename__ = "scoring_rules"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    name: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        default="Default Configuration"
+    )
+    is_active: Mapped[bool] = mapped_column(
+        nullable=False,
+        default=False
+    )
+    config: Mapped[Dict[str, Any]] = mapped_column(
+        JSON,
+        nullable=False,
+        default=dict
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=lambda: datetime.now(tz=timezone.utc),
+    )
+
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"<ScoringRule(id={self.id}, name={self.name!r}, is_active={self.is_active})>"
+
