@@ -38,7 +38,7 @@ class LeetCodeRanker:
         
         rank_score = 0
         if global_rank > 0:
-            rank_score = max(0, (1000000 - global_rank) / 1000000) * 10
+            rank_score = max(0, (4000000 - global_rank) / 4000000) * 10
 
         total = difficulty_score + contest_score + participation + rank_score
 
@@ -63,7 +63,7 @@ class LeetCodeRanker:
             },
             "global_rank_score": {
                 "raw_value": global_rank or "Unranked",
-                "formula": f"MAX(0, (1M - {global_rank})/1M) × 10",
+                "formula": f"MAX(0, (4M - {global_rank})/4M) × 10",
                 "contribution": round(rank_score, 2),
                 "weight": 0.10
             }

@@ -29,7 +29,7 @@ class CodeforcesRanker:
         contests   = _safe_int(data.get("contests") or data.get("contest_count", 0))
 
         title = str(data.get("max_rank") or data.get("rank") or "").lower().strip()
-        TITLE_MAP = {"newbie": 0, "pupil": 2, "specialist": 4, "expert": 6, "candidate master": 8, "master": 10, "international master": 10, "grandmaster": 10, "international grandmaster": 10, "legendary grandmaster": 10}
+        TITLE_MAP = {"newbie": 2, "pupil": 4, "specialist": 6, "expert": 8, "candidate master": 10, "master": 10, "international master": 10, "grandmaster": 10, "international grandmaster": 10, "legendary grandmaster": 10}
         
         title_points = TITLE_MAP.get(title, 0)
         if not title:
