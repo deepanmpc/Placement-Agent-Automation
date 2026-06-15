@@ -319,8 +319,8 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
           </button>
           <button
             onClick={() => onNavigate('scoring-config')}
-            className="btn btn-primary"
-            style={{ fontSize: '0.85rem', backgroundColor: '#2563eb', borderColor: '#2563eb', color: 'white' }}
+            className="btn btn-secondary"
+            style={{ fontSize: '0.85rem' }}
           >
             Configure Scoring
           </button>
@@ -345,7 +345,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             className="btn btn-primary" 
             onClick={handleEnrich} 
             disabled={enriching}
-            style={{ fontSize: '0.85rem', backgroundColor: '#6366f1', borderColor: '#6366f1' }}
+            style={{ fontSize: '0.85rem', backgroundColor: '#3b82f6', borderColor: '#3b82f6' }}
           >
             {enriching ? 'Enriching...' : 'Extract Coding & GitHub Data'}
           </button>
