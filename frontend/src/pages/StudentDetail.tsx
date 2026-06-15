@@ -414,8 +414,8 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                           <span>LeetCode Extracted Metrics</span>
                           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>@{s.personal_info.leetcode_username}</span>
                         </h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', alignItems: 'start' }}>
-                          <div style={{ height: 250, width: '100%' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', alignItems: 'center' }}>
+                          <div style={{ height: 380, width: '100%' }}>
                             <ResponsiveContainer width="100%" height="100%">
                               <BarChart data={[
                                 { name: 'Difficulty', score: r.leetcode_score.breakdown.difficulty_score?.contribution || 0, max: 55 },
@@ -425,38 +425,42 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               ]} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 55]} hide />
-                                <YAxis dataKey="name" type="category" width={90} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
+                                <YAxis dataKey="name" type="category" width={90} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
                                 <RechartsTooltip cursor={{fill: 'var(--bg-secondary)'}} contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} />
-                                <Bar dataKey="score" fill="var(--accent)" radius={[0, 4, 4, 0]} barSize={24} />
+                                <Bar dataKey="score" fill="var(--accent)" radius={[0, 4, 4, 0]} barSize={28} />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
                           <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
                               <thead>
-                                <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
-                                  <th style={{ padding: '0.5rem', fontWeight: 500 }}>Metric</th>
-                                  <th style={{ padding: '0.5rem', fontWeight: 500, textAlign: 'right' }}>Raw Value</th>
-                                  <th style={{ padding: '0.5rem', fontWeight: 500, textAlign: 'right' }}>Score</th>
-                                  <th style={{ padding: '0.5rem', fontWeight: 500, paddingLeft: '1rem' }}>Formula</th>
+                                <tr style={{ borderBottom: '2px solid var(--border)', color: 'var(--text-muted)' }}>
+                                  <th style={{ padding: '0.75rem 0.5rem', fontWeight: 600 }}>Metric</th>
+                                  <th style={{ padding: '0.75rem 0.5rem', fontWeight: 600, textAlign: 'right' }}>Raw Value</th>
+                                  <th style={{ padding: '0.75rem 0.5rem', fontWeight: 600, textAlign: 'right' }}>Score</th>
+                                  <th style={{ padding: '0.75rem 0.5rem', fontWeight: 600, paddingLeft: '1rem' }}>Formula</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {[
-                                  { name: 'Total Solved', val: s.leetcode.total_solved?.toString() || '0', score: '-', formula: 'Informational' },
-                                  { name: 'Easy Solved', val: s.leetcode.easy_solved?.toString() || '0', score: '-', formula: '1 point per problem' },
-                                  { name: 'Medium Solved', val: s.leetcode.medium_solved?.toString() || '0', score: '-', formula: '5 points per problem' },
-                                  { name: 'Hard Solved', val: s.leetcode.hard_solved?.toString() || '0', score: '-', formula: '15 points per problem' },
+                                  { name: 'Total Solved', val: s.leetcode.total_solved?.toString() || '0', score: '-', formula: 'Informational', isSub: true },
+                                  { name: 'Easy Solved', val: s.leetcode.easy_solved?.toString() || '0', score: '-', formula: '1 point per problem', isSub: true },
+                                  { name: 'Medium Solved', val: s.leetcode.medium_solved?.toString() || '0', score: '-', formula: '5 points per problem', isSub: true },
+                                  { name: 'Hard Solved', val: s.leetcode.hard_solved?.toString() || '0', score: '-', formula: '15 points per problem', isSub: true },
                                   { name: 'Difficulty Points', val: `${r.leetcode_score?.breakdown?.difficulty_score?.raw_value || 0}`, score: `${r.leetcode_score?.breakdown?.difficulty_score?.contribution || 0} / 55`, formula: r.leetcode_score?.breakdown?.difficulty_score?.formula },
                                   { name: 'Contest Rating', val: s.leetcode.rating?.toFixed(0) || '0', score: `${r.leetcode_score?.breakdown?.contest_score?.contribution || 0} / 25`, formula: r.leetcode_score?.breakdown?.contest_score?.formula },
                                   { name: 'Contests Attended', val: s.leetcode.contests_participated?.toString() || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
                                   { name: 'Global Ranking', val: r.leetcode_score?.breakdown?.global_rank_score?.raw_value || 'Unranked', score: `${r.leetcode_score?.breakdown?.global_rank_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.global_rank_score?.formula },
                                 ].map((row, idx) => (
-                                  <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
-                                    <td style={{ padding: '0.5rem', fontWeight: 500 }}>{row.name}</td>
-                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
-                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 600, color: 'var(--accent)' }}>{row.score}</td>
-                                    <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                                  <tr key={idx} style={{ 
+                                    borderBottom: '1px solid var(--border)', 
+                                    backgroundColor: row.isSub ? 'rgba(0,0,0,0.015)' : 'transparent',
+                                    opacity: row.isSub ? 0.85 : 1
+                                  }}>
+                                    <td style={{ padding: '0.65rem 0.5rem', fontWeight: 500, paddingLeft: row.isSub ? '1.5rem' : '0.5rem', borderLeft: row.isSub ? '2px solid var(--accent)' : 'none' }}>{row.name}</td>
+                                    <td style={{ padding: '0.65rem 0.5rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                    <td style={{ padding: '0.65rem 0.5rem', textAlign: 'right', fontWeight: 600, color: row.isSub ? 'var(--text-muted)' : 'var(--accent)' }}>{row.score}</td>
+                                    <td style={{ padding: '0.65rem 0.5rem', paddingLeft: '1rem', fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{row.formula}</td>
                                   </tr>
                                 ))}
                               </tbody>
