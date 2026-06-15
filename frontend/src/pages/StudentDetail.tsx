@@ -458,9 +458,9 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                     opacity: row.isSub ? 0.85 : 1
                                   }}>
                                     <td style={{ padding: '0.65rem 0.5rem', fontWeight: 500, paddingLeft: row.isSub ? '1.5rem' : '0.5rem', borderLeft: row.isSub ? '2px solid var(--accent)' : 'none' }}>{row.name}</td>
-                                    <td style={{ padding: '0.65rem 0.5rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                    <td style={{ padding: '0.65rem 0.5rem', textAlign: 'right' }}>{row.val}</td>
                                     <td style={{ padding: '0.65rem 0.5rem', textAlign: 'right', fontWeight: 600, color: row.isSub ? 'var(--text-muted)' : 'var(--accent)' }}>{row.score}</td>
-                                    <td style={{ padding: '0.65rem 0.5rem', paddingLeft: '1rem', fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                                    <td style={{ padding: '0.65rem 0.5rem', paddingLeft: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{row.formula}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -515,9 +515,9 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 ].map((row, idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 500 }}>{row.name}</td>
-                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right' }}>{row.val}</td>
                                     <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 600, color: 'var(--accent)' }}>{row.score}</td>
-                                    <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                                    <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -572,9 +572,9 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 ].map((row, idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 500 }}>{row.name}</td>
-                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right' }}>{row.val}</td>
                                     <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 600, color: 'var(--accent)' }}>{row.score}</td>
-                                    <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                                    <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -639,9 +639,9 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 ].map((row, idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 500 }}>{row.name}</td>
-                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontFamily: 'monospace' }}>{row.val}</td>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right' }}>{row.val}</td>
                                     <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 600, color: 'var(--accent)' }}>{row.score}</td>
-                                    <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                                    <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
                                   </tr>
                                 ))}
                               </tbody>
