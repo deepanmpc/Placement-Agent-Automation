@@ -410,14 +410,14 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                       paddingBottom: idx !== pf.components.length - 1 ? '0.65rem' : '0',
                       borderBottom: idx !== pf.components.length - 1 ? '1px solid var(--border)' : 'none'
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 800, color: '#111827' }}>
                         <span>{comp.name}</span>
-                        <span style={{ color: pf.color }}>{comp.weight}</span>
+                        <span style={{ color: '#10b981', fontWeight: 900 }}>{comp.weight}</span>
                       </div>
                       <div style={{
-                        fontSize: '0.74rem', fontFamily: 'monospace', color: 'var(--text-secondary)',
-                        background: 'var(--bg-secondary)', padding: '0.35rem 0.5rem', borderRadius: '4px',
-                        marginTop: '0.2rem', border: '1px solid var(--border)', overflowX: 'auto',
+                        fontSize: '0.8rem', fontFamily: 'monospace', color: '#ef4444', fontWeight: 700,
+                        background: '#fee2e2', padding: '0.4rem 0.5rem', borderRadius: '4px',
+                        marginTop: '0.25rem', border: '1px solid #fca5a5', overflowX: 'auto',
                         whiteSpace: 'nowrap'
                       }}>
                         {comp.formula}
