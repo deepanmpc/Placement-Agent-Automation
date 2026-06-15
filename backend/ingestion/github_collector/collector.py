@@ -42,6 +42,7 @@ class GitHubCollector:
         self.token: Optional[str] = token
         self.headers: dict[str, str] = {
             "Accept": "application/vnd.github.v3+json",
+            "Cache-Control": "no-cache",
         }
         if token:
             self.headers["Authorization"] = f"token {token}"
@@ -72,15 +73,16 @@ class GitHubCollector:
             timeout=httpx.Timeout(30.0),
             follow_redirects=True,
         ) as client:
-            user_data = await self._fetch_user(client, username)
+            user_task = asyncio.create_task(self._fetch_user(client, username))
+            repo_task = asyncio.create_task(self._fetch_repositories(client, username))
+            user_data, repositories = await asyncio.gather(user_task, repo_task)
+            
             if user_data is None:
                 logger.warning("Could not fetch user profile for {}", username)
                 return GitHubProfile(
                     username=username,
                     profile_url=f"https://github.com/{username}",
                 )
-
-            repositories = await self._fetch_repositories(client, username)
 
         # Build model objects
         repo_models = self._build_repo_models(repositories)
@@ -104,7 +106,12 @@ class GitHubCollector:
         # Scrape Contributions graph
         try:
             async with httpx.AsyncClient() as unauth_client:
-                contrib_resp = await unauth_client.get(f"https://github.com/users/{username}/contributions", timeout=10.0)
+                timestamp = int(datetime.now().timestamp())
+                contrib_resp = await unauth_client.get(
+                    f"https://github.com/users/{username}/contributions?_cb={timestamp}", 
+                    headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache"},
+                    timeout=10.0
+                )
                 if contrib_resp.status_code == 200:
                     text = contrib_resp.text
                     m = re.search(r'(\d{1,3}(?:,\d{3})*)\s+contributions\s+in\s+the\s+last\s+year', text, re.IGNORECASE)
@@ -124,21 +131,25 @@ class GitHubCollector:
             logger.warning(f"Failed to scrape contributions for {username}: {e}")
 
         async with httpx.AsyncClient(headers=self.headers, timeout=httpx.Timeout(15.0)) as client:
-            try:
-                pr_url = f"{self.BASE_URL}/search/issues?q=author:{username}+type:pr+is:merged"
-                pr_resp = await self._request(client, "GET", pr_url)
-                if pr_resp:
-                    merged_prs = pr_resp.json().get("total_count", 0)
-            except Exception as e:
-                logger.warning(f"Failed to fetch PRs for {username}: {e}")
+            async def fetch_count(query: str) -> int:
+                url = f"{self.BASE_URL}/search/issues?q=author:{username}+{query}"
+                resp = await self._request(client, "GET", url)
+                if resp:
+                    return resp.json().get("total_count", 0)
+                return 0
 
             try:
-                iss_url = f"{self.BASE_URL}/search/issues?q=author:{username}+type:issue+is:closed"
-                iss_resp = await self._request(client, "GET", iss_url)
-                if iss_resp:
-                    issues_closed = iss_resp.json().get("total_count", 0)
+                pr_count, iss_count = await asyncio.gather(
+                    fetch_count("type:pr+is:merged"),
+                    fetch_count("type:issue+is:closed"),
+                    return_exceptions=True
+                )
+                if not isinstance(pr_count, Exception):
+                    merged_prs = pr_count
+                if not isinstance(iss_count, Exception):
+                    issues_closed = iss_count
             except Exception as e:
-                logger.warning(f"Failed to fetch issues for {username}: {e}")
+                logger.warning(f"Failed to fetch PRs/issues for {username}: {e}")
 
         profile = GitHubProfile(
             username=user_data.get("login", username),

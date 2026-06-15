@@ -391,10 +391,10 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                           </thead>
                           <tbody>
                             {[
-                              { name: 'Difficulty Points', val: `${r.leetcode_score?.breakdown?.difficulty_score?.raw_value || 0} (E:${s.leetcode.easy_solved}/M:${s.leetcode.medium_solved}/H:${s.leetcode.hard_solved})`, score: `${r.leetcode_score?.breakdown?.difficulty_score?.contribution || 0} / 60`, formula: r.leetcode_score?.breakdown?.difficulty_score?.formula },
+                              { name: 'Difficulty Points', val: `${r.leetcode_score?.breakdown?.difficulty_score?.raw_value || 0} (E:${s.leetcode.easy_solved}/M:${s.leetcode.medium_solved}/H:${s.leetcode.hard_solved})`, score: `${r.leetcode_score?.breakdown?.difficulty_score?.contribution || 0} / 55`, formula: r.leetcode_score?.breakdown?.difficulty_score?.formula },
                               { name: 'Contest Rating', val: s.leetcode.rating?.toFixed(0) || '0', score: `${r.leetcode_score?.breakdown?.contest_score?.contribution || 0} / 25`, formula: r.leetcode_score?.breakdown?.contest_score?.formula },
-                              { name: 'Contests Attended', val: s.leetcode.contests_participated || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 5`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
-                              { name: 'Active Days (90d)', val: r.leetcode_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.leetcode_score?.breakdown?.activity_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.activity_score?.formula },
+                              { name: 'Contests Attended', val: s.leetcode.contests_participated || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
+                              { name: 'Global Ranking', val: r.leetcode_score?.breakdown?.global_rank_score?.raw_value || 'Unranked', score: `${r.leetcode_score?.breakdown?.global_rank_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.global_rank_score?.formula },
                             ].map((row, idx) => (
                               <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: 0.9 }}>
                                 <td style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>{row.name}</td>
@@ -433,10 +433,10 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                           <tbody>
                             {[
                               { name: 'Stars Rating', val: s.codechef.stars || 'Unrated', score: `${r.codechef_score?.breakdown?.star_score?.contribution || 0} / 40`, formula: r.codechef_score?.breakdown?.star_score?.formula },
-                              { name: 'Current Rating', val: s.codechef.rating || '0', score: `${r.codechef_score?.breakdown?.rating_score?.contribution || 0} / 30`, formula: r.codechef_score?.breakdown?.rating_score?.formula },
-                              { name: 'Problems Solved', val: s.codechef.solved_count || '0', score: `${r.codechef_score?.breakdown?.solved_score?.contribution || 0} / 15`, formula: r.codechef_score?.breakdown?.solved_score?.formula },
+                              { name: 'Current Rating', val: s.codechef.rating || '0', score: `${r.codechef_score?.breakdown?.rating_score?.contribution || 0} / 20`, formula: r.codechef_score?.breakdown?.rating_score?.formula },
+                              { name: 'Highest Rating', val: r.codechef_score?.breakdown?.highest_rating_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.highest_rating_score?.contribution || 0} / 10`, formula: r.codechef_score?.breakdown?.highest_rating_score?.formula },
+                              { name: 'Problems Solved', val: s.codechef.solved_count || '0', score: `${r.codechef_score?.breakdown?.solved_score?.contribution || 0} / 20`, formula: r.codechef_score?.breakdown?.solved_score?.formula },
                               { name: 'Contests Count', val: r.codechef_score?.breakdown?.contest_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.contest_score?.contribution || 0} / 10`, formula: r.codechef_score?.breakdown?.contest_score?.formula },
-                              { name: 'Active Days (90d)', val: r.codechef_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.activity_score?.contribution || 0} / 5`, formula: r.codechef_score?.breakdown?.activity_score?.formula },
                             ].map((row, idx) => (
                               <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: 0.9 }}>
                                 <td style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>{row.name}</td>
@@ -474,11 +474,11 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                           </thead>
                           <tbody>
                             {[
-                              { name: 'Current Rating', val: s.codeforces.rating || '0', score: `${r.codeforces_score?.breakdown?.rating_score?.contribution || 0} / 50`, formula: r.codeforces_score?.breakdown?.rating_score?.formula },
-                              { name: 'Max Rating', val: s.codeforces.max_rating || '0', score: `${r.codeforces_score?.breakdown?.max_rating_score?.contribution || 0} / 20`, formula: r.codeforces_score?.breakdown?.max_rating_score?.formula },
-                              { name: 'Problems Solved', val: s.codeforces.solved_count || '0', score: `${r.codeforces_score?.breakdown?.solved_score?.contribution || 0} / 15`, formula: r.codeforces_score?.breakdown?.solved_score?.formula },
+                              { name: 'Current Rating', val: s.codeforces.rating || '0', score: `${r.codeforces_score?.breakdown?.rating_score?.contribution || 0} / 45`, formula: r.codeforces_score?.breakdown?.rating_score?.formula },
+                              { name: 'Max Rating', val: s.codeforces.max_rating || '0', score: `${r.codeforces_score?.breakdown?.max_rating_score?.contribution || 0} / 15`, formula: r.codeforces_score?.breakdown?.max_rating_score?.formula },
+                              { name: 'Title / Rank', val: r.codeforces_score?.breakdown?.title_score?.raw_value || 'Unranked', score: `${r.codeforces_score?.breakdown?.title_score?.contribution || 0} / 10`, formula: r.codeforces_score?.breakdown?.title_score?.formula },
+                              { name: 'Problems Solved', val: s.codeforces.solved_count || '0', score: `${r.codeforces_score?.breakdown?.solved_score?.contribution || 0} / 20`, formula: r.codeforces_score?.breakdown?.solved_score?.formula },
                               { name: 'Contests Count', val: r.codeforces_score?.breakdown?.contest_score?.raw_value || '0', score: `${r.codeforces_score?.breakdown?.contest_score?.contribution || 0} / 10`, formula: r.codeforces_score?.breakdown?.contest_score?.formula },
-                              { name: 'Active Days (90d)', val: r.codeforces_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.codeforces_score?.breakdown?.activity_score?.contribution || 0} / 5`, formula: r.codeforces_score?.breakdown?.activity_score?.formula },
                             ].map((row, idx) => (
                               <tr key={idx} style={{ borderBottom: '1px solid var(--border)', opacity: 0.9 }}>
                                 <td style={{ padding: '0.5rem 0.25rem', fontWeight: 500 }}>{row.name}</td>
