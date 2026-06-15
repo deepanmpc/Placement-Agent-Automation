@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
 
 interface Props {
@@ -98,6 +99,7 @@ const PLATFORM_FORMULAS = [
 ];
 
 export default function ScoringConfig({ scoringMode, onScoringModeChange, customWeights, onCustomWeightsChange, onSave }: Props) {
+  const [showFormulas, setShowFormulas] = useState(false);
   const weightSum = customWeights.lc + customWeights.cc + customWeights.cf + customWeights.gh;
   const validWeights = Math.abs(weightSum - 100) < 0.01;
 
@@ -344,10 +346,54 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
 
         {/* Section 3: Full Platform Scoring Formula References */}
         <div style={{ marginTop: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-primary)', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
-            Detailed Platform Evaluation Formulas
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.25rem' }}>
+          {!showFormulas ? (
+            <button
+              onClick={() => setShowFormulas(true)}
+              style={{
+                width: '100%',
+                background: 'var(--bg-secondary)',
+                border: '1px dashed var(--border)',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                cursor: 'pointer',
+                textAlign: 'center',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+              onMouseEnter={(e) => { 
+                e.currentTarget.style.borderColor = 'var(--accent)';
+                e.currentTarget.style.background = 'var(--accent-bg)';
+              }}
+              onMouseLeave={(e) => { 
+                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.background = 'var(--bg-secondary)';
+              }}
+            >
+              <h3 style={{ margin: 0, color: 'var(--accent)', fontSize: '1.25rem', fontWeight: 800 }}>
+                Custom Default Recommended Criteria
+              </h3>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                Click to view the detailed scoring report, platform formulas, and the current evaluation metrics in depth.
+              </p>
+            </button>
+          ) : (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
+                <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  Detailed Platform Evaluation Formulas
+                </h2>
+                <button
+                  onClick={() => setShowFormulas(false)}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase' }}
+                >
+                  Hide Details
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.25rem' }}>
             {PLATFORM_FORMULAS.map(pf => (
               <div key={pf.name} style={{
                 background: 'var(--bg)', border: '1px solid var(--border)', borderLeft: `4px solid ${pf.color}`,
@@ -381,9 +427,10 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                 </div>
               </div>
             ))}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
-
       </div>
     </div>
   );
