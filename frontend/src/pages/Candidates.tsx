@@ -725,20 +725,20 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{exportPreviewData.length} records</span>
             </div>
             <div style={{ padding: '1rem 1.5rem', overflowY: 'auto', flex: 1 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--border)', textAlign: 'left' }}>
-                    <th style={{ padding: '0.5rem', color: 'var(--text-secondary)' }}>Name</th>
-                    <th style={{ padding: '0.5rem', color: 'var(--text-secondary)' }}>ID Number</th>
-                    <th style={{ padding: '0.5rem', color: 'var(--text-secondary)' }}>Missing Platforms</th>
+                    <th style={{ padding: '0.75rem 0.5rem', color: '#111827', fontWeight: 800 }}>Student Name</th>
+                    <th style={{ padding: '0.75rem 0.5rem', color: '#111827', fontWeight: 800 }}>ID Number</th>
+                    <th style={{ padding: '0.75rem 0.5rem', color: '#111827', fontWeight: 800 }}>Missing Platforms</th>
                   </tr>
                 </thead>
                 <tbody>
                   {exportPreviewData.slice(0, 10).map((row, i) => (
                     <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
-                      <td style={{ padding: '0.5rem' }}>{row['Student Name']}</td>
-                      <td style={{ padding: '0.5rem' }}>{row['ID Number']}</td>
-                      <td style={{ padding: '0.5rem', color: row['Missing Platforms'] === 'None' ? 'var(--text-tertiary)' : 'var(--color-danger)' }}>
+                      <td style={{ padding: '0.75rem 0.5rem', color: '#111827', fontWeight: 600 }}>{row['Student Name']}</td>
+                      <td style={{ padding: '0.75rem 0.5rem', color: '#111827', fontWeight: 600 }}>{row['ID Number']}</td>
+                      <td style={{ padding: '0.75rem 0.5rem', fontWeight: 800, color: row['Missing Platforms'] === 'None' ? '#10b981' : '#ef4444' }}>
                         {row['Missing Platforms']}
                       </td>
                     </tr>
