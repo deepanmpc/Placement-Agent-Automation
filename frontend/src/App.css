@@ -570,6 +570,8 @@ a:hover { color: var(--accent-hover); }
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
@@ -611,6 +613,8 @@ a:hover { color: var(--accent-hover); }
   width: 32px;
   text-align: center;
   flex-shrink: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 .candidate-info { flex: 1; min-width: 0; }
@@ -642,6 +646,8 @@ a:hover { color: var(--accent-hover); }
   align-items: center;
   gap: 0.6rem;
   flex-shrink: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ===== Tags ===== */
