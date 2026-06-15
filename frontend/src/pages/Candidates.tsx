@@ -312,15 +312,15 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
           <button
             onClick={() => setActiveBatch(null)}
-            className="btn btn-primary"
-            style={{ fontSize: '0.85rem', backgroundColor: '#f97316', borderColor: '#f97316' }}
+            className="btn btn-ghost"
+            style={{ fontSize: '0.85rem' }}
           >
             Switch Batch
           </button>
           <button
             onClick={() => onNavigate('scoring-config')}
-            className="btn btn-primary"
-            style={{ fontSize: '0.85rem', backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }}
+            className="btn btn-secondary"
+            style={{ fontSize: '0.85rem' }}
           >
             Configure Scoring
           </button>
@@ -345,7 +345,14 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             className="btn btn-primary" 
             onClick={handleEnrich} 
             disabled={enriching}
-            style={{ fontSize: '0.85rem', backgroundColor: '#3b82f6', borderColor: '#3b82f6' }}
+            style={{ 
+              fontSize: '0.85rem', 
+              background: 'linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #06b6d4 100%)', 
+              border: 'none',
+              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
+              color: 'white',
+              fontWeight: 700
+            }}
           >
             {enriching ? 'Enriching...' : 'Extract Coding & GitHub Data'}
           </button>
