@@ -337,7 +337,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
           <button 
             className="btn btn-primary" 
             onClick={handlePreviewExport} 
-            style={{ fontSize: '0.85rem', backgroundColor: '#ef4444', borderColor: '#ef4444' }}
+            style={{ fontSize: '0.85rem', backgroundColor: '#10b981', borderColor: '#10b981' }}
           >
             Export Displayed Data
           </button>
