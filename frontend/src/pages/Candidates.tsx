@@ -313,7 +313,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             className="btn btn-secondary"
             style={{ fontSize: '0.85rem' }}
           >
-            ⚙️ Configure Scoring
+            Configure Scoring
           </button>
           {selectedIds.size > 0 && (
             <button 
@@ -326,11 +326,11 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             </button>
           )}
           <button 
-            className="btn btn-secondary" 
+            className="btn btn-primary" 
             onClick={handleExportData} 
-            style={{ fontSize: '0.85rem' }}
+            style={{ fontSize: '0.85rem', backgroundColor: '#ef4444', borderColor: '#ef4444' }}
           >
-            ⬇️ Export Displayed Data
+            Export Displayed Data
           </button>
           <button 
             className="btn btn-primary" 
