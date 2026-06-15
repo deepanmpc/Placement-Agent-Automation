@@ -17,6 +17,11 @@ function getInitialTheme(): 'light' | 'dark' {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+function getInitialPage(): PageView {
+  const stored = sessionStorage.getItem('currentPage');
+  return (stored as PageView) || 'upload';
+}
+
 function getInitialScoringMode(): ScoringMode {
   const stored = localStorage.getItem('scoringMode');
   if (stored === 'dsa_mode' || stored === 'github_mode' || stored === 'custom') return stored as ScoringMode;
@@ -36,11 +41,15 @@ function getInitialCustomWeights(): CustomWeights {
 }
 
 export default function App() {
-  const [page, setPage] = useState<PageView>('upload');
+  const [page, setPage] = useState<PageView>(getInitialPage);
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
   const [scoringMode, setScoringMode] = useState<ScoringMode>(getInitialScoringMode);
   const [customWeights, setCustomWeights] = useState<CustomWeights>(getInitialCustomWeights);
+
+  useEffect(() => {
+    sessionStorage.setItem('currentPage', page);
+  }, [page]);
 
   useEffect(() => {
     fetch('http://localhost:9090/api/config')

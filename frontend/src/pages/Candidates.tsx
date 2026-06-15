@@ -281,6 +281,8 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     return numB - numA;
   });
 
+  const globalRanks = new Map(filteredProfiles.map((p, i) => [p.student_uuid, i + 1]));
+
   return (
     <div className="page">
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
@@ -605,6 +607,19 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
                   {selectedIds.has(p.student_uuid) && (
                     <span style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', lineHeight: 1 }}>✓</span>
                   )}
+                </div>
+
+                {/* Serial Rank Number */}
+                <div style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 900,
+                  color: 'var(--text-tertiary)',
+                  width: '32px',
+                  textAlign: 'right',
+                  marginRight: '0.5rem',
+                  fontVariantNumeric: 'tabular-nums'
+                }}>
+                  #{globalRanks.get(p.student_uuid)}
                 </div>
 
                 <div 
