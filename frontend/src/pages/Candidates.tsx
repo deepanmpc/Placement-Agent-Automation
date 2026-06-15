@@ -432,13 +432,12 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         </div>
 
         {/* Clear Filters Button */}
-        {(searchQuery || minScore > 0 || activeBatch !== 'all') && (
+        {(searchQuery !== '' || minScore > 0) && (
           <div style={{ display: 'flex', alignItems: 'flex-end' }}>
             <button
               onClick={() => {
                 setSearchQuery('');
                 setMinScore(0);
-                setActiveBatch('all');
               }}
               style={{
                 width: '100%',
