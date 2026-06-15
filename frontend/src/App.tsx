@@ -19,7 +19,7 @@ function getInitialTheme(): 'light' | 'dark' {
 
 function getInitialScoringMode(): ScoringMode {
   const stored = localStorage.getItem('scoringMode');
-  if (stored === 'dsa_mode' || stored === 'dev_mode' || stored === 'custom_mode') return stored;
+  if (stored === 'dsa_mode' || stored === 'github_mode' || stored === 'custom') return stored as ScoringMode;
   return 'dsa_mode';
 }
 

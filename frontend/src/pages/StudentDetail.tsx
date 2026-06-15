@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { ChevronDown, ChevronUp, Activity } from 'lucide-react';
 import type { PageView } from '../types';
 import type { Profile } from '../api';
@@ -644,7 +644,6 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                     )}
                   </div>
                 )}
-              </div>
               </div>
 
             </div>
