@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { utils, writeFile } from 'xlsx';
 import type { PageView } from '../types';
 import type { Profile } from '../api';
 import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
@@ -112,6 +113,27 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     } finally {
       setEnriching(false);
     }
+  };
+
+  const handleExportData = () => {
+    const exportData = filteredProfiles.map(p => {
+      const missing = [];
+      if (!(p.github?.public_repos > 0 || p.github?.total_stars > 0)) missing.push('GitHub');
+      if (!(p.leetcode?.total_solved > 0)) missing.push('LeetCode');
+      if (!(p.codeforces?.rating > 0 || p.codeforces?.solved_count > 0)) missing.push('Codeforces');
+      if (!(p.codechef?.rating > 0 || p.codechef?.solved_count > 0)) missing.push('CodeChef');
+      
+      return {
+        'Student Name': p.personal_info.name || 'Unknown',
+        'ID Number': p.personal_info.id_number || 'Unknown',
+        'Missing Platforms': missing.join(', ') || 'None'
+      };
+    });
+
+    const worksheet = utils.json_to_sheet(exportData);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Students Data');
+    writeFile(workbook, 'Student_Extract.xlsx');
   };
 
   const handleSelectAll = () => {
@@ -303,6 +325,13 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
               {deleting ? 'Deleting...' : `Delete Selected (${selectedIds.size})`}
             </button>
           )}
+          <button 
+            className="btn btn-secondary" 
+            onClick={handleExportData} 
+            style={{ fontSize: '0.85rem' }}
+          >
+            ⬇️ Export Displayed Data
+          </button>
           <button 
             className="btn btn-primary" 
             onClick={handleEnrich} 
