@@ -71,7 +71,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     if (missingFilter === 'codechef') matchesMissing = !(p.codechef?.rating > 0 || p.codechef?.solved_count > 0);
 
     return matchesSearch && matchesScore && matchesBatch && matchesMissing;
-  });
+  }).sort((a, b) => getCandidateScore(b) - getCandidateScore(a));
 
   const allFilteredSelected = filteredProfiles.length > 0 && filteredProfiles.every(p => selectedIds.has(p.student_uuid));
 
