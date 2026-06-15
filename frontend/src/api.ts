@@ -73,6 +73,7 @@ export interface Profile {
   metadata: {
     ingested_at: string;
     sources_collected: string[];
+    missing_platforms?: string[];
     errors: string[];
   };
   ranking?: any;

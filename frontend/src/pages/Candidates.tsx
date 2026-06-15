@@ -40,6 +40,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const [searchQuery, setSearchQuery] = useState('');
   const [minScore, setMinScore] = useState<number>(0);
   const [activeBatch, setActiveBatch] = useState<string | null>(null);
+  const [missingFilter, setMissingFilter] = useState<string | null>(null);
 
   const getCandidateScore = (p: Profile): number => {
     if (!p.ranking) return 0;
@@ -62,7 +63,13 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     const batch = p.education?.graduation_year?.toString() || '';
     const matchesBatch = activeBatch === 'all' || batch === activeBatch;
 
-    return matchesSearch && matchesScore && matchesBatch;
+    let matchesMissing = true;
+    if (missingFilter === 'github') matchesMissing = !(p.github?.public_repos > 0 || p.github?.total_stars > 0);
+    if (missingFilter === 'leetcode') matchesMissing = !(p.leetcode?.total_solved > 0);
+    if (missingFilter === 'codeforces') matchesMissing = !(p.codeforces?.rating > 0 || p.codeforces?.solved_count > 0);
+    if (missingFilter === 'codechef') matchesMissing = !(p.codechef?.rating > 0 || p.codechef?.solved_count > 0);
+
+    return matchesSearch && matchesScore && matchesBatch && matchesMissing;
   });
 
   const allFilteredSelected = filteredProfiles.length > 0 && filteredProfiles.every(p => selectedIds.has(p.student_uuid));
@@ -306,27 +313,44 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         </div>
       </div>
 
-      <div className="ranking-summary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-        <div className="summary-stat">
+      <div className="ranking-summary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
+        <div className="summary-stat" style={{ cursor: 'pointer', border: missingFilter === null ? '2px solid var(--accent)' : '1px solid var(--border)' }} onClick={() => setMissingFilter(null)}>
           <span className="stat-value">{profiles.length}</span>
           <span className="stat-label">Total Students</span>
         </div>
-        <div className="summary-stat">
-          <span className="stat-value">{profiles.filter(p => p.github?.public_repos > 0 || p.github?.total_stars > 0).length}</span>
-          <span className="stat-label">With GitHub Data</span>
-        </div>
-        <div className="summary-stat">
-          <span className="stat-value">{profiles.filter(p => p.leetcode?.total_solved > 0).length}</span>
-          <span className="stat-label">With LeetCode Data</span>
-        </div>
-        <div className="summary-stat">
-          <span className="stat-value">{profiles.filter(p => p.codeforces?.rating > 0 || p.codeforces?.solved_count > 0).length}</span>
-          <span className="stat-label">With Codeforces Data</span>
-        </div>
-        <div className="summary-stat">
-          <span className="stat-value">{profiles.filter(p => p.codechef?.rating > 0 || p.codechef?.solved_count > 0).length}</span>
-          <span className="stat-label">With CodeChef Data</span>
-        </div>
+        
+        {[
+          { key: 'github', label: 'GitHub Data', hasData: (p: Profile) => p.github?.public_repos > 0 || p.github?.total_stars > 0 },
+          { key: 'leetcode', label: 'LeetCode Data', hasData: (p: Profile) => p.leetcode?.total_solved > 0 },
+          { key: 'codeforces', label: 'Codeforces Data', hasData: (p: Profile) => p.codeforces?.rating > 0 || p.codeforces?.solved_count > 0 },
+          { key: 'codechef', label: 'CodeChef Data', hasData: (p: Profile) => p.codechef?.rating > 0 || p.codechef?.solved_count > 0 }
+        ].map(platform => {
+          const missingCount = profiles.filter(p => !platform.hasData(p)).length;
+          const isSelected = missingFilter === platform.key;
+          return (
+            <div 
+              key={platform.key}
+              className="summary-stat" 
+              style={{ 
+                cursor: 'pointer', 
+                border: isSelected ? '2px solid var(--color-danger)' : '1px solid var(--border)',
+                background: isSelected ? '#ff00000a' : 'var(--card-bg)'
+              }}
+              onClick={() => setMissingFilter(isSelected ? null : platform.key)}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span className="stat-value">{profiles.filter(p => platform.hasData(p)).length}</span>
+                  <span className="stat-label">With {platform.label}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', opacity: 0.8 }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-danger)' }}>{missingCount}</span>
+                  <span style={{ fontSize: '0.55rem', textTransform: 'uppercase', color: 'var(--color-danger)', fontWeight: 700 }}>Missing</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Symmetric Control Panel (Search, Batch, Score) */}
@@ -348,11 +372,12 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Search Candidate
             </label>
-            {(searchQuery !== '' || minScore > 0) && (
+            {(searchQuery !== '' || minScore > 0 || missingFilter !== null) && (
               <button
                 onClick={() => {
                   setSearchQuery('');
                   setMinScore(0);
+                  setMissingFilter(null);
                 }}
                 style={{
                   background: 'none', border: 'none', color: 'var(--color-danger)',

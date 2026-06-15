@@ -128,14 +128,27 @@ class IngestionService:
             return None
             
         collector_tasks = {}
+        missing_platforms = []
+        
         if profile.personal_info.github_url:
             collector_tasks['github'] = self.github_collector.collect(profile.personal_info.github_url)
+        else:
+            missing_platforms.append('github')
+            
         if profile.personal_info.leetcode_username:
             collector_tasks['leetcode'] = self.leetcode_collector.collect(profile.personal_info.leetcode_username)
+        else:
+            missing_platforms.append('leetcode')
+            
         if profile.personal_info.codeforces_username:
             collector_tasks['codeforces'] = self.codeforces_collector.collect(profile.personal_info.codeforces_username)
+        else:
+            missing_platforms.append('codeforces')
+            
         if profile.personal_info.codechef_username:
             collector_tasks['codechef'] = self.codechef_collector.collect(profile.personal_info.codechef_username)
+        else:
+            missing_platforms.append('codechef')
         
         if collector_tasks:
             results = await asyncio.gather(*collector_tasks.values(), return_exceptions=True)
@@ -148,6 +161,9 @@ class IngestionService:
                 if isinstance(result, Exception):
                     logger.error(f"Collector {key} failed for {profile.student_uuid}: {result}")
                     profile.metadata.errors.append(f"{key}: {str(result)}")
+                    missing_platforms.append(key)
+                elif result is None:
+                    missing_platforms.append(key)
                 else:
                     if key == 'github': github_data = result
                     elif key == 'leetcode': leetcode_data = result
@@ -162,6 +178,8 @@ class IngestionService:
                 codechef=codechef_data
             )
             
-            await self.repository.save_profile(profile)
+        # Update missing platforms in metadata
+        profile.metadata.missing_platforms = list(set(missing_platforms))
+        await self.repository.save_profile(profile)
             
         return profile

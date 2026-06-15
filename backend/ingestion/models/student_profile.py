@@ -201,6 +201,10 @@ class IngestionMetadata(BaseModel):
         default_factory=list,
         description="Source identifiers, e.g. ['resume', 'github', 'leetcode'].",
     )
+    missing_platforms: List[str] = Field(
+        default_factory=list,
+        description="Platforms where data extraction failed or no account was provided.",
+    )
     errors: List[str] = Field(
         default_factory=list,
         description="Human-readable error messages from failed collectors.",
