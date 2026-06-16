@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
 from typing import List, Optional
+from pydantic import BaseModel
 
 # Fix imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -388,6 +389,8 @@ async def process_extraction_job(job_id: int):
         
         remaining_uuids = [u for u in target_uuids if u not in completed_uuids]
         
+        from sqlalchemy.orm.attributes import flag_modified
+        
         for uuid in remaining_uuids:
             # check if still IN_PROGRESS (could be canceled)
             job_refresh = await db.execute(select(ExtractionJob).where(ExtractionJob.id == job_id))
@@ -401,8 +404,12 @@ async def process_extraction_job(job_id: int):
                 logger.error(f"Error syncing {uuid}: {e}")
                 
             # Update job progress
-            completed_uuids.append(uuid)
-            job_current.completed_uuids = {"uuids": completed_uuids}
+            if uuid not in completed_uuids:
+                completed_uuids.append(uuid)
+            
+            job_current.completed_uuids = {"uuids": list(completed_uuids)}
+            flag_modified(job_current, "completed_uuids")
+            
             job_current.completed_count = len(completed_uuids)
             if job_current.completed_count >= job_current.total_count:
                 job_current.status = "COMPLETED"
