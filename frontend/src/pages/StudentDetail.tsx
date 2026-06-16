@@ -104,6 +104,16 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
           className="btn btn-primary" 
           onClick={handleEnrich} 
           disabled={enriching}
+          style={{ 
+            fontSize: '0.85rem', 
+            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)', 
+            border: 'none',
+            boxShadow: '0 4px 15px rgba(168, 85, 247, 0.4)',
+            color: 'white',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
+          }}
         >
           {enriching ? 'Extracting...' : 'Extract Recent Platform Data'}
         </button>
