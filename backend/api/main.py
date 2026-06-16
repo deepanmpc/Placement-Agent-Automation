@@ -440,7 +440,7 @@ async def batch_enrich(
     if req.student_uuids:
         uuids = req.student_uuids
     else:
-        stmt = select(StudentProfileRecord.student_uuid).limit(req.batch_size)
+        stmt = select(StudentProfileRecord.student_uuid)
         res = await db.execute(stmt)
         uuids = res.scalars().all()
         

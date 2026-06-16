@@ -158,11 +158,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   };
 
   const handleEnrich = () => {
-    if (extractionJob && extractionJob.status === "PAUSED") {
-        setShowResumeModal(true);
-    } else {
-        startEnrich(false);
-    }
+    setShowResumeModal(true);
   };
 
   const handleCancelEnrich = async () => {
@@ -890,37 +886,52 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             overflow: 'hidden'
           }}>
             <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Paused Extraction Job Detected</h2>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>
+                {extractionJob?.status === "PAUSED" ? "Paused Extraction Job Detected" : "Start Extraction"}
+              </h2>
             </div>
             <div style={{ padding: '1.5rem', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              <p style={{ margin: '0 0 1rem 0' }}>It looks like you have an extraction job that was paused halfway.</p>
-              <ul style={{ paddingLeft: '1.5rem', marginBottom: 0 }}>
-                <li style={{ marginBottom: '0.5rem' }}><strong>Resume:</strong> Continues syncing only the remaining data from where it left off.</li>
-                <li><strong>Start from First:</strong> Forces a complete re-sync of all students to get the newest stats.</li>
-              </ul>
+              {extractionJob?.status === "PAUSED" ? (
+                  <>
+                    <p style={{ margin: '0 0 1rem 0' }}>It looks like you have an extraction job that was paused halfway.</p>
+                    <ul style={{ paddingLeft: '1.5rem', marginBottom: 0 }}>
+                      <li style={{ marginBottom: '0.5rem' }}><strong>Resume:</strong> Continues syncing only the remaining data from where it left off.</li>
+                      <li><strong>Start from First:</strong> Forces a complete re-sync of all students to get the newest stats.</li>
+                    </ul>
+                  </>
+              ) : (
+                  <p style={{ margin: 0 }}>
+                    Are you sure you want to start extracting Coding & GitHub data? <br /><br />
+                    This process will fetch updated stats for <strong>all selected candidates</strong> (or all candidates if none selected).
+                  </p>
+              )}
             </div>
             <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', justifyContent: 'flex-end', background: 'var(--bg-secondary)' }}>
               <button className="btn btn-ghost" onClick={() => setShowResumeModal(false)}>
                 Cancel
               </button>
+              
               <button 
                 className="btn btn-primary" 
                 onClick={() => startEnrich(true)}
-                style={{ backgroundColor: '#ef4444', borderColor: '#ef4444', fontWeight: 700 }}
+                style={extractionJob?.status === "PAUSED" ? { backgroundColor: '#ef4444', borderColor: '#ef4444', fontWeight: 700 } : { backgroundColor: '#10b981', borderColor: '#10b981', fontWeight: 700 }}
               >
-                Start from First
+                {extractionJob?.status === "PAUSED" ? "Start from First" : "Start Extraction"}
               </button>
-              <button 
-                className="btn btn-primary" 
-                onClick={() => startEnrich(false)}
-                style={{ 
-                  background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)', 
-                  border: 'none',
-                  fontWeight: 700 
-                }}
-              >
-                Resume Extraction
-              </button>
+
+              {extractionJob?.status === "PAUSED" && (
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={() => startEnrich(false)}
+                    style={{ 
+                      background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)', 
+                      border: 'none',
+                      fontWeight: 700 
+                    }}
+                  >
+                    Resume Extraction
+                  </button>
+              )}
             </div>
           </div>
         </div>
