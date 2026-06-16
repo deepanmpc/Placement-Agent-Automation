@@ -456,7 +456,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 100]} hide />
-                                <YAxis dataKey="name" type="category" width={90} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
+                                <YAxis dataKey="name" type="category" width={90} axisLine={false} tickLine={false} tick={{fill: 'var(--text-primary)', fontSize: 12}} />
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
@@ -524,7 +524,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 100]} hide />
-                                <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
+                                <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-primary)', fontSize: 11}} />
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
@@ -585,7 +585,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 100]} hide />
-                                <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
+                                <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-primary)', fontSize: 11}} />
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
@@ -650,7 +650,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 100]} hide />
-                                <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
+                                <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-primary)', fontSize: 11}} />
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}}
