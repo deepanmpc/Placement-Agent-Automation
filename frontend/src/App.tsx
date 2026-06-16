@@ -87,6 +87,16 @@ export default function App() {
   const saveConfig = () => {
     localStorage.setItem('scoringMode', scoringMode);
     localStorage.setItem('customWeights', JSON.stringify(customWeights));
+    
+    fetch('http://localhost:9090/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        SCORING_MODE: scoringMode,
+        CUSTOM_WEIGHTS: JSON.stringify(customWeights)
+      })
+    }).catch(console.error);
+
     fetch('http://localhost:8000/scoring-rules')
       .then(res => res.json())
       .then(data => {
