@@ -366,6 +366,7 @@ from pydantic import BaseModel
 class BatchEnrichRequest(BaseModel):
     student_uuids: Optional[List[str]] = None
     batch_size: int = 10
+    reset: bool = False
 
 from fastapi import BackgroundTasks
 from backend.database.connection import async_session_factory
@@ -425,11 +426,16 @@ async def batch_enrich(
     existing_job = result.scalars().first()
     
     if existing_job:
-        if existing_job.status == "PAUSED":
-            existing_job.status = "IN_PROGRESS"
+        if req.reset:
+            existing_job.status = "CANCELED"
             await db.commit()
-            background_tasks.add_task(process_extraction_job, existing_job.id)
-        return {"job_id": existing_job.id, "status": existing_job.status, "message": "Resumed existing job"}
+            # fall through to create a new job
+        else:
+            if existing_job.status == "PAUSED":
+                existing_job.status = "IN_PROGRESS"
+                await db.commit()
+                background_tasks.add_task(process_extraction_job, existing_job.id)
+            return {"job_id": existing_job.id, "status": existing_job.status, "message": "Resumed existing job"}
 
     if req.student_uuids:
         uuids = req.student_uuids

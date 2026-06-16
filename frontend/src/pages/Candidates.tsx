@@ -126,11 +126,19 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   }, [enriching]);
 
   const handleEnrich = async () => {
+    let reset = false;
+    if (extractionJob && extractionJob.status === "PAUSED") {
+        const wantsToResume = window.confirm("You have a paused extraction job.\n\nClick 'OK' to RESUME from where you left off.\nClick 'Cancel' to RESTART the extraction from the beginning.");
+        if (!wantsToResume) {
+            reset = true;
+        }
+    }
+    
     setEnriching(true);
     try {
       const payload = selectedIds.size > 0 
-        ? { student_uuids: Array.from(selectedIds), batch_size: selectedIds.size }
-        : { batch_size: 10 };
+        ? { student_uuids: Array.from(selectedIds), batch_size: selectedIds.size, reset }
+        : { batch_size: 10, reset };
         
       await fetch('http://localhost:8000/profiles/batch-enrich', { 
         method: 'POST',
