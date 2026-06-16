@@ -444,7 +444,13 @@ async def batch_enrich(
                 existing_job.status = "IN_PROGRESS"
                 await db.commit()
                 background_tasks.add_task(process_extraction_job, existing_job.id)
-            return {"job_id": existing_job.id, "status": existing_job.status, "message": "Resumed existing job"}
+            return {
+                "job_id": existing_job.id, 
+                "status": existing_job.status, 
+                "message": "Resumed existing job",
+                "total": existing_job.total_count,
+                "completed": existing_job.completed_count
+            }
     else:
         # If there's no active job and we are starting fresh, clean up any old COMPLETED jobs
         from sqlalchemy import delete
@@ -473,7 +479,13 @@ async def batch_enrich(
     await db.refresh(job)
     
     background_tasks.add_task(process_extraction_job, job.id)
-    return {"job_id": job.id, "status": job.status, "message": "Extraction started"}
+    return {
+        "job_id": job.id, 
+        "status": job.status, 
+        "message": "Extraction started",
+        "total": job.total_count,
+        "completed": job.completed_count
+    }
 
 @app.get("/profiles/extraction-job/status")
 async def get_extraction_status(db: AsyncSession = Depends(get_db)):
