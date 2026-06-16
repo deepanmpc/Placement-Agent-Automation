@@ -40,9 +40,13 @@ function getInitialCustomWeights(): CustomWeights {
   return { lc: 25, cc: 25, cf: 25, gh: 25 };
 }
 
+function getInitialStudent(): string | null {
+  return sessionStorage.getItem('selectedStudent');
+}
+
 export default function App() {
   const [page, setPage] = useState<PageView>(getInitialPage);
-  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(getInitialStudent);
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
   const [scoringMode, setScoringMode] = useState<ScoringMode>(getInitialScoringMode);
   const [customWeights, setCustomWeights] = useState<CustomWeights>(getInitialCustomWeights);
@@ -50,6 +54,14 @@ export default function App() {
   useEffect(() => {
     sessionStorage.setItem('currentPage', page);
   }, [page]);
+
+  useEffect(() => {
+    if (selectedStudent) {
+      sessionStorage.setItem('selectedStudent', selectedStudent);
+    } else {
+      sessionStorage.removeItem('selectedStudent');
+    }
+  }, [selectedStudent]);
 
   useEffect(() => {
     fetch('http://localhost:9090/api/config')

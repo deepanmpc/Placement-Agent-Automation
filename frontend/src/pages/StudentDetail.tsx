@@ -88,6 +88,10 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
     }
   };
 
+  if (!studentId) {
+    return <div className="page"><div className="page-header"><h1>No student selected. Please go back to the dashboard.</h1></div></div>;
+  }
+
   if (loading || !profile) {
     return <div className="page"><div className="page-header"><h1>Loading student...</h1></div></div>;
   }
