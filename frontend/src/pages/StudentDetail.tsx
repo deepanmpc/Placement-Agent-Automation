@@ -640,7 +640,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 { name: 'Consistency', score: r.github_score.breakdown.contribution_days_score?.contribution || 0, max: 21 },
                                 { name: 'Merged PRs', score: r.github_score.breakdown.merged_prs_score?.contribution || 0, max: 10 },
                                 { name: 'Issues', score: r.github_score.breakdown.issues_score?.contribution || 0, max: 5 },
-                                { name: 'Recent Act.', score: r.github_score.breakdown.active_days_90_score?.contribution || 0, max: 11 },
+                                { name: 'Recent Act.', score: r.github_score.breakdown.activity_score?.contribution || 0, max: 11 },
                               ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 100]} hide />
