@@ -312,6 +312,44 @@ async def get_profile(
         logger.error(traceback.format_exc())
     return profile
 
+class ProfileUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    id_number: Optional[str] = None
+    github_url: Optional[str] = None
+    leetcode_username: Optional[str] = None
+    codeforces_username: Optional[str] = None
+    codechef_username: Optional[str] = None
+
+@app.put("/profiles/{student_uuid}")
+async def update_profile(
+    student_uuid: str,
+    req: ProfileUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    service = IngestionService(db_session=db, settings=settings)
+    profile = await service.get_profile(student_uuid)
+    if not profile:
+        raise HTTPException(404, "Profile not found")
+        
+    # Update fields
+    if req.name is not None: profile.personal_info.name = req.name
+    if req.email is not None: profile.personal_info.email = req.email
+    if req.phone is not None: profile.personal_info.phone = req.phone
+    if req.id_number is not None: profile.personal_info.id_number = req.id_number
+    if req.github_url is not None: profile.personal_info.github_url = req.github_url
+    if req.leetcode_username is not None: profile.personal_info.leetcode_username = req.leetcode_username
+    if req.codeforces_username is not None: profile.personal_info.codeforces_username = req.codeforces_username
+    if req.codechef_username is not None: profile.personal_info.codechef_username = req.codechef_username
+
+    from backend.database.repository import StudentRepository
+    repo = StudentRepository(db)
+    await repo.save_profile(profile)
+    
+    return {"status": "success", "message": "Profile updated successfully"}
+
 @app.delete("/profiles/{student_uuid}")
 async def delete_profile(
     student_uuid: str,
