@@ -128,15 +128,10 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     return () => clearInterval(interval);
   }, []);
 
-  const handleEnrich = async () => {
-    let reset = false;
-    if (extractionJob && extractionJob.status === "PAUSED") {
-        const wantsToResume = window.confirm("You have a paused extraction job.\n\nClick 'OK' to RESUME from where you left off.\nClick 'Cancel' to RESTART the extraction from the beginning.");
-        if (!wantsToResume) {
-            reset = true;
-        }
-    }
-    
+  const [showResumeModal, setShowResumeModal] = useState(false);
+
+  const startEnrich = async (reset: boolean) => {
+    setShowResumeModal(false);
     setEnriching(true);
     // Optimistically set a fake job to prevent race condition while fetching
     setExtractionJob({ active: true, status: "IN_PROGRESS", total: 1, completed: 0, estimated_seconds: 0 });
@@ -156,6 +151,14 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
       alert('Failed to start extraction.');
       setEnriching(false);
       setExtractionJob(null);
+    }
+  };
+
+  const handleEnrich = () => {
+    if (extractionJob && extractionJob.status === "PAUSED") {
+        setShowResumeModal(true);
+    } else {
+        startEnrich(false);
     }
   };
 
@@ -859,6 +862,66 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
           </div>
         </div>
       )}
+
+      {showResumeModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '16px',
+            width: '90%',
+            maxWidth: '500px',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: 'var(--shadow-lg)',
+            overflow: 'hidden'
+          }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Paused Extraction Job Detected</h2>
+            </div>
+            <div style={{ padding: '1.5rem', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              <p style={{ margin: '0 0 1rem 0' }}>It looks like you have an extraction job that was paused halfway.</p>
+              <ul style={{ paddingLeft: '1.5rem', marginBottom: 0 }}>
+                <li style={{ marginBottom: '0.5rem' }}><strong>Resume:</strong> Continues syncing only the remaining data from where it left off.</li>
+                <li><strong>Start from First:</strong> Forces a complete re-sync of all students to get the newest stats.</li>
+              </ul>
+            </div>
+            <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', justifyContent: 'flex-end', background: 'var(--bg-secondary)' }}>
+              <button className="btn btn-ghost" onClick={() => setShowResumeModal(false)}>
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => startEnrich(true)}
+                style={{ backgroundColor: '#ef4444', borderColor: '#ef4444', fontWeight: 700 }}
+              >
+                Start from First
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => startEnrich(false)}
+                style={{ 
+                  background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)', 
+                  border: 'none',
+                  fontWeight: 700 
+                }}
+              >
+                Resume Extraction
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
