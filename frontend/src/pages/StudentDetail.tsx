@@ -500,11 +500,11 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                           <div style={{ height: 250, width: '100%' }}>
                             <ResponsiveContainer width="100%" height="100%">
                               <BarChart data={[
-                                { name: 'Stars', score: r.codechef_score.breakdown.star_score?.contribution || 0, max: 40 },
+                                { name: 'Stars', score: r.codechef_score.breakdown.star_score?.contribution || 0, max: 10 },
                                 { name: 'Curr Rating', score: r.codechef_score.breakdown.rating_score?.contribution || 0, max: 20 },
                                 { name: 'High Rating', score: r.codechef_score.breakdown.highest_rating_score?.contribution || 0, max: 10 },
-                                { name: 'Problems', score: r.codechef_score.breakdown.solved_score?.contribution || 0, max: 20 },
-                                { name: 'Contests', score: r.codechef_score.breakdown.contest_score?.contribution || 0, max: 10 },
+                                { name: 'Problems', score: r.codechef_score.breakdown.solved_score?.contribution || 0, max: 30 },
+                                { name: 'Contests', score: r.codechef_score.breakdown.contest_score?.contribution || 0, max: 30 },
                               ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 100]} hide />
@@ -530,11 +530,11 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               </thead>
                               <tbody>
                                 {[
-                                  { name: 'Stars Rating', val: s.codechef.stars || 'Unrated', score: `${r.codechef_score?.breakdown?.star_score?.contribution || 0} / 40`, formula: r.codechef_score?.breakdown?.star_score?.formula },
+                                  { name: 'Stars Rating', val: s.codechef.stars || 'Unrated', score: `${r.codechef_score?.breakdown?.star_score?.contribution || 0} / 10`, formula: r.codechef_score?.breakdown?.star_score?.formula },
                                   { name: 'Current Rating', val: s.codechef.rating || '0', score: `${r.codechef_score?.breakdown?.rating_score?.contribution || 0} / 20`, formula: r.codechef_score?.breakdown?.rating_score?.formula },
                                   { name: 'Highest Rating', val: r.codechef_score?.breakdown?.highest_rating_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.highest_rating_score?.contribution || 0} / 10`, formula: r.codechef_score?.breakdown?.highest_rating_score?.formula },
-                                  { name: 'Problems Solved', val: s.codechef.solved_count || '0', score: `${r.codechef_score?.breakdown?.solved_score?.contribution || 0} / 20`, formula: r.codechef_score?.breakdown?.solved_score?.formula },
-                                  { name: 'Contests Count', val: r.codechef_score?.breakdown?.contest_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.contest_score?.contribution || 0} / 10`, formula: r.codechef_score?.breakdown?.contest_score?.formula },
+                                  { name: 'Problems Solved', val: s.codechef.solved_count || '0', score: `${r.codechef_score?.breakdown?.solved_score?.contribution || 0} / 30`, formula: r.codechef_score?.breakdown?.solved_score?.formula },
+                                  { name: 'Contests Count', val: r.codechef_score?.breakdown?.contest_score?.raw_value || '0', score: `${r.codechef_score?.breakdown?.contest_score?.contribution || 0} / 30`, formula: r.codechef_score?.breakdown?.contest_score?.formula },
                                 ].map((row, idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 500 }}>{row.name}</td>

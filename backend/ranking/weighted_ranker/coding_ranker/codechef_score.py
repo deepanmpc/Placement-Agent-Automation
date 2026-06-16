@@ -45,20 +45,20 @@ class CodeChefRanker:
         solved         = _safe_int(data.get("solved_count") or data.get("problems_solved", 0))
         contests       = _safe_int(data.get("contests") or data.get("contest_count", 0))
 
-        star_component    = star_score * 0.40
+        star_component    = star_score * 0.10
         rating_component  = min(rating / 3000, 1) * 20
         highest_component = min(highest_rating / 3000, 1) * 10
-        solved_component  = min(solved / 1000, 1) * 20
-        contest_component = min(contests / 50, 1) * 10
+        solved_component  = min(solved / 1000, 1) * 30
+        contest_component = min(contests / 50, 1) * 30
 
         total = star_component + rating_component + highest_component + solved_component + contest_component
 
         breakdown = {
             "star_score": {
                 "raw_value": f"{stars_int}★ → {star_score}",
-                "formula": f"{star_score} × 0.40",
+                "formula": f"{star_score} × 0.10",
                 "contribution": round(star_component, 2),
-                "weight": 0.40
+                "weight": 0.10
             },
             "rating_score": {
                 "raw_value": rating,
@@ -74,15 +74,15 @@ class CodeChefRanker:
             },
             "solved_score": {
                 "raw_value": solved,
-                "formula": f"MIN({solved}/1000,1)×20",
+                "formula": f"MIN({solved}/1000,1)×30",
                 "contribution": round(solved_component, 2),
-                "weight": 0.20
+                "weight": 0.30
             },
             "contest_score": {
                 "raw_value": contests,
-                "formula": f"MIN({contests}/50,1)×10",
+                "formula": f"MIN({contests}/50,1)×30",
                 "contribution": round(contest_component, 2),
-                "weight": 0.10
+                "weight": 0.30
             }
         }
         return ExplainableScore(round(min(total, 100), 2), breakdown)
