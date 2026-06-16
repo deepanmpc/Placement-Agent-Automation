@@ -104,7 +104,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
   const [dbConfig, setDbConfig] = useState<any>(null);
   
   useEffect(() => {
-    fetch('http://localhost:8000/scoring-rules')
+    fetch('http://localhost:8000/scoring-rules', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data.config) setDbConfig(data.config);
