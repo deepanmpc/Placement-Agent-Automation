@@ -597,14 +597,13 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               <BarChart data={[
                                 { name: 'Orig Repos', score: r.github_score.breakdown.original_repos_score?.contribution || 0, max: 10 },
                                 { name: 'Proj Depth', score: r.github_score.breakdown.project_depth_score?.contribution || 0, max: 10 },
-                                { name: 'Momentum', score: r.github_score.breakdown.momentum_score?.contribution || 0, max: 10 },
-                                { name: 'Stars', score: r.github_score.breakdown.stars_score?.contribution || 0, max: 15 },
-                                { name: 'Followers', score: r.github_score.breakdown.followers_score?.contribution || 0, max: 5 },
+                                { name: 'Momentum', score: r.github_score.breakdown.momentum_score?.contribution || 0, max: 15 },
+                                { name: 'Stars', score: r.github_score.breakdown.stars_score?.contribution || 0, max: 3 },
                                 { name: 'Commits', score: r.github_score.breakdown.commits_score?.contribution || 0, max: 15 },
-                                { name: 'Consistency', score: r.github_score.breakdown.contribution_days_score?.contribution || 0, max: 15 },
+                                { name: 'Consistency', score: r.github_score.breakdown.contribution_days_score?.contribution || 0, max: 21 },
                                 { name: 'Merged PRs', score: r.github_score.breakdown.merged_prs_score?.contribution || 0, max: 10 },
                                 { name: 'Issues', score: r.github_score.breakdown.issues_score?.contribution || 0, max: 5 },
-                                { name: 'Active (90d)', score: r.github_score.breakdown.activity_score?.contribution || 0, max: 5 },
+                                { name: 'Recent Act.', score: r.github_score.breakdown.active_days_90_score?.contribution || 0, max: 11 },
                               ]} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 15]} hide />
@@ -627,15 +626,14 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               <tbody>
                                 {[
                                   { name: 'Original Repos', val: r.github_score?.breakdown?.original_repos_score?.raw_value || '0', score: `${r.github_score?.breakdown?.original_repos_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.original_repos_score?.formula },
-                                  { name: 'Project Depth', val: r.github_score?.breakdown?.project_depth_score?.raw_value || '0', score: `${r.github_score?.breakdown?.project_depth_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.project_depth_score?.formula },
-                                  { name: 'Momentum (30d)', val: r.github_score?.breakdown?.momentum_score?.raw_value || '0', score: `${r.github_score?.breakdown?.momentum_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.momentum_score?.formula },
-                                  { name: 'Total Stars', val: s.github.total_stars || '0', score: `${r.github_score?.breakdown?.stars_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.stars_score?.formula },
-                                  { name: 'Followers', val: s.github.followers || '0', score: `${r.github_score?.breakdown?.followers_score?.contribution || 0} / 5`, formula: r.github_score?.breakdown?.followers_score?.formula },
-                                  { name: 'Commits (Year)', val: r.github_score?.breakdown?.commits_score?.raw_value || '0', score: `${r.github_score?.breakdown?.commits_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.commits_score?.formula },
-                                  { name: 'Consistency', val: `${r.github_score?.breakdown?.contribution_days_score?.raw_value || 0} days`, score: `${r.github_score?.breakdown?.contribution_days_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.contribution_days_score?.formula },
-                                  { name: 'Merged PRs', val: r.github_score?.breakdown?.merged_prs_score?.raw_value || '0', score: `${r.github_score?.breakdown?.merged_prs_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.merged_prs_score?.formula },
-                                  { name: 'Issues Closed', val: r.github_score?.breakdown?.issues_score?.raw_value || '0', score: `${r.github_score?.breakdown?.issues_score?.contribution || 0} / 5`, formula: r.github_score?.breakdown?.issues_score?.formula },
-                                  { name: 'Active Days (90d)', val: r.github_score?.breakdown?.activity_score?.raw_value || '0', score: `${r.github_score?.breakdown?.activity_score?.contribution || 0} / 5`, formula: r.github_score?.breakdown?.activity_score?.formula },
+                                  { name: 'Proj Depth', val: s.github.repositories.length.toString(), score: `${r.github_score?.breakdown?.project_depth_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.project_depth_score?.formula },
+                                  { name: 'Momentum', val: r.github_score?.breakdown?.momentum_score?.raw_value?.toString() || '0', score: `${r.github_score?.breakdown?.momentum_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.momentum_score?.formula },
+                                  { name: 'Stars', val: s.github.total_stars || '0', score: `${r.github_score?.breakdown?.stars_score?.contribution || 0} / 3`, formula: r.github_score?.breakdown?.stars_score?.formula },
+                                  { name: 'Commits', val: r.github_score?.breakdown?.commits_score?.raw_value?.toString() || '0', score: `${r.github_score?.breakdown?.commits_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.commits_score?.formula },
+                                  { name: 'Consistency', val: `${r.github_score?.breakdown?.contribution_days_score?.raw_value || 0} days`, score: `${r.github_score?.breakdown?.contribution_days_score?.contribution || 0} / 21`, formula: r.github_score?.breakdown?.contribution_days_score?.formula },
+                                  { name: 'Merged PRs', val: r.github_score?.breakdown?.merged_prs_score?.raw_value?.toString() || '0', score: `${r.github_score?.breakdown?.merged_prs_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.merged_prs_score?.formula },
+                                  { name: 'Issues', val: r.github_score?.breakdown?.issues_score?.raw_value?.toString() || '0', score: `${r.github_score?.breakdown?.issues_score?.contribution || 0} / 5`, formula: r.github_score?.breakdown?.issues_score?.formula },
+                                  { name: 'Active (90d)', val: `${r.github_score?.breakdown?.activity_score?.raw_value || 0} days`, score: `${r.github_score?.breakdown?.activity_score?.contribution || 0} / 11`, formula: r.github_score?.breakdown?.activity_score?.formula },
                                 ].map((row, idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 500 }}>{row.name}</td>
