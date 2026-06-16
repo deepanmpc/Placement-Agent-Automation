@@ -449,7 +449,17 @@ async def get_scoring_rules(db: AsyncSession = Depends(get_db)):
             "leetcode": {"rating_divisor": 3000, "rating_weight": 60, "contest_divisor": 2500, "contest_weight": 25, "active_days_divisor": 90, "active_days_weight": 10},
             "codechef": {"rating_divisor": 3000, "rating_weight": 30, "highest_rating_divisor": 3000, "highest_rating_weight": 0, "solved_divisor": 1000, "solved_weight": 15, "contest_divisor": 50, "contest_weight": 10},
             "codeforces": {"rating_divisor": 3500, "rating_weight": 50, "max_rating_divisor": 3500, "max_rating_weight": 20, "solved_divisor": 3000, "solved_weight": 15, "contest_divisor": 100, "contest_weight": 10},
-            "github": {"repos_divisor": 50, "repos_weight": 15, "stars_divisor": 500, "stars_weight": 20, "followers_divisor": 250, "followers_weight": 10, "commits_divisor": 1500, "commits_weight": 20, "merged_pr_divisor": 100, "merged_pr_weight": 10}
+            "github": {
+                "orig_repos_divisor": 30, "orig_repos_weight": 10,
+                "project_depth_divisor": 50, "project_depth_weight": 10,
+                "momentum_divisor": 30, "momentum_weight": 15,
+                "stars_divisor": 500, "stars_weight": 3,
+                "commits_divisor": 1500, "commits_weight": 15,
+                "contrib_days_divisor": 365, "contrib_days_weight": 21,
+                "merged_pr_divisor": 15, "merged_pr_weight": 10,
+                "issues_divisor": 20, "issues_weight": 5,
+                "active90_divisor": 90, "active90_weight": 11
+            }
         }
         return {"id": 0, "name": "Default Configuration", "is_active": True, "config": default_config}
     active_rule = next((r for r in rules if r.is_active), rules[0])

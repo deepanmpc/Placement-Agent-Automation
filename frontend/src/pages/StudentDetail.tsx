@@ -35,7 +35,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
 
   useEffect(() => {
     if (!studentId) return;
-    fetch(`http://localhost:8000/profiles/${studentId}?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`, { cache: 'no-store' })
+    fetch(`http://localhost:8000/profiles/${studentId}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         setProfile(data);
@@ -51,7 +51,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
     if (!studentId) return;
     setEnriching(true);
     try {
-      const response = await fetch(`http://localhost:8000/candidates/${studentId}/sync-platforms?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`, { method: 'POST' });
+      const response = await fetch(`http://localhost:8000/candidates/${studentId}/sync-platforms`, { method: 'POST' });
       if (!response.ok) throw new Error('Failed to enrich');
       const data = await response.json();
       

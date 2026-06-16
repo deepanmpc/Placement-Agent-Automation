@@ -75,16 +75,28 @@ export default function App() {
   const saveConfig = () => {
     localStorage.setItem('scoringMode', scoringMode);
     localStorage.setItem('customWeights', JSON.stringify(customWeights));
-    fetch('http://localhost:9090/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        SCORING_MODE: scoringMode,
-        CUSTOM_WEIGHTS: JSON.stringify(customWeights)
+    fetch('http://localhost:8000/scoring-rules')
+      .then(res => res.json())
+      .then(data => {
+         const currentConfig = data.config || {};
+         const newRule = {
+             name: scoringMode === 'custom' ? 'Custom Configuration' : (scoringMode === 'dsa_mode' ? 'DSA Mode' : 'GitHub Mode'),
+             is_active: true,
+             config: {
+                 ...currentConfig,
+                 platform_weights: customWeights,
+                 mode: scoringMode
+             }
+         };
+         return fetch('http://localhost:8000/scoring-rules', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify(newRule)
+         });
       })
-    })
-    .then(() => alert(`Configuration Saved!\nMode: ${scoringMode}\nWeights: LC ${customWeights.lc}%, CC ${customWeights.cc}%, CF ${customWeights.cf}%, GH ${customWeights.gh}%`))
-    .catch(console.error);
+      .then(res => res.json())
+      .then(() => alert(`Configuration Saved!\nMode: ${scoringMode}\nWeights: LC ${customWeights.lc}%, CC ${customWeights.cc}%, CF ${customWeights.cf}%, GH ${customWeights.gh}%`))
+      .catch(console.error);
   };
   
   const [isAuthenticated, setIsAuthenticated] = useState(() => {

@@ -2,14 +2,13 @@
 GitHub Score Formula (0-100):
   GITHUB_SCORE = MIN(OriginalRepos/30,1)×10
                + MIN(ProjectDepth/50,1)×10
-               + MIN(ActiveDays30/30,1)×10
-               + MIN(TotalStars/500,1)×15
-               + MIN(Followers/250,1)×5
+               + MIN(ActiveDays30/30,1)×15
+               + MIN(TotalStars/500,1)×3
                + MIN(CommitsLast365/1500,1)×15
-               + (ContributionDays365/365)×15
-               + MIN(MergedPRs/100,1)×10
-               + MIN(IssuesClosed/100,1)×5
-               + MIN(ActiveDays90/90,1)×5
+               + (ContributionDays365/365)×21
+               + MIN(MergedPRs/15,1)×10
+               + MIN(IssuesClosed/20,1)×5
+               + MIN(ActiveDays90/90,1)×11
 """
 from ..common import ExplainableScore
 import re
@@ -30,7 +29,6 @@ class GitHubEngineeringRanker:
     def calculate(cls, data: dict) -> ExplainableScore:
         repos        = _safe_num(data.get("public_repos", 0))
         stars        = _safe_num(data.get("total_stars", 0))
-        followers    = _safe_num(data.get("followers", 0))
         commits_365  = _safe_num(data.get("commits_last_365", data.get("commit_frequency", 0)) )
         contrib_days = _safe_num(data.get("contribution_days_365", data.get("contribution_consistency", 0)))
         merged_prs   = _safe_num(data.get("merged_prs", 0))
@@ -47,16 +45,15 @@ class GitHubEngineeringRanker:
 
         orig_repo_score= min(orig_repos / 30, 1) * 10
         depth_score   = min(proj_depth / 50, 1) * 10
-        momentum_score= min(active30 / 30, 1) * 10
-        stars_score   = min(stars / 500, 1) * 15
-        follow_score  = min(followers / 250, 1) * 5
+        momentum_score= min(active30 / 30, 1) * 15
+        stars_score   = min(stars / 500, 1) * 3
         commit_score  = min(commits_365 / 1500, 1) * 15
-        contrib_score = (contrib_days / 365) * 15
-        pr_score      = min(merged_prs / 100, 1) * 10
-        issue_score   = min(issues_closed / 100, 1) * 5
-        active90_score= min(active90 / 90, 1) * 5
+        contrib_score = (contrib_days / 365) * 21
+        pr_score      = min(merged_prs / 15, 1) * 10
+        issue_score   = min(issues_closed / 20, 1) * 5
+        active90_score= min(active90 / 90, 1) * 11
 
-        total = orig_repo_score + depth_score + momentum_score + stars_score + follow_score + commit_score + contrib_score + pr_score + issue_score + active90_score
+        total = orig_repo_score + depth_score + momentum_score + stars_score + commit_score + contrib_score + pr_score + issue_score + active90_score
 
         breakdown = {
             "original_repos_score": {
@@ -73,21 +70,15 @@ class GitHubEngineeringRanker:
             },
             "momentum_score": {
                 "raw_value": active30,
-                "formula": f"MIN({active30}/30,1)×10",
+                "formula": f"MIN({active30}/30,1)×15",
                 "contribution": round(momentum_score, 2),
-                "weight": 0.10
+                "weight": 0.15
             },
             "stars_score": {
                 "raw_value": stars,
-                "formula": f"MIN({stars}/500,1)×15",
+                "formula": f"MIN({stars}/500,1)×3",
                 "contribution": round(stars_score, 2),
-                "weight": 0.15
-            },
-            "followers_score": {
-                "raw_value": followers,
-                "formula": f"MIN({followers}/250,1)×5",
-                "contribution": round(follow_score, 2),
-                "weight": 0.05
+                "weight": 0.03
             },
             "commits_score": {
                 "raw_value": commits_365,
@@ -97,27 +88,27 @@ class GitHubEngineeringRanker:
             },
             "contribution_days_score": {
                 "raw_value": round(contrib_days, 1),
-                "formula": f"({round(contrib_days,1)}/365)×15",
+                "formula": f"({round(contrib_days,1)}/365)×21",
                 "contribution": round(contrib_score, 2),
-                "weight": 0.15
+                "weight": 0.21
             },
             "merged_prs_score": {
                 "raw_value": merged_prs,
-                "formula": f"MIN({merged_prs}/100,1)×10",
+                "formula": f"MIN({merged_prs}/15,1)×10",
                 "contribution": round(pr_score, 2),
                 "weight": 0.10
             },
             "issues_score": {
                 "raw_value": issues_closed,
-                "formula": f"MIN({issues_closed}/100,1)×5",
+                "formula": f"MIN({issues_closed}/20,1)×5",
                 "contribution": round(issue_score, 2),
                 "weight": 0.05
             },
             "activity_score": {
                 "raw_value": active90,
-                "formula": f"MIN({active90}/90,1)×5",
+                "formula": f"MIN({active90}/90,1)×11",
                 "contribution": round(active90_score, 2),
-                "weight": 0.05
+                "weight": 0.11
             }
         }
         return ExplainableScore(round(min(total, 100), 2), breakdown)
