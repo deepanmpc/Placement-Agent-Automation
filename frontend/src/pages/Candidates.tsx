@@ -78,7 +78,8 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const allFilteredSelected = filteredProfiles.length > 0 && filteredProfiles.every(p => selectedIds.has(p.student_uuid));
 
   const fetchProfiles = () => {
-    fetch(`http://localhost:8000/profiles`, { cache: 'no-store' })
+    const query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`;
+    fetch(`http://localhost:8000/profiles${query}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         setProfiles(data);
