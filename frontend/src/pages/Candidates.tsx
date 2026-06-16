@@ -3,7 +3,6 @@ import { utils, writeFile } from 'xlsx';
 import type { PageView } from '../types';
 import type { Profile } from '../api';
 import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
-import EditStudentModal from '../components/EditStudentModal';
 
 const MODE_LABELS: Record<ScoringMode, string> = {
   dsa_mode: 'DSA Mode',
@@ -339,13 +338,6 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
               {deleting ? 'Deleting...' : `Delete Selected (${selectedIds.size})`}
             </button>
           )}
-          <button 
-            className="btn btn-primary" 
-            onClick={() => setIsEditModalOpen(true)} 
-            style={{ fontSize: '0.85rem', backgroundColor: '#3b82f6', borderColor: '#3b82f6' }}
-          >
-            Edit Student Profile
-          </button>
           <button 
             className="btn btn-primary" 
             onClick={handlePreviewExport} 
@@ -782,17 +774,6 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             </div>
           </div>
         </div>
-      )}
-      {isEditModalOpen && (
-        <EditStudentModal
-          profiles={profiles}
-          onClose={() => setIsEditModalOpen(false)}
-          onSuccess={() => {
-            setIsEditModalOpen(false);
-            fetchProfiles();
-            alert('Profile updated successfully!');
-          }}
-        />
       )}
     </div>
   );

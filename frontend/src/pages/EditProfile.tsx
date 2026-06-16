@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-interface Props {
-  onClose: () => void;
-  onSuccess: () => void;
-  profiles: any[];
-}
-
-export default function EditStudentModal({ onClose, onSuccess, profiles }: Props) {
+export default function EditProfile() {
   const [step, setStep] = useState<1 | 2>(1);
   const [searchId, setSearchId] = useState('');
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Form fields
   const [studentUuid, setStudentUuid] = useState('');
@@ -23,11 +20,25 @@ export default function EditStudentModal({ onClose, onSuccess, profiles }: Props
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    fetch('http://localhost:8000/profiles', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        setProfiles(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setError('Failed to load profiles');
+        setIsLoading(false);
+      });
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMsg('');
     
-    // Find student by ID Number (or fallback to UUID if they paste UUID)
     const found = profiles.find(p => 
       (p.personal_info?.id_number && p.personal_info.id_number.toLowerCase() === searchId.toLowerCase()) ||
       p.student_uuid === searchId
@@ -52,6 +63,7 @@ export default function EditStudentModal({ onClose, onSuccess, profiles }: Props
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    setSuccessMsg('');
     
     try {
       const payload = {
@@ -72,9 +84,15 @@ export default function EditStudentModal({ onClose, onSuccess, profiles }: Props
       
       if (!res.ok) throw new Error('Failed to update profile');
       
-      onSuccess();
+      setSuccessMsg('Profile updated successfully!');
+      setTimeout(() => {
+        setStep(1);
+        setSearchId('');
+        setSuccessMsg('');
+      }, 2000);
     } catch (err: any) {
       setError(err.message || 'An error occurred');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -91,17 +109,20 @@ export default function EditStudentModal({ onClose, onSuccess, profiles }: Props
     color: 'var(--text-secondary)', marginBottom: '0.35rem'
   };
 
+  if (isLoading) {
+    return <div className="page"><div className="page-header"><h1>Loading...</h1></div></div>;
+  }
+
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-      <div style={{ background: 'var(--card-bg)', borderRadius: '16px', width: '100%', maxWidth: '500px', boxShadow: 'var(--shadow-lg)', overflow: 'hidden' }}>
-        
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+      <div style={{ background: 'var(--card-bg)', borderRadius: '16px', width: '100%', maxWidth: '500px', boxShadow: 'var(--shadow-lg)', overflow: 'hidden', border: '1px solid var(--border)' }}>
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
           <h2 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-primary)' }}>Edit Student Profile</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1 }}>&times;</button>
         </div>
         
         <div style={{ padding: '1.5rem' }}>
           {error && <div style={{ padding: '0.75rem', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>}
+          {successMsg && <div style={{ padding: '0.75rem', background: 'var(--color-success-bg)', color: 'var(--color-success)', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem' }}>{successMsg}</div>}
           
           {step === 1 ? (
             <form onSubmit={handleSearch}>
@@ -118,7 +139,6 @@ export default function EditStudentModal({ onClose, onSuccess, profiles }: Props
                 required 
               />
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
-                <button type="button" onClick={onClose} style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
                 <button type="submit" style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', border: 'none', background: 'var(--accent)', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Search Student</button>
               </div>
             </form>
@@ -148,7 +168,7 @@ export default function EditStudentModal({ onClose, onSuccess, profiles }: Props
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
-                <button type="button" onClick={() => setStep(1)} disabled={isSubmitting} style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}>Back</button>
+                <button type="button" onClick={() => { setStep(1); setSuccessMsg(''); }} disabled={isSubmitting} style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}>Back</button>
                 <button type="submit" disabled={isSubmitting} style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', border: 'none', background: 'var(--accent)', color: '#fff', cursor: isSubmitting ? 'not-allowed' : 'pointer', fontWeight: 600, opacity: isSubmitting ? 0.7 : 1 }}>
                   {isSubmitting ? 'Saving...' : 'Update Profile'}
                 </button>

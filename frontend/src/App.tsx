@@ -8,6 +8,7 @@ import StudentDetail from './pages/StudentDetail';
 import Analytics from './pages/Analytics';
 import ResumeUpload from './pages/ResumeUpload';
 import ScoringConfig from './pages/ScoringConfig';
+import EditProfile from './pages/EditProfile';
 import type { ScoringMode, CustomWeights } from './components/ScoringSettings';
 import './App.css';
 
@@ -24,8 +25,7 @@ function getInitialPage(): PageView {
 
 function getInitialScoringMode(): ScoringMode {
   const stored = localStorage.getItem('scoringMode');
-  if (stored === 'dsa_mode' || stored === 'github_mode' || stored === 'custom') return stored as ScoringMode;
-  return 'dsa_mode';
+  return (stored as ScoringMode) || 'dsa_mode';
 }
 
 function getInitialCustomWeights(): CustomWeights {
@@ -64,19 +64,25 @@ export default function App() {
   }, [selectedStudent]);
 
   useEffect(() => {
+    localStorage.setItem('scoringMode', scoringMode);
+  }, [scoringMode]);
+
+  useEffect(() => {
+    localStorage.setItem('customWeights', JSON.stringify(customWeights));
+  }, [customWeights]);
+
+  useEffect(() => {
     fetch('http://localhost:9090/api/config')
       .then(r => r.json())
       .then(res => {
         if (res.data) {
           if (res.data.SCORING_MODE) {
             setScoringMode(res.data.SCORING_MODE as ScoringMode);
-            localStorage.setItem('scoringMode', res.data.SCORING_MODE);
           }
           if (res.data.CUSTOM_WEIGHTS) {
             try {
               const cw = JSON.parse(res.data.CUSTOM_WEIGHTS);
               setCustomWeights(cw);
-              localStorage.setItem('customWeights', res.data.CUSTOM_WEIGHTS);
             } catch (e) {}
           }
         }
@@ -85,9 +91,6 @@ export default function App() {
   }, []);
 
   const saveConfig = () => {
-    localStorage.setItem('scoringMode', scoringMode);
-    localStorage.setItem('customWeights', JSON.stringify(customWeights));
-    
     fetch('http://localhost:9090/api/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -99,14 +102,17 @@ export default function App() {
 
     fetch('http://localhost:8000/scoring-rules')
       .then(res => res.json())
-      .then(data => {
-         const currentConfig = data.config || {};
+      .then(rules => {
          const newRule = {
-             name: scoringMode === 'custom' ? 'Custom Configuration' : (scoringMode === 'dsa_mode' ? 'DSA Mode' : 'GitHub Mode'),
-             is_active: true,
-             config: {
-                 ...currentConfig,
-                 platform_weights: customWeights,
+             ...rules,
+             active_mode: scoringMode,
+             custom_weights: customWeights,
+             dsa_weights: {
+                 ...rules.dsa_weights,
+                 mode: scoringMode
+             },
+             github_weights: {
+                 ...rules.github_weights,
                  mode: scoringMode
              }
          };
@@ -154,7 +160,7 @@ export default function App() {
 
   const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
-  const isProtectedPage = page !== 'upload';
+  const isProtectedPage = page !== 'upload' && page !== 'edit';
   const showAuthOverlay = isProtectedPage && !isAuthenticated;
 
   return (
@@ -172,6 +178,7 @@ export default function App() {
           height: '100%'
         }}>
           {page === 'upload' && <ResumeUpload />}
+          {page === 'edit' && <EditProfile />}
           {page === 'dashboard' && <Dashboard />}
           {page === 'jd-input' && <JDInput onParsed={() => setPage('dashboard')} />}
           {page === 'candidates' && (
