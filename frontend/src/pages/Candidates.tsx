@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { utils, writeFile } from 'xlsx';
 import type { PageView } from '../types';
 import type { Profile } from '../api';
@@ -98,6 +98,8 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
 
   const [extractionJob, setExtractionJob] = useState<{ active: boolean; status?: string; total: number; completed: number; estimated_seconds: number } | null>(null);
 
+  const wasActiveRef = useRef(false);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     const pollStatus = async () => {
@@ -108,17 +110,17 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         if (data.active) {
           setEnriching(true);
           setExtractionJob(data);
+          wasActiveRef.current = true;
         } else {
-          // It's not active anymore.
-          // We only want to say "completed" if we previously KNEW it was active locally.
-          setExtractionJob((prev) => {
-            if (prev && prev.active) {
-              setEnriching(false);
-              alert('Extraction job finished or paused!');
-              fetchProfiles();
+          setExtractionJob(data);
+          if (wasActiveRef.current) {
+            wasActiveRef.current = false;
+            setEnriching(false);
+            if (data.status === "COMPLETED") {
+               alert('Extraction job completed successfully!');
             }
-            return data;
-          });
+            fetchProfiles();
+          }
         }
       } catch (err) {}
     };
@@ -133,7 +135,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const startEnrich = async (reset: boolean) => {
     setShowResumeModal(false);
     setEnriching(true);
-    // Optimistically set a fake job to prevent race condition while fetching
+    wasActiveRef.current = true;
     setExtractionJob({ active: true, status: "IN_PROGRESS", total: 1, completed: 0, estimated_seconds: 0 });
     
     try {
@@ -150,6 +152,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
       console.error(err);
       alert('Failed to start extraction.');
       setEnriching(false);
+      wasActiveRef.current = false;
       setExtractionJob(null);
     }
   };
@@ -166,7 +169,8 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     try {
       await fetch('http://localhost:8000/profiles/extraction-job/cancel', { method: 'POST' });
       setEnriching(false);
-      setExtractionJob(null);
+      wasActiveRef.current = false;
+      setExtractionJob(prev => prev ? { ...prev, active: false, status: "PAUSED" } : null);
       alert('Extraction job paused. You can resume later.');
     } catch (err) {
       console.error(err);
