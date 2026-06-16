@@ -298,7 +298,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${Math.min((bd.contribution / (r.github_score?.total_score || 1)) * 100, 100)}%`, background: 'var(--accent)', borderRadius: 3 }} />
+                            <div style={{ height: '100%', width: `${Math.min(bd.contribution / (bd.weight || 1), 100)}%`, background: 'var(--accent)', borderRadius: 3 }} />
                           </div>
                           <strong style={{ color: 'var(--accent)', minWidth: 28, textAlign: 'right' }}>{bd.contribution}</strong>
                         </div>
@@ -320,7 +320,12 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                             ({bd.raw_value})
                           </span>
                         </span>
-                        <strong style={{ color: 'var(--accent)' }}>{bd.contribution}</strong>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min(bd.contribution / (bd.weight || 1), 100)}%`, background: 'var(--accent)', borderRadius: 3 }} />
+                          </div>
+                          <strong style={{ color: 'var(--accent)', minWidth: 28, textAlign: 'right' }}>{bd.contribution}</strong>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -342,7 +347,12 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                             ({bd.raw_value})
                           </span>
                         </span>
-                        <strong style={{ color: 'var(--accent)' }}>{bd.contribution}</strong>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min(bd.contribution / (bd.weight || 1), 100)}%`, background: 'var(--accent)', borderRadius: 3 }} />
+                          </div>
+                          <strong style={{ color: 'var(--accent)', minWidth: 28, textAlign: 'right' }}>{bd.contribution}</strong>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -360,7 +370,12 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                             ({bd.raw_value})
                           </span>
                         </span>
-                        <strong style={{ color: 'var(--accent)' }}>{bd.contribution}</strong>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min(bd.contribution / (bd.weight || 1), 100)}%`, background: 'var(--accent)', borderRadius: 3 }} />
+                          </div>
+                          <strong style={{ color: 'var(--accent)', minWidth: 28, textAlign: 'right' }}>{bd.contribution}</strong>
+                        </div>
                       </div>
                     ))}
                   </div>
