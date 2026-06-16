@@ -156,3 +156,23 @@ class ScoringRule(Base):
     def __repr__(self) -> str:  # pragma: no cover
         return f"<ScoringRule(id={self.id}, name={self.name!r}, is_active={self.is_active})>"
 
+class ExtractionJob(Base):
+    """Tracks batch extraction progress to allow resuming."""
+    __tablename__ = "extraction_jobs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="IN_PROGRESS")
+    total_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    completed_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    target_uuids: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    completed_uuids: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        server_default=func.now(), 
+        onupdate=lambda: datetime.now(tz=timezone.utc)
+    )
+
+    def __repr__(self) -> str:
+        return f"<ExtractionJob(id={self.id}, status={self.status}, {self.completed_count}/{self.total_count})>"
+

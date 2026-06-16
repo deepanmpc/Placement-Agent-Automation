@@ -96,6 +96,35 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     fetchProfiles();
   }, [customWeights]);
 
+  const [extractionJob, setExtractionJob] = useState<{ active: boolean; total: number; completed: number; estimated_seconds: number } | null>(null);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    const pollStatus = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/profiles/extraction-job/status');
+        const data = await res.json();
+        if (data.active) {
+          setEnriching(true);
+          setExtractionJob(data);
+        } else if (enriching) {
+          // It just finished
+          setEnriching(false);
+          setExtractionJob(null);
+          alert('Extraction job completed!');
+          fetchProfiles();
+        } else {
+          // Also set local state if a paused job exists, or if nothing is active
+          setExtractionJob(data);
+        }
+      } catch (err) {}
+    };
+
+    pollStatus();
+    interval = setInterval(pollStatus, 3000);
+    return () => clearInterval(interval);
+  }, [enriching]);
+
   const handleEnrich = async () => {
     setEnriching(true);
     try {
@@ -103,19 +132,26 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
         ? { student_uuids: Array.from(selectedIds), batch_size: selectedIds.size }
         : { batch_size: 10 };
         
-      const response = await fetch('http://localhost:8000/profiles/batch-enrich', { 
+      await fetch('http://localhost:8000/profiles/batch-enrich', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      const data = await response.json();
-      alert(`Successfully extracted data for ${data.enriched} profiles! Errors: ${data.errors.length}`);
-      fetchProfiles();
     } catch (err) {
       console.error(err);
-      alert('Failed to extract profile data.');
-    } finally {
+      alert('Failed to start extraction.');
       setEnriching(false);
+    }
+  };
+
+  const handleCancelEnrich = async () => {
+    try {
+      await fetch('http://localhost:8000/profiles/extraction-job/cancel', { method: 'POST' });
+      setEnriching(false);
+      setExtractionJob(null);
+      alert('Extraction job paused. You can resume later.');
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -345,23 +381,56 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
           >
             Export Displayed Data
           </button>
-          <button 
-            className="btn btn-primary" 
-            onClick={handleEnrich} 
-            disabled={enriching}
-            style={{ 
-              fontSize: '0.85rem', 
-              background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)', 
-              border: 'none',
-              boxShadow: '0 4px 15px rgba(168, 85, 247, 0.4)',
-              color: 'white',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
-            }}
-          >
-            {enriching ? 'Enriching...' : 'Extract Coding & GitHub Data'}
-          </button>
+          {extractionJob?.active ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{
+                background: 'var(--surface)',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: '150px'
+              }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.2rem' }}>
+                  Extracting: {extractionJob.completed} / {extractionJob.total}
+                </div>
+                <div style={{ width: '100%', backgroundColor: 'var(--border)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: `${(extractionJob.completed / extractionJob.total) * 100}%`, backgroundColor: 'var(--accent)', height: '100%', transition: 'width 0.3s ease' }}></div>
+                </div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                  ETA: {Math.max(0, Math.round(extractionJob.estimated_seconds))}s
+                </div>
+              </div>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleCancelEnrich} 
+                style={{ fontSize: '0.75rem', backgroundColor: '#ef4444', borderColor: '#ef4444', padding: '0.4rem 0.8rem' }}
+              >
+                Pause
+              </button>
+            </div>
+          ) : (
+            <button 
+              className="btn btn-primary" 
+              onClick={handleEnrich} 
+              disabled={enriching}
+              style={{ 
+                fontSize: '0.85rem', 
+                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)', 
+                border: 'none',
+                boxShadow: '0 4px 15px rgba(168, 85, 247, 0.4)',
+                color: 'white',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
+              {extractionJob && extractionJob.status === "PAUSED" ? 'Resume Extraction' : 'Extract Coding & GitHub Data'}
+            </button>
+          )}
         </div>
       </div>
 

@@ -367,37 +367,122 @@ class BatchEnrichRequest(BaseModel):
     student_uuids: Optional[List[str]] = None
     batch_size: int = 10
 
+from fastapi import BackgroundTasks
+from backend.database.connection import async_session_factory
+from backend.database.models import ExtractionJob
+import asyncio
+
+async def process_extraction_job(job_id: int):
+    async with async_session_factory() as db:
+        from sqlalchemy.future import select
+        from backend.collection.service import PlatformSyncService
+        
+        result = await db.execute(select(ExtractionJob).where(ExtractionJob.id == job_id))
+        job = result.scalars().first()
+        if not job or job.status != "IN_PROGRESS":
+            return
+            
+        target_uuids = job.target_uuids.get("uuids", [])
+        completed_uuids = job.completed_uuids.get("uuids", [])
+        
+        remaining_uuids = [u for u in target_uuids if u not in completed_uuids]
+        
+        for uuid in remaining_uuids:
+            # check if still IN_PROGRESS (could be canceled)
+            job_refresh = await db.execute(select(ExtractionJob).where(ExtractionJob.id == job_id))
+            job_current = job_refresh.scalars().first()
+            if not job_current or job_current.status != "IN_PROGRESS":
+                break
+                
+            try:
+                await PlatformSyncService.sync_platforms(db, uuid)
+            except Exception as e:
+                logger.error(f"Error syncing {uuid}: {e}")
+                
+            # Update job progress
+            completed_uuids.append(uuid)
+            job_current.completed_uuids = {"uuids": completed_uuids}
+            job_current.completed_count = len(completed_uuids)
+            if job_current.completed_count >= job_current.total_count:
+                job_current.status = "COMPLETED"
+            
+            # Commit after each student to save state
+            await db.commit()
+
 @app.post("/profiles/batch-enrich")
 async def batch_enrich(
     req: BatchEnrichRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
-    """Enrich specific profiles or up to `batch_size` profiles using PlatformSyncService."""
+    """Creates an ExtractionJob and starts background processing."""
     from backend.database.models import StudentProfileRecord
     from sqlalchemy.future import select
-    from backend.collection.service import PlatformSyncService
     
+    # Check if there's an active or paused job
+    result = await db.execute(select(ExtractionJob).where(ExtractionJob.status.in_(["IN_PROGRESS", "PAUSED"])))
+    existing_job = result.scalars().first()
+    
+    if existing_job:
+        if existing_job.status == "PAUSED":
+            existing_job.status = "IN_PROGRESS"
+            await db.commit()
+            background_tasks.add_task(process_extraction_job, existing_job.id)
+        return {"job_id": existing_job.id, "status": existing_job.status, "message": "Resumed existing job"}
+
     if req.student_uuids:
-        stmt = select(StudentProfileRecord).where(StudentProfileRecord.student_uuid.in_(req.student_uuids))
+        uuids = req.student_uuids
     else:
-        stmt = select(StudentProfileRecord).limit(req.batch_size)
+        stmt = select(StudentProfileRecord.student_uuid).limit(req.batch_size)
+        res = await db.execute(stmt)
+        uuids = res.scalars().all()
         
-    result = await db.execute(stmt)
-    records = result.scalars().all()
+    if not uuids:
+        return {"message": "No students selected."}
+        
+    job = ExtractionJob(
+        status="IN_PROGRESS",
+        total_count=len(uuids),
+        completed_count=0,
+        target_uuids={"uuids": list(uuids)},
+        completed_uuids={"uuids": []}
+    )
+    db.add(job)
+    await db.commit()
+    await db.refresh(job)
     
-    success_count = 0
-    errors = []
-    
-    for record in records:
-        try:
-            res = await PlatformSyncService.sync_platforms(db, record.student_uuid)
-            if res:
-                success_count += 1
-        except Exception as e:
-            errors.append(str(e))
-            
-    return {"enriched": success_count, "errors": errors}
+    background_tasks.add_task(process_extraction_job, job.id)
+    return {"job_id": job.id, "status": job.status, "message": "Extraction started"}
+
+@app.get("/profiles/extraction-job/status")
+async def get_extraction_status(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy.future import select
+    result = await db.execute(select(ExtractionJob).order_by(ExtractionJob.id.desc()).limit(1))
+    job = result.scalars().first()
+    if not job:
+        return {"active": False}
+        
+    estimated_seconds = (job.total_count - job.completed_count) * 2.5
+        
+    return {
+        "active": job.status == "IN_PROGRESS",
+        "job_id": job.id,
+        "status": job.status,
+        "total": job.total_count,
+        "completed": job.completed_count,
+        "estimated_seconds": estimated_seconds
+    }
+
+@app.post("/profiles/extraction-job/cancel")
+async def cancel_extraction_job(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy.future import select
+    result = await db.execute(select(ExtractionJob).where(ExtractionJob.status == "IN_PROGRESS"))
+    jobs = result.scalars().all()
+    for job in jobs:
+        job.status = "PAUSED"
+    await db.commit()
+    return {"status": "PAUSED", "message": "All active jobs paused"}
 
 @app.post("/profiles/{student_uuid}/enrich", response_model=StudentProfile)
 async def enrich_profile(
