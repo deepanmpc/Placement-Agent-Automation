@@ -422,12 +422,16 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 { name: 'Rating', score: r.leetcode_score.breakdown.contest_score?.contribution || 0, max: 25 },
                                 { name: 'Contests', score: r.leetcode_score.breakdown.participation_score?.contribution || 0, max: 10 },
                                 { name: 'Global Rank', score: r.leetcode_score.breakdown.global_rank_score?.contribution || 0, max: 10 },
-                              ]} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                              ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                                <XAxis type="number" domain={[0, 55]} hide />
+                                <XAxis type="number" domain={[0, 100]} hide />
                                 <YAxis dataKey="name" type="category" width={90} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} />
-                                <RechartsTooltip cursor={{fill: 'var(--bg-secondary)'}} contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} />
-                                <Bar dataKey="score" fill="var(--accent)" radius={[0, 4, 4, 0]} barSize={28} />
+                                <RechartsTooltip 
+                                  cursor={{fill: 'var(--bg-secondary)'}} 
+                                  contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
+                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                />
+                                <Bar dataKey="percent" fill="var(--accent)" radius={[0, 4, 4, 0]} barSize={28} />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
@@ -486,12 +490,16 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 { name: 'High Rating', score: r.codechef_score.breakdown.highest_rating_score?.contribution || 0, max: 10 },
                                 { name: 'Problems', score: r.codechef_score.breakdown.solved_score?.contribution || 0, max: 20 },
                                 { name: 'Contests', score: r.codechef_score.breakdown.contest_score?.contribution || 0, max: 10 },
-                              ]} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                              ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                                <XAxis type="number" domain={[0, 40]} hide />
+                                <XAxis type="number" domain={[0, 100]} hide />
                                 <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
-                                <RechartsTooltip cursor={{fill: 'var(--bg-secondary)'}} contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} />
-                                <Bar dataKey="score" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} />
+                                <RechartsTooltip 
+                                  cursor={{fill: 'var(--bg-secondary)'}} 
+                                  contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
+                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                />
+                                <Bar dataKey="percent" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
@@ -543,12 +551,16 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 { name: 'Title/Rank', score: r.codeforces_score.breakdown.title_score?.contribution || 0, max: 10 },
                                 { name: 'Problems', score: r.codeforces_score.breakdown.solved_score?.contribution || 0, max: 20 },
                                 { name: 'Contests', score: r.codeforces_score.breakdown.contest_score?.contribution || 0, max: 10 },
-                              ]} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                              ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                                <XAxis type="number" domain={[0, 45]} hide />
+                                <XAxis type="number" domain={[0, 100]} hide />
                                 <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
-                                <RechartsTooltip cursor={{fill: 'var(--bg-secondary)'}} contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} />
-                                <Bar dataKey="score" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
+                                <RechartsTooltip 
+                                  cursor={{fill: 'var(--bg-secondary)'}} 
+                                  contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
+                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                />
+                                <Bar dataKey="percent" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
@@ -604,12 +616,16 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 { name: 'Merged PRs', score: r.github_score.breakdown.merged_prs_score?.contribution || 0, max: 10 },
                                 { name: 'Issues', score: r.github_score.breakdown.issues_score?.contribution || 0, max: 5 },
                                 { name: 'Recent Act.', score: r.github_score.breakdown.active_days_90_score?.contribution || 0, max: 11 },
-                              ]} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                              ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                                <XAxis type="number" domain={[0, 15]} hide />
+                                <XAxis type="number" domain={[0, 100]} hide />
                                 <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 11}} />
-                                <RechartsTooltip cursor={{fill: 'var(--bg-secondary)'}} contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} />
-                                <Bar dataKey="score" fill="#10b981" radius={[0, 4, 4, 0]} barSize={16} />
+                                <RechartsTooltip 
+                                  cursor={{fill: 'var(--bg-secondary)'}} 
+                                  contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}}
+                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                />
+                                <Bar dataKey="percent" fill="#10b981" radius={[0, 4, 4, 0]} barSize={16} />
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
