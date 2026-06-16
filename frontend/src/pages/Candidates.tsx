@@ -96,7 +96,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     fetchProfiles();
   }, [customWeights]);
 
-  const [extractionJob, setExtractionJob] = useState<{ active: boolean; total: number; completed: number; estimated_seconds: number } | null>(null);
+  const [extractionJob, setExtractionJob] = useState<{ active: boolean; status?: string; total: number; completed: number; estimated_seconds: number } | null>(null);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -104,18 +104,21 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
       try {
         const res = await fetch('http://localhost:8000/profiles/extraction-job/status');
         const data = await res.json();
+        
         if (data.active) {
           setEnriching(true);
           setExtractionJob(data);
-        } else if (enriching) {
-          // It just finished
-          setEnriching(false);
-          setExtractionJob(null);
-          alert('Extraction job completed!');
-          fetchProfiles();
         } else {
-          // Also set local state if a paused job exists, or if nothing is active
-          setExtractionJob(data);
+          // It's not active anymore.
+          // We only want to say "completed" if we previously KNEW it was active locally.
+          setExtractionJob((prev) => {
+            if (prev && prev.active) {
+              setEnriching(false);
+              alert('Extraction job finished or paused!');
+              fetchProfiles();
+            }
+            return data;
+          });
         }
       } catch (err) {}
     };
@@ -123,7 +126,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     pollStatus();
     interval = setInterval(pollStatus, 3000);
     return () => clearInterval(interval);
-  }, [enriching]);
+  }, []);
 
   const handleEnrich = async () => {
     let reset = false;
@@ -135,6 +138,9 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     }
     
     setEnriching(true);
+    // Optimistically set a fake job to prevent race condition while fetching
+    setExtractionJob({ active: true, status: "IN_PROGRESS", total: 1, completed: 0, estimated_seconds: 0 });
+    
     try {
       const payload = selectedIds.size > 0 
         ? { student_uuids: Array.from(selectedIds), batch_size: selectedIds.size, reset }
@@ -149,6 +155,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
       console.error(err);
       alert('Failed to start extraction.');
       setEnriching(false);
+      setExtractionJob(null);
     }
   };
 
