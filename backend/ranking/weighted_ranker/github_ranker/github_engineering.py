@@ -3,7 +3,7 @@ GitHub Score Formula (0-100):
   GITHUB_SCORE = MIN(OriginalRepos/30,1)×10
                + MIN(ProjectDepth/50,1)×10
                + MIN(ActiveDays30/30,1)×15
-               + MIN(TotalStars/500,1)×3
+               + MIN(TotalStars/100,1)×3
                + MIN(CommitsLast365/1500,1)×15
                + (ContributionDays365/365)×21
                + MIN(MergedPRs/15,1)×10
@@ -46,7 +46,7 @@ class GitHubEngineeringRanker:
         orig_repo_score= min(orig_repos / 30, 1) * 10
         depth_score   = min(proj_depth / 50, 1) * 10
         momentum_score= min(active30 / 30, 1) * 15
-        stars_score   = min(stars / 500, 1) * 3
+        stars_score   = min(stars / 100, 1) * 3
         commit_score  = min(commits_365 / 1500, 1) * 15
         contrib_score = (contrib_days / 365) * 21
         pr_score      = min(merged_prs / 15, 1) * 10
@@ -76,7 +76,7 @@ class GitHubEngineeringRanker:
             },
             "stars_score": {
                 "raw_value": stars,
-                "formula": f"MIN({stars}/500,1)×3",
+                "formula": f"MIN({stars}/100,1)×3",
                 "contribution": round(stars_score, 2),
                 "weight": 0.03
             },

@@ -453,7 +453,7 @@ async def get_scoring_rules(db: AsyncSession = Depends(get_db)):
                 "orig_repos_divisor": 30, "orig_repos_weight": 10,
                 "project_depth_divisor": 50, "project_depth_weight": 10,
                 "momentum_divisor": 30, "momentum_weight": 15,
-                "stars_divisor": 500, "stars_weight": 3,
+                "stars_divisor": 100, "stars_weight": 3,
                 "commits_divisor": 1500, "commits_weight": 15,
                 "contrib_days_divisor": 365, "contrib_days_weight": 21,
                 "merged_pr_divisor": 15, "merged_pr_weight": 10,
