@@ -145,10 +145,13 @@ class CodeChefCollector:
 
         # 3. Highest Rating
         highest_rating = rating
-        highest_elem = soup.find('small')
-        if highest_elem and 'Highest Rating' in highest_elem.text:
-            m = re.search(r'\d+', highest_elem.text)
-            if m: highest_rating = int(m.group())
+        for highest_elem in soup.find_all('small'):
+            if 'Highest Rating' in highest_elem.text:
+                m = re.search(r'\d+', highest_elem.text)
+                if m: 
+                    val = int(m.group())
+                    if val > highest_rating:
+                        highest_rating = val
 
         # 4. Problems Solved
         solved = 0

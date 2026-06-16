@@ -227,8 +227,10 @@ class CodeChefCollector:
                 stars = star_match.group(1) if star_match else "1★"
                 
                 # Highest Rating
-                hr_match = re.search(r'Highest Rating[^0-9]*(\d+)', html)
-                highest_rating = int(hr_match.group(1)) if hr_match else 0
+                highest_rating = rating
+                hr_matches = re.findall(r'Highest Rating[^0-9]*(\d+)', html)
+                if hr_matches:
+                    highest_rating = max(rating, max(int(m) for m in hr_matches))
                 
                 # Contests
                 c_match = re.search(r'Contests Participated[^0-9]*(\d+)', html)
