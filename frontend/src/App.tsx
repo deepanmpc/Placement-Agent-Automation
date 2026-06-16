@@ -117,7 +117,7 @@ export default function App() {
          });
       })
       .then(res => res.json())
-      .then(() => alert(`Configuration Saved!\nMode: ${scoringMode}\nWeights: LC ${customWeights.lc}%, CC ${customWeights.cc}%, CF ${customWeights.cf}%, GH ${customWeights.gh}%`))
+      .then(() => alert('Configuration Saved Successfully!'))
       .catch(console.error);
   };
   
