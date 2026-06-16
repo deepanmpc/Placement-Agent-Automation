@@ -32,40 +32,40 @@ class LeetCodeRanker:
         global_rank     = _safe_int(data.get("global_ranking") or data.get("ranking", 0))
 
         diff_points    = (easy * 1) + (medium * 3) + (hard * 8)
-        difficulty_score  = min(diff_points / 3000, 1) * 55
-        contest_score     = min(contest_rating / 2500, 1) * 25
-        participation     = min(contests / 50, 1) * 10
+        difficulty_score  = min(diff_points / 1500, 1) * 30
+        contest_score     = min(contest_rating / 2500, 1) * 30
+        participation     = min(contests / 50, 1) * 20
         
         rank_score = 0
         if global_rank > 0:
-            rank_score = max(0, (4000000 - global_rank) / 4000000) * 10
+            rank_score = max(0, (4000000 - global_rank) / 4000000) * 20
 
         total = difficulty_score + contest_score + participation + rank_score
 
         breakdown = {
             "difficulty_score": {
                 "raw_value": diff_points,
-                "formula": f"({easy}×1)+({medium}×3)+({hard}×8) = {diff_points} → MIN({diff_points}/3000,1)×55",
+                "formula": f"({easy}×1)+({medium}×3)+({hard}×8) = {diff_points} → MIN({diff_points}/1500,1)×30",
                 "contribution": round(difficulty_score, 2),
-                "weight": 0.55
+                "weight": 0.30
             },
             "contest_score": {
                 "raw_value": contest_rating,
-                "formula": f"MIN({contest_rating}/2500,1)×25",
+                "formula": f"MIN({contest_rating}/2500,1)×30",
                 "contribution": round(contest_score, 2),
-                "weight": 0.25
+                "weight": 0.30
             },
             "participation_score": {
                 "raw_value": contests,
-                "formula": f"MIN({contests}/50,1)×10",
+                "formula": f"MIN({contests}/50,1)×20",
                 "contribution": round(participation, 2),
-                "weight": 0.10
+                "weight": 0.20
             },
             "global_rank_score": {
                 "raw_value": global_rank or "Unranked",
-                "formula": f"MAX(0, (4M - {global_rank})/4M) × 10",
+                "formula": f"MAX(0, (4M - {global_rank})/4M) × 20",
                 "contribution": round(rank_score, 2),
-                "weight": 0.10
+                "weight": 0.20
             }
         }
         return ExplainableScore(round(min(total, 100), 2), breakdown)

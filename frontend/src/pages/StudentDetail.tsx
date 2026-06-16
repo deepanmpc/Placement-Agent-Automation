@@ -433,10 +433,10 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                           <div style={{ height: 380, width: '100%' }}>
                             <ResponsiveContainer width="100%" height="100%">
                               <BarChart data={[
-                                { name: 'Difficulty', score: r.leetcode_score.breakdown.difficulty_score?.contribution || 0, max: 55 },
-                                { name: 'Rating', score: r.leetcode_score.breakdown.contest_score?.contribution || 0, max: 25 },
-                                { name: 'Contests', score: r.leetcode_score.breakdown.participation_score?.contribution || 0, max: 10 },
-                                { name: 'Global Rank', score: r.leetcode_score.breakdown.global_rank_score?.contribution || 0, max: 10 },
+                                { name: 'Difficulty', score: r.leetcode_score.breakdown.difficulty_score?.contribution || 0, max: 30 },
+                                { name: 'Rating', score: r.leetcode_score.breakdown.contest_score?.contribution || 0, max: 30 },
+                                { name: 'Contests', score: r.leetcode_score.breakdown.participation_score?.contribution || 0, max: 20 },
+                                { name: 'Global Rank', score: r.leetcode_score.breakdown.global_rank_score?.contribution || 0, max: 20 },
                               ].map(d => ({ ...d, percent: (d.score / d.max) * 100 }))} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
                                 <XAxis type="number" domain={[0, 100]} hide />
@@ -466,10 +466,10 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                   { name: 'Easy Solved', val: s.leetcode.easy_solved?.toString() || '0', score: '-', formula: '1 point per problem', isSub: true },
                                   { name: 'Medium Solved', val: s.leetcode.medium_solved?.toString() || '0', score: '-', formula: '5 points per problem', isSub: true },
                                   { name: 'Hard Solved', val: s.leetcode.hard_solved?.toString() || '0', score: '-', formula: '15 points per problem', isSub: true },
-                                  { name: 'Difficulty Points', val: `${r.leetcode_score?.breakdown?.difficulty_score?.raw_value || 0}`, score: `${r.leetcode_score?.breakdown?.difficulty_score?.contribution || 0} / 55`, formula: r.leetcode_score?.breakdown?.difficulty_score?.formula },
-                                  { name: 'Contest Rating', val: s.leetcode.rating?.toFixed(0) || '0', score: `${r.leetcode_score?.breakdown?.contest_score?.contribution || 0} / 25`, formula: r.leetcode_score?.breakdown?.contest_score?.formula },
-                                  { name: 'Contests Attended', val: s.leetcode.contests_participated?.toString() || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
-                                  { name: 'Global Ranking', val: r.leetcode_score?.breakdown?.global_rank_score?.raw_value || 'Unranked', score: `${r.leetcode_score?.breakdown?.global_rank_score?.contribution || 0} / 10`, formula: r.leetcode_score?.breakdown?.global_rank_score?.formula },
+                                  { name: 'Difficulty Points', val: `${r.leetcode_score?.breakdown?.difficulty_score?.raw_value || 0}`, score: `${r.leetcode_score?.breakdown?.difficulty_score?.contribution || 0} / 30`, formula: r.leetcode_score?.breakdown?.difficulty_score?.formula },
+                                  { name: 'Contest Rating', val: s.leetcode.rating?.toFixed(0) || '0', score: `${r.leetcode_score?.breakdown?.contest_score?.contribution || 0} / 30`, formula: r.leetcode_score?.breakdown?.contest_score?.formula },
+                                  { name: 'Contests Attended', val: s.leetcode.contests_participated?.toString() || '0', score: `${r.leetcode_score?.breakdown?.participation_score?.contribution || 0} / 20`, formula: r.leetcode_score?.breakdown?.participation_score?.formula },
+                                  { name: 'Global Ranking', val: r.leetcode_score?.breakdown?.global_rank_score?.raw_value || 'Unranked', score: `${r.leetcode_score?.breakdown?.global_rank_score?.contribution || 0} / 20`, formula: r.leetcode_score?.breakdown?.global_rank_score?.formula },
                                 ].map((row, idx) => (
                                   <tr key={idx} style={{ 
                                     borderBottom: '1px solid var(--border)', 
