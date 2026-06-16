@@ -466,13 +466,23 @@ async def batch_enrich(
         
     if not uuids:
         return {"message": "No students selected."}
+
+    # Smart Resume logic: pre-calculate which students have already been synced
+    completed_uuids_list = []
+    if not req.reset:
+        stmt = select(StudentProfileRecord.student_uuid).where(
+            StudentProfileRecord.student_uuid.in_(uuids),
+            StudentProfileRecord.platform_sync_metadata.is_not(None)
+        )
+        res = await db.execute(stmt)
+        completed_uuids_list = res.scalars().all()
         
     job = ExtractionJob(
         status="IN_PROGRESS",
         total_count=len(uuids),
-        completed_count=0,
+        completed_count=len(completed_uuids_list),
         target_uuids={"uuids": list(uuids)},
-        completed_uuids={"uuids": []}
+        completed_uuids={"uuids": list(completed_uuids_list)}
     )
     db.add(job)
     await db.commit()
