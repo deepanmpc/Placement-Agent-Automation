@@ -434,7 +434,9 @@ async def batch_enrich(
     
     if existing_job:
         if req.reset:
-            existing_job.status = "CANCELED"
+            # Delete all old jobs to prevent flooding the database
+            from sqlalchemy import delete
+            await db.execute(delete(ExtractionJob))
             await db.commit()
             # fall through to create a new job
         else:
@@ -443,6 +445,11 @@ async def batch_enrich(
                 await db.commit()
                 background_tasks.add_task(process_extraction_job, existing_job.id)
             return {"job_id": existing_job.id, "status": existing_job.status, "message": "Resumed existing job"}
+    else:
+        # If there's no active job and we are starting fresh, clean up any old COMPLETED jobs
+        from sqlalchemy import delete
+        await db.execute(delete(ExtractionJob))
+        await db.commit()
 
     if req.student_uuids:
         uuids = req.student_uuids
