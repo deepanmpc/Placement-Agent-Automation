@@ -1,11 +1,11 @@
 """
 CodeChef Score Formula (0-100):
   StarScore: 1★=10, 2★=25, 3★=40, 4★=60, 5★=80, 6★=95, 7★=100
-  CC_SCORE = (StarScore × 0.40)
+  CC_SCORE = (StarScore × 0.10)
            + MIN(CurrentRating / 3000, 1) × 20
            + MIN(HighestRating / 3000, 1) × 10
-           + MIN(ProblemsSolved / 1000, 1) × 20
-           + MIN(Contests / 50, 1) × 10
+           + MIN(ProblemsSolved / 1000, 1) × 30
+           + MIN(Contests / 50, 1) × 30
 """
 from ..common import ExplainableScore
 import re
@@ -40,10 +40,10 @@ class CodeChefRanker:
         stars_int  = _stars_to_int(stars_raw)
         star_score = STAR_MAP.get(stars_int, 0)
 
-        rating         = _safe_int(data.get("rating") or 0)
-        highest_rating = _safe_int(data.get("highest_rating") or rating)
-        solved         = _safe_int(data.get("solved_count") or data.get("problems_solved", 0))
-        contests       = _safe_int(data.get("contests") or data.get("contest_count", 0))
+        rating         = _safe_int(data.get("rating", 0))
+        highest_rating = _safe_int(data.get("highest_rating", rating))
+        solved         = _safe_int(data.get("solved_count", data.get("problems_solved", 0)))
+        contests       = _safe_int(data.get("contests", data.get("contest_count", 0)))
 
         star_component    = star_score * 0.10
         rating_component  = min(rating / 3000, 1) * 20

@@ -277,7 +277,8 @@ async def list_profiles(
             attach_ranking(p, custom_weights=custom_weights)
         except Exception as e:
             import traceback
-            logger.error(f"attach_ranking failed for {p.student_uuid}: {e}")
+            logger.error(f"attach_ranking failed for {p.student_uuid}:\n{traceback.format_exc()}")
+            p.ranking = {"error": f"Ranking calculation failed: {str(e)}"}
     return profiles
 
 @app.get("/profiles/{student_uuid}", response_model=StudentProfile)
@@ -310,8 +311,8 @@ async def get_profile(
         attach_ranking(profile, custom_weights=custom_weights)
     except Exception as e:
         import traceback
-        logger.error(f"attach_ranking failed for {student_uuid}: {e}")
-        logger.error(traceback.format_exc())
+        logger.error(f"attach_ranking failed for {student_uuid}:\n{traceback.format_exc()}")
+        profile.ranking = {"error": f"Ranking calculation failed: {str(e)}"}
     return profile
 
 class ProfileUpdateRequest(BaseModel):
@@ -379,6 +380,7 @@ async def process_extraction_job(job_id: int):
     async with async_session_factory() as db:
         from sqlalchemy.future import select
         from backend.collection.service import PlatformSyncService
+        from backend.database.models import StudentProfileRecord
         
         result = await db.execute(select(ExtractionJob).where(ExtractionJob.id == job_id))
         job = result.scalars().first()
@@ -401,21 +403,25 @@ async def process_extraction_job(job_id: int):
                 
             try:
                 await PlatformSyncService.sync_platforms(db, uuid)
+                rec_res = await db.execute(select(StudentProfileRecord).where(StudentProfileRecord.student_uuid == uuid))
+                rec = rec_res.scalars().first()
+                if rec and rec.platform_sync_metadata and rec.platform_sync_metadata.get("sync_status") == "completed":
+                    if uuid not in completed_uuids:
+                        completed_uuids.append(uuid)
             except Exception as e:
                 logger.error(f"Error syncing {uuid}: {e}")
-                
-            # Update job progress
-            if uuid not in completed_uuids:
-                completed_uuids.append(uuid)
             
             job_current.completed_uuids = {"uuids": list(completed_uuids)}
             flag_modified(job_current, "completed_uuids")
             
-            job_current.completed_count = len(completed_uuids)
-            if job_current.completed_count >= job_current.total_count:
-                job_current.status = "COMPLETED"
+            job_current.completed_count += 1
+            await db.commit()
             
-            # Commit after each student to save state
+        # After processing all targeted uuids, if job wasn't paused/canceled, mark it completed
+        job_refresh = await db.execute(select(ExtractionJob).where(ExtractionJob.id == job_id))
+        job_final = job_refresh.scalars().first()
+        if job_final and job_final.status == "IN_PROGRESS":
+            job_final.status = "COMPLETED"
             await db.commit()
 
 @app.post("/profiles/batch-enrich")
@@ -471,13 +477,14 @@ async def batch_enrich(
     # Smart Resume logic: pre-calculate which students have already been synced
     completed_uuids_list = []
     if not req.reset:
-        stmt = select(StudentProfileRecord.student_uuid).where(
-            StudentProfileRecord.student_uuid.in_(uuids),
-            StudentProfileRecord.platform_sync_metadata.is_not(None)
+        stmt = select(StudentProfileRecord).where(
+            StudentProfileRecord.student_uuid.in_(uuids)
         )
         res = await db.execute(stmt)
-        completed_uuids_list = res.scalars().all()
-        
+        for r in res.scalars().all():
+            meta = r.platform_sync_metadata
+            if meta and meta.get("sync_status") == "completed":
+                completed_uuids_list.append(r.student_uuid)
     job = ExtractionJob(
         status="IN_PROGRESS",
         total_count=len(uuids),

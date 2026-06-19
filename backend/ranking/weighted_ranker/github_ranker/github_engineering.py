@@ -35,7 +35,7 @@ class GitHubEngineeringRanker:
         issues_closed= _safe_num(data.get("issues_closed", 0))
         active90     = _safe_num(data.get("active_days_90", 0))
         
-        orig_repos   = _safe_num(data.get("original_repos", repos))
+        orig_repos   = _safe_num(data.get("original_repos", 0))
         active30     = _safe_num(data.get("active_days_30", min(active90, 30)))
         proj_depth   = _safe_num(data.get("project_depth", 0))
 
@@ -48,7 +48,7 @@ class GitHubEngineeringRanker:
         momentum_score= min(active30 / 30, 1) * 15
         stars_score   = min(stars / 30, 1) * 3
         commit_score  = min(commits_365 / 1500, 1) * 15
-        contrib_score = (contrib_days / 365) * 21
+        contrib_score = min(contrib_days / 365, 1) * 21
         pr_score      = min(merged_prs / 15, 1) * 10
         issue_score   = min(issues_closed / 20, 1) * 5
         active90_score= min(active90 / 90, 1) * 11

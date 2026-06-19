@@ -132,7 +132,8 @@ class GitHubCollector:
                         last_30 = days[-30:]
                         active_days_30 = sum(1 for d, l in last_30 if l != '0')
         except Exception as e:
-            logger.warning(f"Failed to scrape contributions for {username}: {e}")
+            logger.error(f"Failed to scrape contributions for {username}: {e}. Failing collection to allow retry.")
+            raise
 
         project_depth = round(commits_last_365 / original_repos, 2) if original_repos > 0 else float(commits_last_365)
 

@@ -49,24 +49,33 @@ class RuleScoreAggregator:
         cf_weight: float = 25.0, gh_weight: float = 25.0
     ) -> ExplainableScore:
         """
-        CUSTOM_SCORE = (LC×LC_W + CC×CC_W + CF×CF_W + GH×GH_W) / 100
-        Weights are in percentage (sum to 100).
+        CUSTOM_SCORE = Normalized weighted sum of all platforms
         """
-        numerator = (lc_score * lc_weight) + (cc_score * cc_weight) + \
-                    (cf_score * cf_weight) + (github_score * gh_weight)
-        total = numerator / 100.0
+        total_weight = lc_weight + cc_weight + cf_weight + gh_weight
+        if total_weight <= 0:
+            total_weight = 100.0
+            lc_weight = cc_weight = cf_weight = gh_weight = 25.0
+
+        lc_pct = lc_weight / total_weight
+        cc_pct = cc_weight / total_weight
+        cf_pct = cf_weight / total_weight
+        gh_pct = gh_weight / total_weight
+
+        total = (lc_score * lc_pct) + (cc_score * cc_pct) + \
+                (cf_score * cf_pct) + (github_score * gh_pct)
+
         breakdown = {
-            "leetcode":   {"raw_value": round(lc_score, 2), "weight_pct": lc_weight,
+            "leetcode":   {"raw_value": round(lc_score, 2), "weight_pct": round(lc_pct * 100, 2),
                            "formula": f"{round(lc_score,2)} × {lc_weight}",
                            "contribution": round(lc_score * lc_weight / 100, 2)},
-            "codechef":   {"raw_value": round(cc_score, 2), "weight_pct": cc_weight,
-                           "formula": f"{round(cc_score,2)} × {cc_weight}",
-                           "contribution": round(cc_score * cc_weight / 100, 2)},
-            "codeforces": {"raw_value": round(cf_score, 2), "weight_pct": cf_weight,
-                           "formula": f"{round(cf_score,2)} × {cf_weight}",
-                           "contribution": round(cf_score * cf_weight / 100, 2)},
-            "github":     {"raw_value": round(github_score, 2), "weight_pct": gh_weight,
-                           "formula": f"{round(github_score,2)} × {gh_weight}",
-                           "contribution": round(github_score * gh_weight / 100, 2)},
+            "codechef":   {"raw_value": round(cc_score, 2), "weight_pct": round(cc_pct * 100, 2),
+                           "formula": f"{round(cc_score,2)} × {round(cc_pct, 2)}",
+                           "contribution": round(cc_score * cc_pct, 2)},
+            "codeforces": {"raw_value": round(cf_score, 2), "weight_pct": round(cf_pct * 100, 2),
+                           "formula": f"{round(cf_score,2)} × {round(cf_pct, 2)}",
+                           "contribution": round(cf_score * cf_pct, 2)},
+            "github":     {"raw_value": round(github_score, 2), "weight_pct": round(gh_pct * 100, 2),
+                           "formula": f"{round(github_score,2)} × {round(gh_pct, 2)}",
+                           "contribution": round(github_score * gh_pct, 2)},
         }
-        return ExplainableScore(round(min(total, 100), 2), breakdown)
+        return ExplainableScore(round(max(0, min(total, 100)), 2), breakdown)

@@ -55,16 +55,15 @@ class CodeforcesCollector:
             solved_count = await self._fetch_solved_count(client, username)
 
         if user_info is None:
-            logger.warning(
-                "Could not fetch Codeforces user info for {}", username
-            )
-            return CodeforcesProfile(username=username)
+            logger.error(f"Could not fetch Codeforces user info for {username}")
+            raise ValueError(f"Codeforces API failed for {username}")
 
         profile = CodeforcesProfile(
             username=user_info.get("handle", username),
             rating=int(user_info.get("rating", 0) or 0),
             max_rating=int(user_info.get("maxRating", 0) or 0),
             rank=str(user_info.get("rank", "") or ""),
+            max_rank=str(user_info.get("maxRank", "") or ""),
             solved_count=solved_count,
             contest_count=contest_count,
             contests=contest_count,

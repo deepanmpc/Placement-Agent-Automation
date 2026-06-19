@@ -35,7 +35,7 @@ class PlatformSyncService:
         
         # Initialize collectors
         settings = get_settings()
-        github_collector = GitHubCollector(token=settings.github_token if settings and hasattr(settings, 'github_token') else None)
+        github_collector = GitHubCollector(token=settings.github_api_token if settings and hasattr(settings, 'github_api_token') else None)
         leetcode_collector = LeetCodeCollector()
         codeforces_collector = CodeforcesCollector()
         codechef_collector = CodeChefCollector()
@@ -65,16 +65,22 @@ class PlatformSyncService:
         old_cf_username = (record.codeforces_profile or {}).get("username", None)
         old_cc_username = (record.codechef_profile or {}).get("username", None)
         
-        gh_username_changed = github_url and old_gh_username and old_gh_username not in (github_url or "")
+        gh_extracted = github_url.rstrip('/').split('/')[-1] if github_url else ""
+        gh_username_changed = github_url and old_gh_username and old_gh_username.lower() != gh_extracted.lower()
         lc_username_changed = leetcode_username and old_lc_username and old_lc_username.lower() != (leetcode_username or "").lower()
         cf_username_changed = codeforces_username and old_cf_username and old_cf_username.lower() != (codeforces_username or "").lower()
         cc_username_changed = codechef_username and old_cc_username and old_cc_username.lower() != (codechef_username or "").lower()
+        
+        has_no_gh = not record.github_profile
+        has_no_lc = not record.leetcode_profile
+        has_no_cf = not record.codeforces_profile
+        has_no_cc = not record.codechef_profile
         
         # Process GitHub
         if isinstance(github_result, Exception):
             logger.error(f"GitHub collection exception: {github_result}")
             failed_platforms.append("github")
-        elif github_result is not None and (gh_username_changed or (github_result.username and (github_result.public_repos > 0 or github_result.total_stars > 0 or github_result.followers > 0))):
+        elif github_result is not None and (has_no_gh or gh_username_changed or (github_result.username and (github_result.public_repos > 0 or github_result.total_stars > 0 or github_result.followers > 0))):
             old_snapshots = [] if gh_username_changed else (record.github_profile.get("snapshots", []) if record.github_profile else [])
             # Prevent duplicate snapshots for the same day
             if not any(s.get("date") == today for s in old_snapshots):
@@ -88,7 +94,7 @@ class PlatformSyncService:
         if isinstance(leetcode_result, Exception):
             logger.error(f"LeetCode collection exception: {leetcode_result}")
             failed_platforms.append("leetcode")
-        elif leetcode_result is not None and (lc_username_changed or (leetcode_result.username and (leetcode_result.total_solved > 0 or leetcode_result.rating > 0 or leetcode_result.easy_solved > 0))):
+        elif leetcode_result is not None and (has_no_lc or lc_username_changed or (leetcode_result.username and (leetcode_result.total_solved > 0 or leetcode_result.rating > 0 or leetcode_result.easy_solved > 0))):
             old_snapshots = [] if lc_username_changed else (record.leetcode_profile.get("snapshots", []) if record.leetcode_profile else [])
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": leetcode_result.rating, "total_solved": leetcode_result.total_solved})
@@ -101,7 +107,7 @@ class PlatformSyncService:
         if isinstance(codeforces_result, Exception):
             logger.error(f"Codeforces collection exception: {codeforces_result}")
             failed_platforms.append("codeforces")
-        elif codeforces_result is not None and (cf_username_changed or (codeforces_result.username and (codeforces_result.rating > 0 or codeforces_result.contest_count > 0 or codeforces_result.solved_count > 0))):
+        elif codeforces_result is not None and (has_no_cf or cf_username_changed or (codeforces_result.username and (codeforces_result.rating > 0 or codeforces_result.max_rating > 0 or codeforces_result.solved_count > 0))):
             old_snapshots = [] if cf_username_changed else (record.codeforces_profile.get("snapshots", []) if record.codeforces_profile else [])
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": codeforces_result.rating, "solved_count": codeforces_result.solved_count})
@@ -114,7 +120,7 @@ class PlatformSyncService:
         if isinstance(codechef_result, Exception):
             logger.error(f"CodeChef collection exception: {codechef_result}")
             failed_platforms.append("codechef")
-        elif codechef_result is not None and (cc_username_changed or (codechef_result.username and (codechef_result.rating > 0 or codechef_result.contest_count > 0 or codechef_result.solved_count > 0))):
+        elif codechef_result is not None and (has_no_cc or cc_username_changed or (codechef_result.username and (codechef_result.rating > 0 or codechef_result.highest_rating > 0 or codechef_result.solved_count > 0))):
             old_snapshots = [] if cc_username_changed else (record.codechef_profile.get("snapshots", []) if record.codechef_profile else [])
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": codechef_result.rating, "solved_count": codechef_result.solved_count})

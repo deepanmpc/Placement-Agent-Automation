@@ -1,10 +1,10 @@
 """
 LeetCode Score Formula (0-100):
   DifficultyPoints = (Easy × 1) + (Medium × 3) + (Hard × 8)
-  DifficultyScore  = MIN(DifficultyPoints / 3000, 1) × 55
-  ContestScore     = MIN(ContestRating / 2500, 1) × 25
-  Participation    = MIN(ContestsAttended / 50, 1) × 10
-  GlobalRankScore  = MAX(0, (1,000,000 - GlobalRank) / 1,000,000) × 10
+  DifficultyScore  = MIN(DifficultyPoints / 1500, 1) × 30
+  ContestScore     = MIN(ContestRating / 2500, 1) × 30
+  Participation    = MIN(ContestsAttended / 50, 1) × 20
+  GlobalRankScore  = MAX(0, (4,000,000 - GlobalRank) / 4,000,000) × 20
   LC_SCORE = DifficultyScore + ContestScore + Participation + GlobalRankScore
 """
 from ..common import ExplainableScore
@@ -24,12 +24,12 @@ class LeetCodeRanker:
 
     @classmethod
     def calculate(cls, data: dict) -> ExplainableScore:
-        easy   = _safe_int(data.get("easy_solved") or data.get("easy", 0))
-        medium = _safe_int(data.get("medium_solved") or data.get("medium", 0))
-        hard   = _safe_int(data.get("hard_solved") or data.get("hard", 0))
-        contest_rating  = _safe_int(data.get("rating") or data.get("recent_contest_rating", 0))
-        contests        = _safe_int(data.get("contests_participated") or data.get("contest_count", 0))
-        global_rank     = _safe_int(data.get("global_ranking") or data.get("ranking", 0))
+        easy   = _safe_int(data.get("easy_solved", data.get("easy", 0)))
+        medium = _safe_int(data.get("medium_solved", data.get("medium", 0)))
+        hard   = _safe_int(data.get("hard_solved", data.get("hard", 0)))
+        contest_rating  = _safe_int(data.get("rating", data.get("recent_contest_rating", 0)))
+        contests        = _safe_int(data.get("contests_participated", data.get("contest_count", 0)))
+        global_rank     = _safe_int(data.get("global_ranking", data.get("ranking", 0)))
 
         diff_points    = (easy * 1) + (medium * 3) + (hard * 8)
         difficulty_score  = min(diff_points / 1500, 1) * 30

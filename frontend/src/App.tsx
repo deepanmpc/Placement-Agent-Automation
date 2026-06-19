@@ -19,6 +19,10 @@ function getInitialTheme(): 'light' | 'dark' {
 }
 
 function getInitialPage(): PageView {
+  const params = new URLSearchParams(window.location.search);
+  const pageParam = params.get('page') as PageView;
+  if (pageParam) return pageParam;
+  
   const stored = sessionStorage.getItem('currentPage');
   return (stored as PageView) || 'upload';
 }
@@ -41,6 +45,10 @@ function getInitialCustomWeights(): CustomWeights {
 }
 
 function getInitialStudent(): string | null {
+  const params = new URLSearchParams(window.location.search);
+  const idParam = params.get('studentId');
+  if (idParam) return idParam;
+
   return sessionStorage.getItem('selectedStudent');
 }
 
@@ -53,15 +61,28 @@ export default function App() {
 
   useEffect(() => {
     sessionStorage.setItem('currentPage', page);
+    
+    // Sync URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', page);
+    if (page !== 'student') {
+        url.searchParams.delete('studentId');
+    }
+    window.history.pushState({}, '', url.toString());
   }, [page]);
 
   useEffect(() => {
     if (selectedStudent) {
       sessionStorage.setItem('selectedStudent', selectedStudent);
+      if (page === 'student') {
+          const url = new URL(window.location.href);
+          url.searchParams.set('studentId', selectedStudent);
+          window.history.pushState({}, '', url.toString());
+      }
     } else {
       sessionStorage.removeItem('selectedStudent');
     }
-  }, [selectedStudent]);
+  }, [selectedStudent, page]);
 
   useEffect(() => {
     localStorage.setItem('scoringMode', scoringMode);

@@ -23,16 +23,16 @@ class CodeforcesRanker:
 
     @classmethod
     def calculate(cls, data: dict) -> ExplainableScore:
-        rating     = _safe_int(data.get("rating") or 0)
-        max_rating = _safe_int(data.get("max_rating") or 0)
-        solved     = _safe_int(data.get("solved_count") or data.get("solved", 0))
-        contests   = _safe_int(data.get("contests") or data.get("contest_count", 0))
+        rating     = _safe_int(data.get("rating", 0))
+        max_rating = _safe_int(data.get("max_rating", 0))
+        solved     = _safe_int(data.get("solved_count", data.get("solved", 0)))
+        contests   = _safe_int(data.get("contests", data.get("contest_count", 0)))
 
         title = str(data.get("max_rank") or data.get("rank") or "").lower().strip()
         TITLE_MAP = {"newbie": 2, "pupil": 4, "specialist": 6, "expert": 8, "candidate master": 10, "master": 10, "international master": 10, "grandmaster": 10, "international grandmaster": 10, "legendary grandmaster": 10}
         
         title_points = TITLE_MAP.get(title, 0)
-        if not title:
+        if not title_points:
             if max_rating >= 2100: title_points = 10
             elif max_rating >= 1900: title_points = 8
             elif max_rating >= 1600: title_points = 6
