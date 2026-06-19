@@ -221,14 +221,6 @@ def attach_ranking(profile: StudentProfile, custom_weights: dict = None, job_des
         dsa_mode    = RuleScoreAggregator.calculate_dsa_mode(dsa.total_score, gh.total_score)
         github_mode = RuleScoreAggregator.calculate_github_mode(dsa.total_score, gh.total_score)
     
-        cw = custom_weights or {}
-        custom = RuleScoreAggregator.calculate_custom(
-            lc_score=lc.total_score, cc_score=cc.total_score,
-            cf_score=cf.total_score, github_score=gh.total_score,
-            lc_weight=cw.get("lc", 25.0), cc_weight=cw.get("cc", 25.0),
-            cf_weight=cw.get("cf", 25.0), gh_weight=cw.get("gh", 25.0),
-        )
-        
         # Semantic Fitment (3-Pillar Score)
         semantic_score_obj = None
         if job_description:
@@ -241,6 +233,15 @@ def attach_ranking(profile: StudentProfile, custom_weights: dict = None, job_des
         else:
             # Default to 0 if no JD provided
             fitment_blend = ExplainableScore(0.0, {"error": "No JD provided"})
+            
+        cw = custom_weights or {}
+        custom = RuleScoreAggregator.calculate_custom(
+            lc_score=lc.total_score, cc_score=cc.total_score,
+            cf_score=cf.total_score, github_score=gh.total_score,
+            semantic_score=semantic_score_obj.total_score if semantic_score_obj else 0.0,
+            lc_weight=cw.get("lc", 20.0), cc_weight=cw.get("cc", 20.0),
+            cf_weight=cw.get("cf", 20.0), gh_weight=cw.get("gh", 20.0), sm_weight=cw.get("sm", 20.0)
+        )
             
         missing_platforms = profile.metadata.missing_platforms if profile.metadata and getattr(profile.metadata, 'missing_platforms', None) else []
     
@@ -289,6 +290,7 @@ async def list_profiles(
     cc_w: Optional[float] = None,
     cf_w: Optional[float] = None,
     gh_w: Optional[float] = None,
+    sm_w: Optional[float] = None,
     job_description: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
@@ -297,8 +299,8 @@ async def list_profiles(
     profiles = await service.get_all_profiles(limit=limit, offset=offset)
     
     custom_weights = None
-    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
-        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None and sm_w is not None:
+        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w, "sm": sm_w}
     else:
         from backend.database.models import ScoringRule
         from sqlalchemy.future import select
@@ -323,6 +325,7 @@ async def get_profile(
     cc_w: Optional[float] = None,
     cf_w: Optional[float] = None,
     gh_w: Optional[float] = None,
+    sm_w: Optional[float] = None,
     job_description: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
@@ -333,8 +336,8 @@ async def get_profile(
         raise HTTPException(404, "Profile not found")
         
     custom_weights = None
-    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
-        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None and sm_w is not None:
+        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w, "sm": sm_w}
     else:
         from backend.database.models import ScoringRule
         from sqlalchemy.future import select
@@ -388,6 +391,70 @@ async def update_profile(
     await repo.save_profile(profile)
     
     return {"status": "success", "message": "Profile updated successfully"}
+
+
+@app.post("/profiles/{student_uuid}/resume")
+async def update_profile_resume(
+    student_uuid: str,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    if not file.filename:
+        raise HTTPException(400, "No file provided")
+    
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in (".pdf", ".docx", ".txt", ".md"):
+        raise HTTPException(400, f"Unsupported format: {ext}")
+        
+    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+        file_content = await file.read()
+        tmp.write(file_content)
+        tmp_path = tmp.name
+        
+    try:
+        text = extract_text_from_file(tmp_path, ext)
+        if not text.strip():
+            raise HTTPException(400, "Could not extract text from file")
+            
+        service = IngestionService(db_session=db, settings=settings)
+        profile = await service.get_profile(student_uuid)
+        if not profile:
+            raise HTTPException(404, "Profile not found")
+            
+        from backend.ingestion.resume_parser.resume_extractor import ResumeExtractor, ResumeData
+        extractor = ResumeExtractor()
+        resume_json = extractor.extract(text)
+        resume_data = ResumeData.model_validate_json(resume_json)
+        
+        # Merge the new resume data into the existing profile
+        merged_profile = service.merger.merge_resume_data(resume_data)
+        
+        # We only want to override education, skills, projects, and metadata.resume_file
+        # We KEEP the personal_info, leetcode, github, codeforces, codechef data intact
+        profile.education = merged_profile.education
+        profile.skills = merged_profile.skills
+        profile.projects = merged_profile.projects
+        
+        # Also if the user hasn't set their personal info fields manually, we might want to update them
+        if not profile.personal_info.phone and merged_profile.personal_info.phone:
+            profile.personal_info.phone = merged_profile.personal_info.phone
+        if not profile.personal_info.email and merged_profile.personal_info.email:
+            profile.personal_info.email = merged_profile.personal_info.email
+        if not profile.personal_info.portfolio_url and merged_profile.personal_info.portfolio_url:
+            profile.personal_info.portfolio_url = merged_profile.personal_info.portfolio_url
+            
+        profile.metadata.resume_file = file.filename
+        
+        from backend.database.repository import StudentRepository
+        repo = StudentRepository(db)
+        await repo.save_profile(profile)
+        
+        return {"status": "success", "message": "Resume updated successfully"}
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
 
 @app.delete("/profiles/{student_uuid}")
 async def delete_profile(
@@ -604,6 +671,7 @@ async def sync_platforms(
     cc_w: Optional[float] = None,
     cf_w: Optional[float] = None,
     gh_w: Optional[float] = None,
+    sm_w: Optional[float] = None,
     db: AsyncSession = Depends(get_db)
 ):
     from backend.collection.service import PlatformSyncService
@@ -616,8 +684,8 @@ async def sync_platforms(
     profile = StudentProfile.model_validate(updated_record.profile_data)
     
     custom_weights = None
-    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None:
-        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w}
+    if lc_w is not None and cc_w is not None and cf_w is not None and gh_w is not None and sm_w is not None:
+        custom_weights = {"lc": lc_w, "cc": cc_w, "cf": cf_w, "gh": gh_w, "sm": sm_w}
     else:
         from backend.database.models import ScoringRule
         from sqlalchemy.future import select
@@ -654,7 +722,7 @@ async def get_scoring_rules(db: AsyncSession = Depends(get_db)):
     if not rules:
         # Default config if db is empty
         default_config = {
-            "platform_weights": {"lc": 25.0, "cc": 25.0, "cf": 25.0, "gh": 25.0},
+            "platform_weights": {"lc": 20.0, "cc": 20.0, "cf": 20.0, "gh": 20.0, "sm": 20.0},
             "leetcode": {"rating_divisor": 3000, "rating_weight": 60, "contest_divisor": 2500, "contest_weight": 25, "active_days_divisor": 90, "active_days_weight": 10},
             "codechef": {"rating_divisor": 3000, "rating_weight": 30, "highest_rating_divisor": 3000, "highest_rating_weight": 0, "solved_divisor": 1000, "solved_weight": 15, "contest_divisor": 50, "contest_weight": 10},
             "codeforces": {"rating_divisor": 3500, "rating_weight": 50, "max_rating_divisor": 3500, "max_rating_weight": 20, "solved_divisor": 3000, "solved_weight": 15, "contest_divisor": 100, "contest_weight": 10},

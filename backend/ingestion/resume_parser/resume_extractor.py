@@ -236,22 +236,53 @@ class ResumeExtractor:
             data.skills = unique_skills
             data.confidence.skills = 0.8
 
-        # Parse Projects
         if sections["PROJECT"]:
-            # Split projects by empty lines
-            paragraphs = re.split(r'\n\s*\n', sections["PROJECT"].strip())
-            for para in paragraphs:
-                proj_lines = [l for l in para.split('\n') if l.strip()]
-                if proj_lines:
-                    proj = Project()
-                    proj.title = proj_lines[0][:100]
-                    desc = " ".join(proj_lines[1:])
-                    desc = re.sub(r'(https?://[^\s]+)', '', desc).strip()
-                    if len(desc) < 10:
-                        continue # Skip very short snippets that aren't real projects
-                    proj.description = desc[:500] + ('...' if len(desc) > 500 else '')
-                    data.projects.append(proj)
-            data.confidence.projects = 0.7
+            proj_lines = [l.strip() for l in sections["PROJECT"].split('\n') if l.strip()]
+            projects = []
+            current_proj = None
+            i = 0
+            while i < len(proj_lines):
+                line = proj_lines[i]
+                is_bullet = bool(re.match(r'^[\•\-\*]', line))
+                has_tech = '·' in line or '|' in line
+                is_date = bool(re.search(r'\b(20\d{2}|present)\b', line, re.IGNORECASE)) and len(line) < 40
+                
+                is_title = False
+                if not is_bullet and not has_tech and not is_date and len(line) < 150:
+                    if i + 1 < len(proj_lines):
+                        nxt = proj_lines[i+1]
+                        if '·' in nxt or '|' in nxt or (bool(re.search(r'\b(20\d{2}|present)\b', nxt, re.IGNORECASE)) and len(nxt) < 40):
+                            is_title = True
+                        elif len(nxt) < 100 and not bool(re.match(r'^[\•\-\*]', nxt)):
+                            if i + 2 < len(proj_lines):
+                                nxt2 = proj_lines[i+2]
+                                if '·' in nxt2 or '|' in nxt2 or (bool(re.search(r'\b(20\d{2}|present)\b', nxt2, re.IGNORECASE)) and len(nxt2) < 40):
+                                    is_title = True
+
+                if is_title:
+                    if current_proj and current_proj.title:
+                        projects.append(current_proj)
+                    current_proj = Project()
+                    current_proj.title = line
+                    current_proj.description = ""
+                elif current_proj:
+                    if has_tech:
+                        current_proj.technologies.extend([t.strip() for t in re.split(r'[·|]', line) if t.strip()])
+                    elif is_bullet:
+                        clean_bullet = re.sub(r'^[\•\-\*]\s*', '', line)
+                        current_proj.achievements.append(clean_bullet)
+                        current_proj.description += clean_bullet + " "
+                    else:
+                        if not is_date:
+                            if current_proj.achievements:
+                                current_proj.achievements[-1] += " " + line
+                            current_proj.description += " " + line
+                i += 1
+
+            if current_proj and current_proj.title:
+                projects.append(current_proj)
+            data.projects = projects
+            data.confidence.projects = 0.8
 
         # Parse Experience
         if sections["EXPERIENCE"]:

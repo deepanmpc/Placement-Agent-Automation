@@ -35,7 +35,11 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
 
   useEffect(() => {
     if (!studentId) return;
-    const query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`;
+    const activeJd = localStorage.getItem('active_jd');
+    let query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}&sm_w=${customWeights.sm || 0}`;
+    if (activeJd) {
+      query += `&job_description=${encodeURIComponent(activeJd)}`;
+    }
     fetch(`http://localhost:8000/profiles/${studentId}${query}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
@@ -52,7 +56,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
     if (!studentId) return;
     setEnriching(true);
     try {
-      const query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`;
+      const query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}&sm_w=${customWeights.sm || 0}`;
       const response = await fetch(`http://localhost:8000/candidates/${studentId}/sync-platforms${query}`, { method: 'POST' });
       if (!response.ok) throw new Error('Failed to enrich');
       const data = await response.json();
@@ -146,6 +150,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent)' }}>
                   {scoringMode === 'dsa_mode' ? s.ranking.overall_dsa_mode 
                    : scoringMode === 'github_mode' ? s.ranking.overall_github_mode 
+                   : scoringMode === 'fitment_mode' ? s.ranking.fitment_score ?? 0
                    : (s.ranking.custom_score ?? s.ranking.total_technical_score)}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/100</span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>
@@ -187,31 +192,70 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
             <SkillSection label="All Extracted Skills" items={s.skills.all_skills} />
           </div>
 
+          {s.projects && s.projects.length > 0 && (
+            <div className="detail-projects" style={{ marginTop: '2rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--text-primary)' }}>Projects & Experience</h3>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {s.projects.map((proj, idx) => (
+                  <div key={idx} style={{ padding: '1.25rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                      <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--primary)', fontWeight: 700 }}>{proj.title}</h4>
+                      {proj.link && (
+                        <a href={proj.link.startsWith('http') ? proj.link : `https://${proj.link}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#fff', background: 'var(--accent)', padding: '0.2rem 0.6rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 600 }}>
+                          View
+                        </a>
+                      )}
+                    </div>
+                    {proj.description && <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: 1.6 }}>{proj.description}</p>}
+                    
+                    {proj.achievements && proj.achievements.length > 0 && (
+                      <div style={{ marginBottom: '1rem' }}>
+                        <strong style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Key Achievements:</strong>
+                        <ul style={{ margin: '0.4rem 0 0', paddingLeft: '1.2rem', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                          {proj.achievements.map((ach, i) => (
+                            <li key={i} style={{ marginBottom: '0.2rem' }}>{ach}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {proj.technologies && proj.technologies.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem' }}>
+                        {proj.technologies.map((t, i) => (
+                          <span key={i} style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-primary)', fontWeight: 500 }}>{t}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
 
         {s.ranking && (() => {
           const r = s.ranking;
-          const activeJd = localStorage.getItem('active_jd');
-          const hasFitment = activeJd && r.fitment_score !== undefined;
+          const isFitmentActive = scoringMode === 'fitment_mode';
           
-          const activeScore = hasFitment ? r.fitment_score
+          const activeScore = isFitmentActive && r.fitment_score !== undefined ? r.fitment_score
             : scoringMode === 'dsa_mode' ? r.overall_dsa_mode
             : scoringMode === 'github_mode' ? r.overall_github_mode
             : r.custom_score ?? r.total_technical_score;
             
-          const activeLabel = hasFitment ? 'Fitment Match'
+          const activeLabel = scoringMode === 'fitment_mode' ? 'Fitment Mode'
             : scoringMode === 'dsa_mode' ? 'DSA Mode'
             : scoringMode === 'github_mode' ? 'GitHub Mode' : 'Custom Mode';
             
-          const activeColor = hasFitment ? 'var(--accent)' : 'var(--accent)';
+          const activeColor = 'var(--accent)';
           
-          const activeFormula = hasFitment
-            ? `DSA(${r.dsa_score})×0.40 + GH(${r.github_score_total})×0.20 + Semantic×0.40`
+          const activeFormula = scoringMode === 'fitment_mode'
+            ? `DSA(${r.dsa_score}) × 0.40  +  GH(${r.github_score_total}) × 0.35  +  Semantic × 0.25`
             : scoringMode === 'dsa_mode'
             ? `DSA(${r.dsa_score}) × 0.60  +  GH(${r.github_score_total}) × 0.40`
             : scoringMode === 'github_mode'
             ? `GH(${r.github_score_total}) × 0.60  +  DSA(${r.dsa_score}) × 0.40`
-            : `(LC×${customWeights.lc} + CC×${customWeights.cc} + CF×${customWeights.cf} + GH×${customWeights.gh}) / 100`;
+            : `(LC×${customWeights.lc} + CC×${customWeights.cc} + CF×${customWeights.cf} + GH×${customWeights.gh} + SM×${customWeights.sm || 0}) / 100`;
 
           return (
             <div style={{ marginTop: '2rem' }}>
@@ -241,8 +285,10 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                         formula: `(DSA×0.60) + (GH×0.40)` },
                       { key: 'github_mode', label: 'Overall GitHub Mode', score: r.overall_github_mode,
                         formula: `(GH×0.60) + (DSA×0.40)` },
+                      { key: 'fitment_mode', label: 'Fitment Mode', score: r.fitment_score,
+                        formula: `DSA(40%) + GH(35%) + SM(25%)` },
                       { key: 'custom', label: 'Custom Score', score: r.custom_score,
-                        formula: `(LC×${customWeights.lc}+CC×${customWeights.cc}+CF×${customWeights.cf}+GH×${customWeights.gh})/100` },
+                        formula: `(LC×${customWeights.lc}+CC×${customWeights.cc}+CF×${customWeights.cf}+GH×${customWeights.gh}+SM×${customWeights.sm || 0})/100` },
                     ].map(item => (
                       <button
                         key={item.key}
@@ -724,14 +770,14 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 </tr>
                               </thead>
                               <tbody>
-                                {Object.entries(r.semantic_breakdown).map(([key, data]: [string, any], idx) => (
+                                {Object.entries(r.semantic_breakdown.breakdown || {}).map(([key, value]: [string, any], idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 600, textTransform: 'capitalize' }}>{key.replace('_', ' ')}</td>
-                                    <td style={{ padding: '0.5rem', color: 'var(--text-primary)', maxWidth: '400px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.text_snippet}</td>
-                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 800, color: data.similarity_score > 70 ? '#10b981' : data.similarity_score > 40 ? '#f59e0b' : '#ef4444' }}>
-                                      {data.similarity_score}%
+                                    <td style={{ padding: '0.5rem', color: 'var(--text-primary)', maxWidth: '400px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>-</td>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 800, color: value > 70 ? '#10b981' : value > 40 ? '#f59e0b' : '#ef4444' }}>
+                                      {value}
                                     </td>
-                                    <td style={{ padding: '0.5rem', textAlign: 'right', color: 'var(--text-muted)' }}>{data.weight}x</td>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right', color: 'var(--text-muted)' }}>-</td>
                                   </tr>
                                 ))}
                               </tbody>

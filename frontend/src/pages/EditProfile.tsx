@@ -17,6 +17,7 @@ export default function EditProfile() {
   const [leetcode, setLeetcode] = useState('');
   const [codeforces, setCodeforces] = useState('');
   const [codechef, setCodechef] = useState('');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,6 +84,16 @@ export default function EditProfile() {
       });
       
       if (!res.ok) throw new Error('Failed to update profile');
+      
+      if (resumeFile) {
+        const formData = new FormData();
+        formData.append('file', resumeFile);
+        const resumeRes = await fetch(`http://localhost:8000/profiles/${studentUuid}/resume`, {
+          method: 'POST',
+          body: formData
+        });
+        if (!resumeRes.ok) throw new Error('Failed to update resume');
+      }
       
       setSuccessMsg('Profile updated successfully!');
       setTimeout(() => {
@@ -166,6 +177,14 @@ export default function EditProfile() {
                 <label style={labelStyle}>CodeChef Username</label>
                 <input type="text" value={codechef} onChange={e => setCodechef(e.target.value)} style={inputStyle} />
               </div>
+                <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>Re-upload Resume (Optional)</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                    Upload a new resume to update the student's extracted skills, projects, and education. Existing platform links will be preserved.
+                  </p>
+                  <input type="file" accept=".pdf,.docx,.txt,.md" onChange={(e) => setResumeFile(e.target.files?.[0] || null)} style={inputStyle} />
+                </div>
+
               
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
                 <button type="button" onClick={() => { setStep(1); setSuccessMsg(''); }} disabled={isSubmitting} style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}>Back</button>
