@@ -14,7 +14,6 @@ const NAV_ITEMS: { id: PageView; label: string }[] = [
   { id: 'jd-input', label: 'Job Description' },
   { id: 'candidates', label: 'Candidates' },
   { id: 'analytics', label: 'Analytics' },
-  { id: 'scoring-config', label: 'Scoring Engine' },
 ];
 
 export default function Sidebar({

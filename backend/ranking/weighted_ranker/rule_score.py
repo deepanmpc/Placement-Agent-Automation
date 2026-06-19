@@ -79,3 +79,50 @@ class RuleScoreAggregator:
                            "contribution": round(github_score * gh_pct, 2)},
         }
         return ExplainableScore(round(max(0, min(total, 100)), 2), breakdown)
+
+    @classmethod
+    def calculate_fitment_blend(
+        cls, 
+        platform_score: float, 
+        behavioral_score: float, 
+        semantic_score: float,
+        w_platform: float = 0.4,
+        w_behavioral: float = 0.2,
+        w_semantic: float = 0.4
+    ) -> ExplainableScore:
+        """
+        Blends the 3 core pillars:
+        1. Rule-Based Weight Score (Platforms)
+        2. Behavioral Score (GitHub)
+        3. Fitment Score (Semantic RAG Match)
+        """
+        # Ensure weights sum to 1.0 (or adjust to relative percentage)
+        total_w = w_platform + w_behavioral + w_semantic
+        if total_w <= 0:
+            total_w = 1.0
+            w_platform, w_behavioral, w_semantic = 0.4, 0.2, 0.4
+            
+        p_pct = w_platform / total_w
+        b_pct = w_behavioral / total_w
+        s_pct = w_semantic / total_w
+        
+        total = (platform_score * p_pct) + (behavioral_score * b_pct) + (semantic_score * s_pct)
+        
+        breakdown = {
+            "platform_score": {
+                "raw_value": round(platform_score, 2),
+                "weight_pct": round(p_pct * 100, 2),
+                "contribution": round(platform_score * p_pct, 2)
+            },
+            "behavioral_score": {
+                "raw_value": round(behavioral_score, 2),
+                "weight_pct": round(b_pct * 100, 2),
+                "contribution": round(behavioral_score * b_pct, 2)
+            },
+            "semantic_fitment_score": {
+                "raw_value": round(semantic_score, 2),
+                "weight_pct": round(s_pct * 100, 2),
+                "contribution": round(semantic_score * s_pct, 2)
+            }
+        }
+        return ExplainableScore(round(max(0, min(total, 100)), 2), breakdown)

@@ -48,6 +48,10 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
 
   const getCandidateScore = (p: Profile): number => {
     if (!p.ranking) return 0;
+    const activeJd = localStorage.getItem('active_jd');
+    if (activeJd && p.ranking.fitment_score !== undefined) {
+      return p.ranking.fitment_score;
+    }
     return scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
       : scoringMode === 'github_mode' ? p.ranking.overall_github_mode
       : p.ranking.custom_score ?? p.ranking.total_technical_score;
@@ -79,7 +83,11 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const allFilteredSelected = filteredProfiles.length > 0 && filteredProfiles.every(p => selectedIds.has(p.student_uuid));
 
   const fetchProfiles = () => {
-    const query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`;
+    let query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`;
+    const activeJd = localStorage.getItem('active_jd');
+    if (activeJd) {
+      query += `&job_description=${encodeURIComponent(activeJd)}`;
+    }
     fetch(`http://localhost:8000/profiles${query}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
@@ -759,10 +767,16 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
                     {p.ranking ? (
                       <>
                         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'right', marginBottom: '0.1rem' }}>
-                          {MODE_LABELS[scoringMode]}
+                          {localStorage.getItem('active_jd') ? (
+                            <span style={{ color: 'var(--accent)' }}>✨ Fitment Score (RAG)</span>
+                          ) : (
+                            MODE_LABELS[scoringMode]
+                          )}
                         </div>
                         <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1 }}>
-                          {scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
+                          {localStorage.getItem('active_jd') && p.ranking.fitment_score !== undefined
+                            ? p.ranking.fitment_score
+                            : scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
                             : scoringMode === 'github_mode' ? p.ranking.overall_github_mode
                             : p.ranking.custom_score ?? p.ranking.total_technical_score}
                           <span style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 400 }}>/100</span>

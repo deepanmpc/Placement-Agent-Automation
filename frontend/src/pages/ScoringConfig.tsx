@@ -54,32 +54,32 @@ const DEFAULT_PLATFORM_FORMULAS = [
     name: 'LeetCode (LC) Formula Details',
     color: 'var(--accent)',
     components: [
-      { name: 'Difficulty Points (Easy × 1, Med × 3, Hard × 8)', weight: 'Max 60 pts', formula: 'MIN(Points / 3000, 1) × 60' },
-      { name: 'Contest Rating Score', weight: 'Max 25 pts', formula: 'MIN(ContestRating / 2500, 1) × 25' },
-      { name: 'Participation Consistency', weight: 'Max 5 pts', formula: 'MIN(ContestsAttended / 50, 1) × 5' },
-      { name: 'Recent Activity (90 days)', weight: 'Max 10 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 10' },
+      { name: 'Difficulty Points (Easy×1, Med×3, Hard×8)', weight: 'Max 30 pts', formula: 'MIN(Points / 1500, 1) × 30' },
+      { name: 'Contest Rating Score', weight: 'Max 30 pts', formula: 'MIN(ContestRating / 2500, 1) × 30' },
+      { name: 'Participation Consistency', weight: 'Max 20 pts', formula: 'MIN(ContestsAttended / 50, 1) × 20' },
+      { name: 'Global Rank Score', weight: 'Max 20 pts', formula: 'MAX(0, (4M - GlobalRank) / 4M) × 20' },
     ],
   },
   {
     name: 'CodeChef (CC) Formula Details',
     color: 'var(--accent)',
     components: [
-      { name: 'Star Rank Points (1★=10, 2★=25, 3★=40, 4★=60...)', weight: 'Max 40 pts', formula: 'StarMapPoints × 0.40' },
-      { name: 'Current Rating Score', weight: 'Max 30 pts', formula: 'MIN(Rating / 3000, 1) × 30' },
-      { name: 'Problems Solved Score', weight: 'Max 15 pts', formula: 'MIN(ProblemsSolved / 1000, 1) × 15' },
-      { name: 'Contest Count Score', weight: 'Max 10 pts', formula: 'MIN(ContestsCount / 50, 1) × 10' },
-      { name: 'Recent Activity (90 days)', weight: 'Max 5 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 5' },
+      { name: 'Star Rank Points (1★=10, 2★=25, 3★=40... 7★=100)', weight: 'Max 10 pts', formula: 'StarMapPoints × 0.10' },
+      { name: 'Current Rating Score', weight: 'Max 20 pts', formula: 'MIN(Rating / 3000, 1) × 20' },
+      { name: 'Highest Rating Score', weight: 'Max 10 pts', formula: 'MIN(HighestRating / 3000, 1) × 10' },
+      { name: 'Problems Solved Score', weight: 'Max 30 pts', formula: 'MIN(ProblemsSolved / 1000, 1) × 30' },
+      { name: 'Contest Count Score', weight: 'Max 30 pts', formula: 'MIN(ContestsCount / 50, 1) × 30' },
     ],
   },
   {
     name: 'Codeforces (CF) Formula Details',
     color: 'var(--accent)',
     components: [
-      { name: 'Current Rating Score', weight: 'Max 50 pts', formula: 'MIN(CurrentRating / 3500, 1) × 50' },
-      { name: 'Maximum Rating Score', weight: 'Max 20 pts', formula: 'MIN(MaxRating / 3500, 1) × 20' },
-      { name: 'Problems Solved Score', weight: 'Max 15 pts', formula: 'MIN(ProblemsSolved / 3000, 1) × 15' },
-      { name: 'Contest Count Score', weight: 'Max 10 pts', formula: 'MIN(ContestsCount / 100, 1) × 10' },
-      { name: 'Recent Activity (90 days)', weight: 'Max 5 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 5' },
+      { name: 'Current Rating Score', weight: 'Max 45 pts', formula: 'MIN(CurrentRating / 3500, 1) × 45' },
+      { name: 'Maximum Rating Score', weight: 'Max 15 pts', formula: 'MIN(MaxRating / 3500, 1) × 15' },
+      { name: 'Title Score (Newbie=2 ... Grandmaster=10)', weight: 'Max 10 pts', formula: 'MapTitleToPoints(Title)' },
+      { name: 'Problems Solved Score', weight: 'Max 20 pts', formula: 'MIN(ProblemsSolved / 3000, 1) × 20' },
+      { name: 'Contest Count Score', weight: 'Max 10 pts', formula: 'MIN(Contests / 100, 1) × 10' },
     ],
   },
   {
@@ -132,61 +132,10 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
     onCustomWeightsChange(nextWeights);
   };
 
-  const dynamicPlatformFormulas = dbConfig ? [
-    {
-      name: 'LeetCode (LC) Formula Details',
-      color: 'var(--accent)',
-      components: [
-        { name: 'Difficulty Points', weight: `Max ${dbConfig.leetcode.rating_weight} pts`, formula: `MIN(Points / ${dbConfig.leetcode.rating_divisor}, 1) × ${dbConfig.leetcode.rating_weight}` },
-        { name: 'Contest Rating Score', weight: `Max ${dbConfig.leetcode.contest_weight} pts`, formula: `MIN(ContestRating / ${dbConfig.leetcode.contest_divisor}, 1) × ${dbConfig.leetcode.contest_weight}` },
-        { name: 'Recent Activity', weight: `Max ${dbConfig.leetcode.active_days_weight} pts`, formula: `MIN(ActiveDays90 / ${dbConfig.leetcode.active_days_divisor}, 1) × ${dbConfig.leetcode.active_days_weight}` },
-      ],
-    },
-    {
-      name: 'CodeChef (CC) Formula Details',
-      color: 'var(--accent)',
-      components: [
-        { name: 'Star Rank Points', weight: 'Base Points', formula: 'StarMapPoints' },
-        { name: 'Current Rating Score', weight: `Max ${dbConfig.codechef.rating_weight} pts`, formula: `MIN(Rating / ${dbConfig.codechef.rating_divisor}, 1) × ${dbConfig.codechef.rating_weight}` },
-        { name: 'Problems Solved Score', weight: `Max ${dbConfig.codechef.solved_weight} pts`, formula: `MIN(ProblemsSolved / ${dbConfig.codechef.solved_divisor}, 1) × ${dbConfig.codechef.solved_weight}` },
-        { name: 'Contest Count Score', weight: `Max ${dbConfig.codechef.contest_weight} pts`, formula: `MIN(ContestsCount / ${dbConfig.codechef.contest_divisor}, 1) × ${dbConfig.codechef.contest_weight}` },
-      ],
-    },
-    {
-      name: 'Codeforces (CF) Formula Details',
-      color: 'var(--accent)',
-      components: [
-        { name: 'Current Rating Score', weight: `Max ${dbConfig.codeforces.rating_weight} pts`, formula: `MIN(CurrentRating / ${dbConfig.codeforces.rating_divisor}, 1) × ${dbConfig.codeforces.rating_weight}` },
-        { name: 'Maximum Rating Score', weight: `Max ${dbConfig.codeforces.max_rating_weight} pts`, formula: `MIN(MaxRating / ${dbConfig.codeforces.max_rating_divisor}, 1) × ${dbConfig.codeforces.max_rating_weight}` },
-        { name: 'Problems Solved Score', weight: `Max ${dbConfig.codeforces.solved_weight} pts`, formula: `MIN(ProblemsSolved / ${dbConfig.codeforces.solved_divisor}, 1) × ${dbConfig.codeforces.solved_weight}` },
-        { name: 'Contest Count Score', weight: `Max ${dbConfig.codeforces.contest_weight} pts`, formula: `MIN(ContestsCount / ${dbConfig.codeforces.contest_divisor}, 1) × ${dbConfig.codeforces.contest_weight}` },
-      ],
-    },
-    {
-      name: 'GitHub (GH) Engineering Formula Details',
-      color: 'var(--accent)',
-      components: [
-        { name: 'Original Repositories', weight: `Max ${dbConfig.github.orig_repos_weight || 10} pts`, formula: `MIN(OriginalRepos / ${dbConfig.github.orig_repos_divisor || 30}, 1) × ${dbConfig.github.orig_repos_weight || 10}` },
-        { name: 'Project Depth', weight: `Max ${dbConfig.github.project_depth_weight || 10} pts`, formula: `MIN(ProjectDepth / ${dbConfig.github.project_depth_divisor || 50}, 1) × ${dbConfig.github.project_depth_weight || 10}` },
-        { name: 'Momentum (Active 30 Days)', weight: `Max ${dbConfig.github.momentum_weight || 15} pts`, formula: `MIN(ActiveDays30 / ${dbConfig.github.momentum_divisor || 30}, 1) × ${dbConfig.github.momentum_weight || 15}` },
-        { name: 'Total Repository Stars', weight: `Max ${dbConfig.github.stars_weight || 3} pts`, formula: `MIN(TotalStars / ${dbConfig.github.stars_divisor || 30}, 1) × ${dbConfig.github.stars_weight || 3}` },
-        { name: 'Commit Count (Year)', weight: `Max ${dbConfig.github.commits_weight || 15} pts`, formula: `MIN(Commits365 / ${dbConfig.github.commits_divisor || 1500}, 1) × ${dbConfig.github.commits_weight || 15}` },
-        { name: 'Contribution Consistency', weight: `Max ${dbConfig.github.contrib_days_weight || 21} pts`, formula: `(ContributionDays365 / ${dbConfig.github.contrib_days_divisor || 365}) × ${dbConfig.github.contrib_days_weight || 21}` },
-        { name: 'Merged Pull Requests', weight: `Max ${dbConfig.github.merged_pr_weight || 10} pts`, formula: `MIN(MergedPRs / ${dbConfig.github.merged_pr_divisor || 15}, 1) × ${dbConfig.github.merged_pr_weight || 10}` },
-        { name: 'Closed Issues', weight: `Max ${dbConfig.github.issues_weight || 5} pts`, formula: `MIN(ClosedIssues / ${dbConfig.github.issues_divisor || 20}, 1) × ${dbConfig.github.issues_weight || 5}` },
-        { name: 'Recent Activity (90 days)', weight: `Max ${dbConfig.github.active90_weight || 11} pts`, formula: `MIN(ActiveDays90 / ${dbConfig.github.active90_divisor || 90}, 1) × ${dbConfig.github.active90_weight || 11}` },
-      ],
-    },
-  ] : DEFAULT_PLATFORM_FORMULAS;
+  const dynamicPlatformFormulas = DEFAULT_PLATFORM_FORMULAS;
 
   return (
-    <div className="page" style={{ paddingBottom: '3rem' }}>
-      <div className="page-header" style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>Scoring Engine Settings</h1>
-        <p className="page-subtitle" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Configure overall candidate ranking modes, custom platform evaluation weights, and review scoring formulas.</p>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         
         {/* Save Configuration Top Bar */}
         <div style={{ padding: '1.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'var(--shadow-sm)' }}>
@@ -491,6 +440,5 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
           )}
         </div>
       </div>
-    </div>
   );
 }

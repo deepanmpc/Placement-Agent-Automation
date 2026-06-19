@@ -40,7 +40,7 @@ class GitHubEngineeringRanker:
         proj_depth   = _safe_num(data.get("project_depth", 0))
 
         # Contribution days: if stored as a fraction (0-1), multiply by 365
-        if 0 < contrib_days <= 1.0:
+        if 0 < contrib_days < 1.0:
             contrib_days = contrib_days * 365
 
         orig_repo_score= min(orig_repos / 30, 1) * 10

@@ -191,13 +191,23 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
 
         {s.ranking && (() => {
           const r = s.ranking;
-          const activeScore = scoringMode === 'dsa_mode' ? r.overall_dsa_mode
+          const activeJd = localStorage.getItem('active_jd');
+          const hasFitment = activeJd && r.fitment_score !== undefined;
+          
+          const activeScore = hasFitment ? r.fitment_score
+            : scoringMode === 'dsa_mode' ? r.overall_dsa_mode
             : scoringMode === 'github_mode' ? r.overall_github_mode
             : r.custom_score ?? r.total_technical_score;
-          const activeLabel = scoringMode === 'dsa_mode' ? 'DSA Mode'
+            
+          const activeLabel = hasFitment ? 'Fitment Match'
+            : scoringMode === 'dsa_mode' ? 'DSA Mode'
             : scoringMode === 'github_mode' ? 'GitHub Mode' : 'Custom Mode';
-          const activeColor = 'var(--accent)';
-          const activeFormula = scoringMode === 'dsa_mode'
+            
+          const activeColor = hasFitment ? 'var(--accent)' : 'var(--accent)';
+          
+          const activeFormula = hasFitment
+            ? `DSA(${r.dsa_score})×0.40 + GH(${r.github_score_total})×0.20 + Semantic×0.40`
+            : scoringMode === 'dsa_mode'
             ? `DSA(${r.dsa_score}) × 0.60  +  GH(${r.github_score_total}) × 0.40`
             : scoringMode === 'github_mode'
             ? `GH(${r.github_score_total}) × 0.60  +  DSA(${r.dsa_score}) × 0.40`
@@ -687,6 +697,41 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                     <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>{row.val}</td>
                                     <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 800, color: '#10b981', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em' }}>{row.score}</td>
                                     <td style={{ padding: '0.5rem', paddingLeft: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{row.formula}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {/* SEMANTIC / FITMENT SECTION */}
+                    {r.semantic_breakdown && Object.keys(r.semantic_breakdown).length > 0 && (
+                      <div className="detail-card" style={{ borderColor: 'var(--border)', display: 'flex', flexDirection: 'column' }}>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--accent)', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Semantic Fitment Match (RAG)</span>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Job Description Analysis</span>
+                        </h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', alignItems: 'start' }}>
+                          <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+                              <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                                  <th style={{ padding: '0.5rem', fontWeight: 500 }}>Category</th>
+                                  <th style={{ padding: '0.5rem', fontWeight: 500 }}>Extracted Snippet</th>
+                                  <th style={{ padding: '0.5rem', fontWeight: 500, textAlign: 'right' }}>Similarity Score</th>
+                                  <th style={{ padding: '0.5rem', fontWeight: 500, textAlign: 'right' }}>Weight</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {Object.entries(r.semantic_breakdown).map(([key, data]: [string, any], idx) => (
+                                  <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
+                                    <td style={{ padding: '0.5rem', fontWeight: 600, textTransform: 'capitalize' }}>{key.replace('_', ' ')}</td>
+                                    <td style={{ padding: '0.5rem', color: 'var(--text-primary)', maxWidth: '400px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.text_snippet}</td>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 800, color: data.similarity_score > 70 ? '#10b981' : data.similarity_score > 40 ? '#f59e0b' : '#ef4444' }}>
+                                      {data.similarity_score}%
+                                    </td>
+                                    <td style={{ padding: '0.5rem', textAlign: 'right', color: 'var(--text-muted)' }}>{data.weight}x</td>
                                   </tr>
                                 ))}
                               </tbody>

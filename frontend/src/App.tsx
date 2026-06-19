@@ -201,7 +201,16 @@ export default function App() {
           {page === 'upload' && <ResumeUpload />}
           {page === 'edit' && <EditProfile />}
           {page === 'dashboard' && <Dashboard />}
-          {page === 'jd-input' && <JDInput onParsed={() => setPage('dashboard')} />}
+          {page === 'jd-input' && (
+            <JDInput 
+              onParsed={() => setPage('dashboard')} 
+              scoringMode={scoringMode} 
+              onScoringModeChange={setScoringMode} 
+              customWeights={customWeights} 
+              onCustomWeightsChange={setCustomWeights} 
+              onSave={saveConfig}
+            />
+          )}
           {page === 'candidates' && (
             <Candidates
               onSelect={(id) => setSelectedStudent(id)}
@@ -218,15 +227,6 @@ export default function App() {
               onScoringModeChange={setScoringMode}
               customWeights={customWeights}
             />
-          )}
-          {page === 'scoring-config' && (
-            <ScoringConfig 
-            scoringMode={scoringMode} 
-            onScoringModeChange={setScoringMode} 
-            customWeights={customWeights} 
-            onCustomWeightsChange={setCustomWeights} 
-            onSave={saveConfig}
-          />
           )}
           {page === 'analytics' && <Analytics />}
         </div>

@@ -1,17 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { JDRequirements } from '../types';
 import { MOCK_JD } from '../data/mockData';
+import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
+import ScoringConfig from './ScoringConfig';
 
 interface Props {
-  onParsed: (jd: JDRequirements) => void;
+  onParsed: (jd: JDRequirements | null) => void;
+  scoringMode: ScoringMode;
+  onScoringModeChange: (m: ScoringMode) => void;
+  customWeights: CustomWeights;
+  onCustomWeightsChange: (w: CustomWeights) => void;
+  onSave: () => void;
 }
 
-export default function JDInput({ onParsed }: Props) {
+export default function JDInput({ 
+  onParsed, 
+  scoringMode, 
+  onScoringModeChange, 
+  customWeights, 
+  onCustomWeightsChange, 
+  onSave 
+}: Props) {
   const [jdText, setJdText] = useState('');
   const [showMock, setShowMock] = useState(false);
 
+  useEffect(() => {
+    const savedJd = localStorage.getItem('active_jd');
+    if (savedJd) {
+      setJdText(savedJd);
+    }
+  }, []);
+
+  const handleClear = () => {
+    localStorage.removeItem('active_jd');
+    setJdText('');
+    onParsed(null);
+    alert('Job Description cleared. Reverting to technical skill ranking.');
+  };
+
   const handleParse = () => {
     if (!jdText.trim()) return;
+    localStorage.setItem('active_jd', jdText);
+    alert('Job Description saved! Candidates will now be ranked by Fitment Score.');
     onParsed({
       title: 'Parsed Job Description',
       company: 'Imported Company',
@@ -27,11 +57,11 @@ export default function JDInput({ onParsed }: Props) {
   };
 
   return (
-    <div className="page">
+    <div className="page" style={{ overflowY: 'auto' }}>
       <div className="page-header">
         <h1>Job Description</h1>
         <p className="page-subtitle">
-          Paste a job description to extract hiring requirements
+          Paste a job description to extract hiring requirements and set active matching.
         </p>
       </div>
 
@@ -46,7 +76,10 @@ export default function JDInput({ onParsed }: Props) {
         />
         <div className="jd-actions">
           <button className="btn btn-primary" onClick={handleParse} disabled={!jdText.trim()}>
-            Parse JD
+            Save & Apply JD
+          </button>
+          <button className="btn btn-danger" onClick={handleClear} disabled={!jdText.trim()} style={{ backgroundColor: '#dc3545', color: 'white' }}>
+            Clear JD
           </button>
           <button className="btn btn-secondary" onClick={() => setShowMock(!showMock)}>
             {showMock ? 'Hide' : 'Show'} Sample
@@ -65,6 +98,23 @@ export default function JDInput({ onParsed }: Props) {
           </div>
         </div>
       )}
+
+      {/* Render Scoring Engine Here */}
+      <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
+        <div className="page-header" style={{ marginBottom: '1.5rem' }}>
+          <h2>Scoring Engine Settings</h2>
+          <p className="page-subtitle">Configure baseline rule-based platform weights (overridden partially by Fitment Score when active).</p>
+        </div>
+        <div style={{ paddingBottom: '3rem' }}>
+          <ScoringConfig 
+            scoringMode={scoringMode}
+            onScoringModeChange={onScoringModeChange}
+            customWeights={customWeights}
+            onCustomWeightsChange={onCustomWeightsChange}
+            onSave={onSave}
+          />
+        </div>
+      </div>
     </div>
   );
 }

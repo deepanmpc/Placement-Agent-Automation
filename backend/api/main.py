@@ -185,7 +185,7 @@ from backend.ranking.weighted_ranker.github_ranker.github_engineering import Git
 from backend.ranking.weighted_ranker.rule_score import RuleScoreAggregator
 
 
-def attach_ranking(profile: StudentProfile, custom_weights: dict | None = None):
+def attach_ranking(profile: StudentProfile, custom_weights: dict = None, job_description: str = None):
     """
     Computes all scoring modes and attaches them to the profile.ranking field.
     
@@ -193,59 +193,93 @@ def attach_ranking(profile: StudentProfile, custom_weights: dict | None = None):
       dsa_mode    = DSA_SCORE × 0.60 + GITHUB_SCORE × 0.40
       github_mode = GITHUB_SCORE × 0.60 + DSA_SCORE × 0.40
       custom      = (LC×lc_w + CC×cc_w + CF×cf_w + GH×gh_w) / 100
+      fitment     = Rule-based (DSA) × 0.4 + Behavioral (GH) × 0.2 + Semantic × 0.4
     """
-    lc = LeetCodeRanker.calculate(profile.leetcode.model_dump())
-    cf = CodeforcesRanker.calculate(profile.codeforces.model_dump())
-    cc = CodeChefRanker.calculate(profile.codechef.model_dump())
+    from backend.ranking.weighted_ranker.semantic_ranker import SemanticRanker
+    from backend.ranking.weighted_ranker.common import ExplainableScore
+    
+    try:
+        lc_data = profile.leetcode.model_dump() if profile.leetcode else {}
+        cf_data = profile.codeforces.model_dump() if profile.codeforces else {}
+        cc_data = profile.codechef.model_dump() if profile.codechef else {}
+    
+        lc = LeetCodeRanker.calculate(lc_data)
+        cf = CodeforcesRanker.calculate(cf_data)
+        cc = CodeChefRanker.calculate(cc_data)
+    
+        # DSA aggregate: LC×0.33 + CC×0.34 + CF×0.33
+        dsa = CodingAggregator.calculate(lc, cf, cc)
+    
+        # GitHub score
+        gh_raw = profile.github.model_dump() if profile.github else {}
+        # Also merge github_strength sub-fields if present
+        if getattr(profile, 'github', None) and getattr(profile.github, 'github_strength', None):
+            gh_raw.update(profile.github.github_strength.model_dump())
+        gh = GitHubEngineeringRanker.calculate(gh_raw)
+    
+        # All three composite modes
+        dsa_mode    = RuleScoreAggregator.calculate_dsa_mode(dsa.total_score, gh.total_score)
+        github_mode = RuleScoreAggregator.calculate_github_mode(dsa.total_score, gh.total_score)
+    
+        cw = custom_weights or {}
+        custom = RuleScoreAggregator.calculate_custom(
+            lc_score=lc.total_score, cc_score=cc.total_score,
+            cf_score=cf.total_score, github_score=gh.total_score,
+            lc_weight=cw.get("lc", 25.0), cc_weight=cw.get("cc", 25.0),
+            cf_weight=cw.get("cf", 25.0), gh_weight=cw.get("gh", 25.0),
+        )
+        
+        # Semantic Fitment (3-Pillar Score)
+        semantic_score_obj = None
+        if job_description:
+            semantic_score_obj = SemanticRanker.calculate_fitment(profile, job_description)
+            fitment_blend = RuleScoreAggregator.calculate_fitment_blend(
+                platform_score=dsa.total_score,
+                behavioral_score=gh.total_score,
+                semantic_score=semantic_score_obj.total_score
+            )
+        else:
+            # Default to 0 if no JD provided
+            fitment_blend = ExplainableScore(0.0, {"error": "No JD provided"})
+            
+        missing_platforms = profile.metadata.missing_platforms if profile.metadata and getattr(profile.metadata, 'missing_platforms', None) else []
+    
+        profile.ranking = {
+            # Individual platform scores
+            "lc_score":  round(lc.total_score, 2),
+            "cc_score":  round(cc.total_score, 2),
+            "cf_score":  round(cf.total_score, 2),
+            "dsa_score": round(dsa.total_score, 2),
+            "github_score_total": round(gh.total_score, 2),
+            "semantic_score": round(semantic_score_obj.total_score, 2) if semantic_score_obj else 0.0,
+    
+            # Composite modes
+            "overall_dsa_mode":    round(dsa_mode.total_score, 2),
+            "overall_github_mode": round(github_mode.total_score, 2),
+            "custom_score":        round(custom.total_score, 2),
+            "fitment_score":       round(fitment_blend.total_score, 2),
+    
+            # Full breakdowns (for detailed UI)
+            "leetcode_score":   lc.to_dict(),
+            "codechef_score":   cc.to_dict(),
+            "codeforces_score": cf.to_dict(),
+            "coding_score":     dsa.to_dict(),
+            "github_score":     gh.to_dict(),
+            "dsa_mode_breakdown":    dsa_mode.to_dict(),
+            "github_mode_breakdown": github_mode.to_dict(),
+            "custom_breakdown":      custom.to_dict(),
+            "semantic_breakdown":    semantic_score_obj.to_dict() if semantic_score_obj else {},
+            "fitment_breakdown":     fitment_blend.to_dict(),
+    
+            # Legacy field kept for backward-compat
+            "total_technical_score": round(dsa_mode.total_score, 2),
+            "missing_platforms": missing_platforms
+        }
+    except Exception as e:
+        import logging
+        logging.error(f"Error in attach_ranking: {e}")
+        profile.ranking = {"error": str(e), "missing_platforms": getattr(profile.metadata, 'missing_platforms', []) if getattr(profile, 'metadata', None) else []}
 
-    # DSA aggregate: LC×0.33 + CC×0.34 + CF×0.33
-    dsa = CodingAggregator.calculate(lc, cf, cc)
-
-    # GitHub score
-    gh_raw = profile.github.model_dump()
-    # Also merge github_strength sub-fields if present
-    if profile.github.github_strength:
-        gh_raw.update(profile.github.github_strength.model_dump())
-    gh = GitHubEngineeringRanker.calculate(gh_raw)
-
-    # All three composite modes
-    dsa_mode    = RuleScoreAggregator.calculate_dsa_mode(dsa.total_score, gh.total_score)
-    github_mode = RuleScoreAggregator.calculate_github_mode(dsa.total_score, gh.total_score)
-
-    cw = custom_weights or {}
-    custom = RuleScoreAggregator.calculate_custom(
-        lc_score=lc.total_score, cc_score=cc.total_score,
-        cf_score=cf.total_score, github_score=gh.total_score,
-        lc_weight=cw.get("lc", 25.0), cc_weight=cw.get("cc", 25.0),
-        cf_weight=cw.get("cf", 25.0), gh_weight=cw.get("gh", 25.0),
-    )
-
-    profile.ranking = {
-        # Individual platform scores
-        "lc_score":  round(lc.total_score, 2),
-        "cc_score":  round(cc.total_score, 2),
-        "cf_score":  round(cf.total_score, 2),
-        "dsa_score": round(dsa.total_score, 2),
-        "github_score_total": round(gh.total_score, 2),
-
-        # Composite modes
-        "overall_dsa_mode":    round(dsa_mode.total_score, 2),
-        "overall_github_mode": round(github_mode.total_score, 2),
-        "custom_score":        round(custom.total_score, 2),
-
-        # Full breakdowns (for detailed UI)
-        "leetcode_score":   lc.to_dict(),
-        "codechef_score":   cc.to_dict(),
-        "codeforces_score": cf.to_dict(),
-        "coding_score":     dsa.to_dict(),
-        "github_score":     gh.to_dict(),
-        "dsa_mode_breakdown":    dsa_mode.to_dict(),
-        "github_mode_breakdown": github_mode.to_dict(),
-        "custom_breakdown":      custom.to_dict(),
-
-        # Legacy field kept for backward-compat
-        "total_technical_score": round(dsa_mode.total_score, 2),
-    }
 
 @app.get("/profiles", response_model=List[StudentProfile])
 async def list_profiles(
@@ -255,6 +289,7 @@ async def list_profiles(
     cc_w: Optional[float] = None,
     cf_w: Optional[float] = None,
     gh_w: Optional[float] = None,
+    job_description: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
@@ -274,7 +309,7 @@ async def list_profiles(
         
     for p in profiles:
         try:
-            attach_ranking(p, custom_weights=custom_weights)
+            attach_ranking(p, custom_weights=custom_weights, job_description=job_description)
         except Exception as e:
             import traceback
             logger.error(f"attach_ranking failed for {p.student_uuid}:\n{traceback.format_exc()}")
@@ -288,6 +323,7 @@ async def get_profile(
     cc_w: Optional[float] = None,
     cf_w: Optional[float] = None,
     gh_w: Optional[float] = None,
+    job_description: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ):
@@ -308,7 +344,7 @@ async def get_profile(
             custom_weights = active_rule.config["platform_weights"]
         
     try:
-        attach_ranking(profile, custom_weights=custom_weights)
+        attach_ranking(profile, custom_weights=custom_weights, job_description=job_description)
     except Exception as e:
         import traceback
         logger.error(f"attach_ranking failed for {student_uuid}:\n{traceback.format_exc()}")

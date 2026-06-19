@@ -39,50 +39,60 @@ def attach_ranking(profile, custom_weights: dict | None = None):
     """
     Extracted from backend.api.main to avoid FastAPI dependency.
     """
-    lc = LeetCodeRanker.calculate(profile.leetcode.model_dump())
-    cf = CodeforcesRanker.calculate(profile.codeforces.model_dump())
-    cc = CodeChefRanker.calculate(profile.codechef.model_dump())
-
-    # DSA aggregate: LC×0.33 + CC×0.34 + CF×0.33
-    dsa = CodingAggregator.calculate(lc, cf, cc)
-
-    # GitHub score
-    gh_raw = profile.github.model_dump()
-    if getattr(profile.github, 'github_strength', None):
-        gh_raw.update(profile.github.github_strength.model_dump())
-    gh = GitHubEngineeringRanker.calculate(gh_raw)
-
-    # All three composite modes
-    dsa_mode    = RuleScoreAggregator.calculate_dsa_mode(dsa.total_score, gh.total_score)
-    github_mode = RuleScoreAggregator.calculate_github_mode(dsa.total_score, gh.total_score)
-
-    cw = custom_weights or {}
-    custom = RuleScoreAggregator.calculate_custom(
-        lc_score=lc.total_score, cc_score=cc.total_score,
-        cf_score=cf.total_score, github_score=gh.total_score,
-        lc_weight=cw.get("lc", 25.0), cc_weight=cw.get("cc", 25.0),
-        cf_weight=cw.get("cf", 25.0), gh_weight=cw.get("gh", 25.0),
-    )
-
-    profile.ranking = {
-        "lc_score":  round(lc.total_score, 2),
-        "cc_score":  round(cc.total_score, 2),
-        "cf_score":  round(cf.total_score, 2),
-        "dsa_score": round(dsa.total_score, 2),
-        "github_score_total": round(gh.total_score, 2),
-        "overall_dsa_mode":    round(dsa_mode.total_score, 2),
-        "overall_github_mode": round(github_mode.total_score, 2),
-        "custom_score":        round(custom.total_score, 2),
-        "leetcode_score":   lc.to_dict(),
-        "codechef_score":   cc.to_dict(),
-        "codeforces_score": cf.to_dict(),
-        "coding_score":     dsa.to_dict(),
-        "github_score":     gh.to_dict(),
-        "dsa_mode_breakdown":    dsa_mode.to_dict(),
-        "github_mode_breakdown": github_mode.to_dict(),
-        "custom_breakdown":      custom.to_dict(),
-        "total_technical_score": round(dsa_mode.total_score, 2),
-    }
+    try:
+        lc_data = profile.leetcode.model_dump() if profile.leetcode else {}
+        cf_data = profile.codeforces.model_dump() if profile.codeforces else {}
+        cc_data = profile.codechef.model_dump() if profile.codechef else {}
+        gh_raw = profile.github.model_dump() if profile.github else {}
+        
+        if getattr(profile, 'github', None) and getattr(profile.github, 'github_strength', None):
+            gh_raw.update(profile.github.github_strength.model_dump())
+            
+        lc = LeetCodeRanker.calculate(lc_data)
+        cf = CodeforcesRanker.calculate(cf_data)
+        cc = CodeChefRanker.calculate(cc_data)
+    
+        # DSA aggregate: LC×0.33 + CC×0.34 + CF×0.33
+        dsa = CodingAggregator.calculate(lc, cf, cc)
+    
+        gh = GitHubEngineeringRanker.calculate(gh_raw)
+    
+        # All three composite modes
+        dsa_mode    = RuleScoreAggregator.calculate_dsa_mode(dsa.total_score, gh.total_score)
+        github_mode = RuleScoreAggregator.calculate_github_mode(dsa.total_score, gh.total_score)
+    
+        cw = custom_weights or {}
+        custom = RuleScoreAggregator.calculate_custom(
+            lc_score=lc.total_score, cc_score=cc.total_score,
+            cf_score=cf.total_score, github_score=gh.total_score,
+            lc_weight=cw.get("lc", 25.0), cc_weight=cw.get("cc", 25.0),
+            cf_weight=cw.get("cf", 25.0), gh_weight=cw.get("gh", 25.0),
+        )
+        
+        missing_platforms = profile.metadata.missing_platforms if profile.metadata and getattr(profile.metadata, 'missing_platforms', None) else []
+    
+        profile.ranking = {
+            "lc_score":  round(lc.total_score, 2),
+            "cc_score":  round(cc.total_score, 2),
+            "cf_score":  round(cf.total_score, 2),
+            "dsa_score": round(dsa.total_score, 2),
+            "github_score_total": round(gh.total_score, 2),
+            "overall_dsa_mode":    round(dsa_mode.total_score, 2),
+            "overall_github_mode": round(github_mode.total_score, 2),
+            "custom_score":        round(custom.total_score, 2),
+            "leetcode_score":   lc.to_dict(),
+            "codechef_score":   cc.to_dict(),
+            "codeforces_score": cf.to_dict(),
+            "coding_score":     dsa.to_dict(),
+            "github_score":     gh.to_dict(),
+            "dsa_mode_breakdown":    dsa_mode.to_dict(),
+            "github_mode_breakdown": github_mode.to_dict(),
+            "custom_breakdown":      custom.to_dict(),
+            "total_technical_score": round(dsa_mode.total_score, 2),
+            "missing_platforms": missing_platforms
+        }
+    except Exception as e:
+        profile.ranking = {"error": str(e), "missing_platforms": getattr(profile.metadata, 'missing_platforms', []) if getattr(profile, 'metadata', None) else []}
 
 passed_tests = 0
 failed_tests = 0
@@ -390,9 +400,14 @@ def test_integration_only_github():
     assert profile.ranking["github_score_total"] > 0.0
 
 def test_integration_bug3_silent_failure():
-    profile = MockStudentProfile(leetcode=None)
-    attach_ranking(profile)
-    assert profile.ranking is not None, "Bug 3: attach_ranking crashed and didn't set ranking"
+    profile = MockStudentProfile()
+    profile.leetcode = None # Explicitly set to None to simulate the bug
+    try:
+        attach_ranking(profile)
+        assert profile.ranking is not None, "Bug 3: attach_ranking didn't crash but didn't set ranking"
+    except AttributeError:
+        # If it crashes, it means the silent failure bug exists in attach_ranking itself (no internal try-catch)
+        assert False, "Bug 3: attach_ranking crashed with AttributeError due to missing try/catch"
 
 def test_integration_github_strength_none():
     profile = MockStudentProfile()
