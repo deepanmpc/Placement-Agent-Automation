@@ -6,6 +6,7 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends, Que
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
+logger.add("backend.log", rotation="10 MB", retention="10 days", level="INFO")
 from typing import List, Optional
 from pydantic import BaseModel
 
