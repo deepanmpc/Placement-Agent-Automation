@@ -7,6 +7,7 @@ import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
 const MODE_LABELS: Record<ScoringMode, string> = {
   dsa_mode: 'DSA Mode',
   github_mode: 'GH Mode',
+  fitment_mode: 'Fitment Mode',
   custom: 'Custom',
 };
 
@@ -48,8 +49,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
 
   const getCandidateScore = (p: Profile): number => {
     if (!p.ranking) return 0;
-    const activeJd = localStorage.getItem('active_jd');
-    if (activeJd && p.ranking.fitment_score !== undefined) {
+    if (scoringMode === 'fitment_mode' && p.ranking?.fitment_score !== undefined) {
       return p.ranking.fitment_score;
     }
     return scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
@@ -83,7 +83,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const allFilteredSelected = filteredProfiles.length > 0 && filteredProfiles.every(p => selectedIds.has(p.student_uuid));
 
   const fetchProfiles = () => {
-    let query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}`;
+    let query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}&sm_w=${customWeights.sm || 0}`;
     const activeJd = localStorage.getItem('active_jd');
     if (activeJd) {
       query += `&job_description=${encodeURIComponent(activeJd)}`;
@@ -149,7 +149,15 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
     try {
       const payload = selectedIds.size > 0 
         ? { student_uuids: Array.from(selectedIds), batch_size: selectedIds.size, reset }
-        : { batch_size: 10, reset };
+        : { student_uuids: filteredProfiles.map(p => p.student_uuid), batch_size: filteredProfiles.length || 1, reset };
+
+      if (payload.student_uuids.length === 0) {
+        alert('No candidates found to extract data for in the current view.');
+        setEnriching(false);
+        wasActiveRef.current = false;
+        setExtractionJob(null);
+        return;
+      }
         
       await fetch('http://localhost:8000/profiles/batch-enrich', { 
         method: 'POST',
@@ -357,18 +365,18 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   return (
     <div className="page">
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
+        <div style={{ flex: '1 1 300px', minWidth: 0 }}>
           <h1>Ingested Profiles Dashboard</h1>
           <p className="page-subtitle" style={{ marginBottom: '0.4rem' }}>
             {profiles.length} total students ingested in {activeBatch === 'all' ? 'All Batches' : activeBatch}
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
             <span style={{ padding: '0.2rem 0.5rem', background: 'var(--bg)', borderRadius: '4px', border: '1px solid var(--border)' }}>
               Mode: <span style={{ color: 'var(--accent)' }}>{MODE_LABELS[scoringMode] || scoringMode}</span>
             </span>
             {scoringMode === 'custom' && (
               <span style={{ padding: '0.2rem 0.5rem', background: 'var(--bg)', borderRadius: '4px', border: '1px solid var(--border)' }}>
-                Weights: LC {customWeights.lc}% &middot; CC {customWeights.cc}% &middot; CF {customWeights.cf}% &middot; GH {customWeights.gh}%
+                Weights: LC {customWeights.lc}% &middot; CC {customWeights.cc}% &middot; CF {customWeights.cf}% &middot; GH {customWeights.gh}% &middot; SM {customWeights.sm || 0}%
               </span>
             )}
           </div>
@@ -383,7 +391,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             Switch Batch
           </a>
           <a
-            onClick={(e) => { e.preventDefault(); onNavigate('scoring-config'); }}
+            onClick={(e) => { e.preventDefault(); window.location.href = 'http://localhost:5173/github.com/deepanmpc?page=jd-input'; }}
             style={{ fontSize: '0.85rem', color: 'var(--accent)', cursor: 'pointer', textDecoration: 'none', fontWeight: 700, marginRight: '1rem' }}
             onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
             onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
@@ -767,14 +775,14 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
                     {p.ranking ? (
                       <>
                         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'right', marginBottom: '0.1rem' }}>
-                          {localStorage.getItem('active_jd') ? (
+                          {scoringMode === 'fitment_mode' ? (
                             <span style={{ color: 'var(--accent)' }}>✨ Fitment Score (RAG)</span>
                           ) : (
                             MODE_LABELS[scoringMode]
                           )}
                         </div>
                         <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1 }}>
-                          {localStorage.getItem('active_jd') && p.ranking.fitment_score !== undefined
+                          {scoringMode === 'fitment_mode' && p.ranking.fitment_score !== undefined
                             ? p.ranking.fitment_score
                             : scoringMode === 'dsa_mode' ? p.ranking.overall_dsa_mode
                             : scoringMode === 'github_mode' ? p.ranking.overall_github_mode
@@ -786,6 +794,11 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
                           {(p.ranking.cc_score ?? 0) > 0 && <span>CC: {p.ranking.cc_score}</span>}
                           {(p.ranking.cf_score ?? 0) > 0 && <span>CF: {p.ranking.cf_score}</span>}
                           {(p.ranking.github_score_total ?? 0) > 0 && <span>GH: {p.ranking.github_score_total}</span>}
+                          {p.ranking.semantic_score !== undefined && p.ranking.semantic_score > 0 && (localStorage.getItem('active_jd') || scoringMode === 'fitment_mode') && (
+                            <span style={{ color: 'var(--accent)', fontWeight: 700, background: 'rgba(0, 240, 255, 0.1)', padding: '0 0.25rem', borderRadius: '4px' }}>
+                              SEM: {p.ranking.semantic_score}
+                            </span>
+                          )}
                         </div>
                       </>
                     ) : (
