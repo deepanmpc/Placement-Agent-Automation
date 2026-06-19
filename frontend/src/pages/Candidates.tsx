@@ -391,7 +391,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
             Switch Batch
           </a>
           <a
-            onClick={(e) => { e.preventDefault(); window.location.href = 'http://localhost:5173/github.com/deepanmpc?page=jd-input'; }}
+            onClick={(e) => { e.preventDefault(); onNavigate('jd-input'); }}
             style={{ fontSize: '0.85rem', color: 'var(--accent)', cursor: 'pointer', textDecoration: 'none', fontWeight: 700, marginRight: '1rem' }}
             onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
             onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
