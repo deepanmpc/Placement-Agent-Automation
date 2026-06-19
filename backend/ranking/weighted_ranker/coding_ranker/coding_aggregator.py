@@ -20,31 +20,25 @@ class CodingAggregator:
         cf_score: ExplainableScore,
         cc_score: ExplainableScore
     ) -> ExplainableScore:
-        available = {}
-        if lc_score and lc_score.total_score > 0:
-            available["leetcode"] = lc_score.total_score
-        if cc_score and cc_score.total_score > 0:
-            available["codechef"] = cc_score.total_score
-        if cf_score and cf_score.total_score > 0:
-            available["codeforces"] = cf_score.total_score
+        
+        scores = {
+            "leetcode":   lc_score.total_score if lc_score else 0.0,
+            "codechef":   cc_score.total_score if cc_score else 0.0,
+            "codeforces": cf_score.total_score if cf_score else 0.0,
+        }
 
-        if not available:
-            return ExplainableScore(0.0, {})
-
-        # Normalize weights to available platforms
-        total_weight = sum(cls.WEIGHTS[k] for k in available)
         breakdowns = {}
         final_score = 0.0
 
-        for k, val in available.items():
-            adj_weight = cls.WEIGHTS[k] / total_weight
-            contrib = val * adj_weight
+        for k, val in scores.items():
+            fixed_weight = cls.WEIGHTS[k]
+            contrib = val * fixed_weight
             final_score += contrib
             breakdowns[k] = {
                 "raw_value": round(val, 2),
-                "fixed_weight": cls.WEIGHTS[k],
-                "adjusted_weight": round(adj_weight, 4),
-                "formula": f"{round(val,2)} × {round(adj_weight,4)}",
+                "fixed_weight": fixed_weight,
+                "adjusted_weight": fixed_weight,
+                "formula": f"{round(val,2)} × {fixed_weight}",
                 "contribution": round(contrib, 2)
             }
 
