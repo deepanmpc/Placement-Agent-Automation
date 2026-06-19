@@ -63,24 +63,28 @@ class PlatformSyncService:
         if isinstance(github_result, Exception):
             logger.error(f"GitHub collection exception: {github_result}")
             failed_platforms.append("github")
-        elif github_result is not None:
+        elif github_result is not None and github_result.username and (github_result.public_repos > 0 or github_result.total_stars > 0 or github_result.followers > 0):
             old_snapshots = record.github_profile.get("snapshots", []) if record.github_profile else []
             # Prevent duplicate snapshots for the same day
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "public_repos": github_result.public_repos, "total_stars": github_result.total_stars})
             github_result.snapshots = old_snapshots
             record.github_profile = github_result.model_dump(mode="json")
+        elif github_result is not None:
+            logger.warning(f"GitHub returned empty profile for {record.github_url}, keeping existing data")
             
         # Process LeetCode
         if isinstance(leetcode_result, Exception):
             logger.error(f"LeetCode collection exception: {leetcode_result}")
             failed_platforms.append("leetcode")
-        elif leetcode_result is not None:
+        elif leetcode_result is not None and leetcode_result.username and (leetcode_result.total_solved > 0 or leetcode_result.rating > 0 or leetcode_result.easy_solved > 0):
             old_snapshots = record.leetcode_profile.get("snapshots", []) if record.leetcode_profile else []
             if not any(s.get("date") == today for s in old_snapshots):
                 old_snapshots.append({"date": today, "rating": leetcode_result.rating, "total_solved": leetcode_result.total_solved})
             leetcode_result.snapshots = old_snapshots
             record.leetcode_profile = leetcode_result.model_dump(mode="json")
+        elif leetcode_result is not None:
+            logger.warning(f"LeetCode returned empty profile for {record.leetcode_username}, keeping existing data")
             
         # Process Codeforces
         if isinstance(codeforces_result, Exception):
