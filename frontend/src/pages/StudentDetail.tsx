@@ -35,7 +35,11 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
 
   useEffect(() => {
     if (!studentId) return;
-    const query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}&sm_w=${customWeights.sm || 0}`;
+    let query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}&sm_w=${customWeights.sm || 0}`;
+    const activeJd = localStorage.getItem('active_jd');
+    if (activeJd) {
+      query += `&job_description=${encodeURIComponent(activeJd)}`;
+    }
     fetch(`http://localhost:8000/profiles/${studentId}${query}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
@@ -52,7 +56,11 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
     if (!studentId) return;
     setEnriching(true);
     try {
-      const query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}&sm_w=${customWeights.sm || 0}`;
+      let query = `?lc_w=${customWeights.lc}&cc_w=${customWeights.cc}&cf_w=${customWeights.cf}&gh_w=${customWeights.gh}&sm_w=${customWeights.sm || 0}`;
+      const activeJd = localStorage.getItem('active_jd');
+      if (activeJd) {
+        query += `&job_description=${encodeURIComponent(activeJd)}`;
+      }
       const response = await fetch(`http://localhost:8000/candidates/${studentId}/sync-platforms${query}`, { method: 'POST' });
       if (!response.ok) throw new Error('Failed to enrich');
       const data = await response.json();
@@ -500,28 +508,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                     )}
                   </div>
 
-                  {/* Fitment Blend Breakdown */}
-                  {r.fitment_breakdown && !r.fitment_breakdown.error && (
-                    <div className="detail-card" style={{ borderColor: 'rgba(168,85,247,0.4)' }}>
-                      <h3 style={{ color: '#a855f7', borderBottom: '1px solid rgba(168,85,247,0.2)', paddingBottom: '0.5rem' }}>Semantic Mode Blend</h3>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.82rem', marginTop: '0.5rem' }}>
-                        {Object.entries(r.fitment_breakdown).map(([key, bd]: [string, any]) => (
-                          <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: 'var(--text-primary)', textTransform: 'capitalize', fontWeight: 600 }}>
-                              {key.replace(/_/g, ' ')} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({Math.round((bd.weight_pct ?? bd.weight ?? 0) * (bd.weight_pct > 1 ? 1 : 100))}%)</span>
-                            </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <div style={{ width: 60, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${Math.min(bd.raw_value ?? 0, 100)}%`, background: '#a855f7', borderRadius: 3 }} />
-                              </div>
-                              <strong style={{ color: '#a855f7', minWidth: 32 }}>{bd.raw_value ?? 0}</strong>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+
               )}
 
               {/* Row 4: Detailed Extracted Live Metrics Container */}
