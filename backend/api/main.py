@@ -366,6 +366,7 @@ class ProfileUpdateRequest(BaseModel):
     leetcode_username: Optional[str] = None
     codeforces_username: Optional[str] = None
     codechef_username: Optional[str] = None
+    graduation_year: Optional[int] = None
 
 @app.put("/profiles/{student_uuid}")
 async def update_profile(
@@ -388,6 +389,11 @@ async def update_profile(
     if req.leetcode_username is not None: profile.personal_info.leetcode_username = req.leetcode_username
     if req.codeforces_username is not None: profile.personal_info.codeforces_username = req.codeforces_username
     if req.codechef_username is not None: profile.personal_info.codechef_username = req.codechef_username
+    if req.graduation_year is not None:
+        if not profile.education:
+            from backend.ingestion.models.student_profile import Education
+            profile.education = Education()
+        profile.education.graduation_year = req.graduation_year
 
     from backend.database.repository import StudentRepository
     repo = StudentRepository(db)
@@ -433,11 +439,21 @@ async def update_profile_resume(
         # Merge the new resume data into the existing profile
         merged_profile = service.merger.merge_resume_data(resume_data)
         
+        # Preserve old graduation year if not found in new resume
+        old_grad_year = profile.education.graduation_year if profile.education else None
+        
         # We only want to override education, skills, projects, and metadata.resume_file
         # We KEEP the personal_info, leetcode, github, codeforces, codechef data intact
         profile.education = merged_profile.education
         profile.skills = merged_profile.skills
         profile.projects = merged_profile.projects
+        
+        # Restore old graduation year unconditionally if it existed
+        if old_grad_year:
+            if not profile.education:
+                from backend.ingestion.models.student_profile import Education
+                profile.education = Education()
+            profile.education.graduation_year = old_grad_year
         
         # Also if the user hasn't set their personal info fields manually, we might want to update them
         if not profile.personal_info.phone and merged_profile.personal_info.phone:

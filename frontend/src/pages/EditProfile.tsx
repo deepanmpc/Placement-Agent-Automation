@@ -17,6 +17,7 @@ export default function EditProfile() {
   const [leetcode, setLeetcode] = useState('');
   const [codeforces, setCodeforces] = useState('');
   const [codechef, setCodechef] = useState('');
+  const [batch, setBatch] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,6 +55,7 @@ export default function EditProfile() {
       setLeetcode(found.personal_info?.leetcode_username || '');
       setCodeforces(found.personal_info?.codeforces_username || '');
       setCodechef(found.personal_info?.codechef_username || '');
+      setBatch(found.education?.graduation_year?.toString() || '');
       setStep(2);
     } else {
       setError('Student not found with this ID Number.');
@@ -74,7 +76,8 @@ export default function EditProfile() {
         github_url: github,
         leetcode_username: leetcode,
         codeforces_username: codeforces,
-        codechef_username: codechef
+        codechef_username: codechef,
+        graduation_year: batch ? parseInt(batch, 10) : null
       };
       
       const res = await fetch(`http://localhost:8000/profiles/${studentUuid}`, {
@@ -161,6 +164,9 @@ export default function EditProfile() {
                 
                 <label style={labelStyle}>ID Number</label>
                 <input type="text" value={idNumber} onChange={e => setIdNumber(e.target.value)} style={inputStyle} />
+                
+                <label style={labelStyle}>Graduation Batch</label>
+                <input type="number" value={batch} onChange={e => setBatch(e.target.value)} style={inputStyle} />
                 
                 <label style={labelStyle}>Email</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
