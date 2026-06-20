@@ -93,18 +93,15 @@ export default function App() {
   }, [customWeights]);
 
   useEffect(() => {
-    fetch('http://localhost:9090/api/config')
+    fetch('http://localhost:8000/scoring-rules')
       .then(r => r.json())
       .then(res => {
-        if (res.data) {
-          if (res.data.SCORING_MODE) {
-            setScoringMode(res.data.SCORING_MODE as ScoringMode);
+        if (res && res.config) {
+          if (res.config.active_mode) {
+            setScoringMode(res.config.active_mode as ScoringMode);
           }
-          if (res.data.CUSTOM_WEIGHTS) {
-            try {
-              const cw = JSON.parse(res.data.CUSTOM_WEIGHTS);
-              setCustomWeights(cw);
-            } catch (e) {}
+          if (res.config.platform_weights) {
+            setCustomWeights(res.config.platform_weights);
           }
         }
       })
@@ -112,29 +109,16 @@ export default function App() {
   }, []);
 
   const saveConfig = () => {
-    fetch('http://localhost:9090/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        SCORING_MODE: scoringMode,
-        CUSTOM_WEIGHTS: JSON.stringify(customWeights)
-      })
-    }).catch(console.error);
-
     fetch('http://localhost:8000/scoring-rules')
       .then(res => res.json())
       .then(rules => {
          const newRule = {
-             ...rules,
-             active_mode: scoringMode,
-             custom_weights: customWeights,
-             dsa_weights: {
-                 ...rules.dsa_weights,
-                 mode: scoringMode
-             },
-             github_weights: {
-                 ...rules.github_weights,
-                 mode: scoringMode
+             name: "Updated Configuration",
+             is_active: true,
+             config: {
+                 ...(rules.config || {}),
+                 active_mode: scoringMode,
+                 platform_weights: customWeights
              }
          };
          return fetch('http://localhost:8000/scoring-rules', {

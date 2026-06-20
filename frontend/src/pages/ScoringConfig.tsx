@@ -38,11 +38,22 @@ const FORMULA_CONFIGS: Record<ScoringMode, ModeUIConfig> = {
       { name: 'DSA Aggregate (LC, CC, CF)', weight: '40%' },
     ],
   },
+  fitment_mode: {
+    title: 'Semantic Mode',
+    color: '#a855f7',
+    desc: 'Combines traditional metrics (DSA & GitHub) with an AI-driven Semantic Match against the provided Job Description.',
+    formula: 'Score = DSA × 0.35 + GH × 0.40 + Semantic × 0.25',
+    components: [
+      { name: 'DSA Aggregate', weight: '35%' },
+      { name: 'GitHub Engineering', weight: '40%' },
+      { name: 'Semantic/JD Match', weight: '25%' },
+    ],
+  },
   custom: {
     title: 'Custom Mode',
     color: 'var(--accent)',
     desc: 'Fully customizable scoring weights. Set individual platform weights to customize evaluations according to your requirements.',
-    formula: 'Score = LC × W_LC + CC × W_CC + CF × W_CF + GH × W_GH',
+    formula: 'Score = LC × W_LC + CC × W_CC + CF × W_CF + GH × W_GH + SM × W_SM',
     components: [
       { name: 'User Defined Allocations', weight: '100% Total' },
     ],
@@ -112,7 +123,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
       .catch(err => console.error("Could not fetch scoring rules:", err));
   }, []);
 
-  const weightSum = customWeights.lc + customWeights.cc + customWeights.cf + customWeights.gh;
+  const weightSum = customWeights.lc + customWeights.cc + customWeights.cf + customWeights.gh + (customWeights.sm || 0);
   const validWeights = Math.abs(weightSum - 100) < 0.01;
 
   const setWeight = (key: keyof CustomWeights, val: number) => {
@@ -166,7 +177,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
             Overall Ranking Mode Selection
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
-            {(['dsa_mode', 'github_mode', 'custom'] as ScoringMode[]).map(m => {
+            {(['dsa_mode', 'github_mode', 'fitment_mode', 'custom'] as ScoringMode[]).map(m => {
               const f = FORMULA_CONFIGS[m];
               const isActive = scoringMode === m;
               return (
@@ -270,7 +281,8 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
                 { key: 'lc', label: 'LeetCode (LC)', color: 'var(--accent)' },
                 { key: 'cc', label: 'CodeChef (CC)', color: 'var(--accent)' },
                 { key: 'cf', label: 'Codeforces (CF)', color: 'var(--accent)' },
-                { key: 'gh', label: 'GitHub (GH)', color: 'var(--accent)' }
+                { key: 'gh', label: 'GitHub (GH)', color: 'var(--accent)' },
+                { key: 'sm', label: 'Semantic (SM)', color: '#a855f7' }
               ].map(item => {
                 const sumOfOthers = (Object.keys(customWeights) as (keyof CustomWeights)[])
                   .filter(k => k !== item.key)
