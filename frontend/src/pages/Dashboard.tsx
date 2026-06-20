@@ -1,5 +1,4 @@
-import { PIPELINE_STAGES, MOCK_JD } from '../data/mockData';
-import StageCard from '../components/StageCard';
+import { MOCK_JD } from '../data/mockData';
 
 export default function Dashboard() {
   return (
@@ -11,13 +10,8 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-        gap: '2rem',
-        alignItems: 'start'
-      }}>
-        {/* Left Column: Job Description Summary */}
+      <div style={{ maxWidth: '800px' }}>
+        {/* Job Description Summary */}
         <div style={{
           background: 'var(--card-bg)',
           border: '1px solid var(--border)',
@@ -144,36 +138,6 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Right Column: Pipeline flow */}
-        <div>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-              Pipeline Progress
-            </h3>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '0.2rem 0 0' }}>
-              Stages executed to ingest resumes, screen, and calculate matching scores.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-            {PIPELINE_STAGES.map((stage, idx) => (
-              <div key={stage.id} style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                <StageCard stage={stage} index={idx} />
-                {idx < PIPELINE_STAGES.length - 1 && (
-                  <div style={{
-                    width: '2px',
-                    height: '24px',
-                    marginLeft: '36px',
-                    background: stage.status === 'completed' ? '#10B981' : stage.status === 'active' ? 'var(--accent)' : 'var(--border)',
-                    opacity: stage.status === 'future' ? 0.3 : 1,
-                    transition: 'all 0.25s ease'
-                  }} />
-                )}
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
