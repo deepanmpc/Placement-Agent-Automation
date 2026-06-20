@@ -7,7 +7,7 @@ import type { ScoringMode, CustomWeights } from '../components/ScoringSettings';
 const MODE_LABELS: Record<ScoringMode, string> = {
   dsa_mode: 'DSA Mode',
   github_mode: 'GH Mode',
-  fitment_mode: 'Fitment Mode',
+  fitment_mode: '🧠 Semantic Mode',
   custom: 'Custom',
 };
 

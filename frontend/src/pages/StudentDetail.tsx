@@ -141,12 +141,15 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
             {s.ranking && (
               <div style={{ padding: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '12px', textAlign: 'right' }}>
                 <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>
-                  {scoringMode === 'dsa_mode' ? 'DSA Mode' : scoringMode === 'github_mode' ? 'GitHub Mode' : 'Custom Weights'} Score
+                  {scoringMode === 'dsa_mode' ? 'DSA Mode'
+                   : scoringMode === 'github_mode' ? 'GitHub Mode'
+                   : scoringMode === 'fitment_mode' ? 'Semantic Mode'
+                   : 'Custom Weights'} Score
                 </div>
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent)' }}>
-                  {scoringMode === 'dsa_mode' ? s.ranking.overall_dsa_mode 
-                   : scoringMode === 'github_mode' ? s.ranking.overall_github_mode 
-                   : scoringMode === 'fitment_mode' ? s.ranking.fitment_score ?? 0
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: scoringMode === 'fitment_mode' ? '#a855f7' : 'var(--accent)' }}>
+                  {scoringMode === 'dsa_mode' ? s.ranking.overall_dsa_mode
+                   : scoringMode === 'github_mode' ? s.ranking.overall_github_mode
+                   : scoringMode === 'fitment_mode' ? (s.ranking.fitment_score ?? 0)
                    : (s.ranking.custom_score ?? s.ranking.total_technical_score)}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/100</span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>
@@ -233,25 +236,25 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
         {s.ranking && (() => {
           const r = s.ranking;
           const isFitmentActive = scoringMode === 'fitment_mode';
-          
-          const activeScore = isFitmentActive && r.fitment_score !== undefined ? r.fitment_score
+
+          const activeScore = isFitmentActive ? (r.fitment_score ?? 0)
             : scoringMode === 'dsa_mode' ? r.overall_dsa_mode
             : scoringMode === 'github_mode' ? r.overall_github_mode
-            : r.custom_score ?? r.total_technical_score;
-            
-          const activeLabel = scoringMode === 'fitment_mode' ? 'Fitment Mode'
+            : (r.custom_score ?? r.total_technical_score);
+
+          const activeLabel = scoringMode === 'fitment_mode' ? 'Semantic Mode'
             : scoringMode === 'dsa_mode' ? 'DSA Mode'
             : scoringMode === 'github_mode' ? 'GitHub Mode' : 'Custom Mode';
-            
-          const activeColor = 'var(--accent)';
-          
+
+          const activeColor = isFitmentActive ? '#a855f7' : 'var(--accent)';
+
           const activeFormula = scoringMode === 'fitment_mode'
-            ? `DSA(${r.dsa_score}) × 0.40  +  GH(${r.github_score_total}) × 0.35  +  Semantic × 0.25`
+            ? `DSA(${r.dsa_score}) × 0.35  +  GH(${r.github_score_total}) × 0.40  +  Semantic(${r.semantic_score ?? 0}) × 0.25`
             : scoringMode === 'dsa_mode'
             ? `DSA(${r.dsa_score}) × 0.60  +  GH(${r.github_score_total}) × 0.40`
             : scoringMode === 'github_mode'
             ? `GH(${r.github_score_total}) × 0.60  +  DSA(${r.dsa_score}) × 0.40`
-            : `(LC×${customWeights.lc} + CC×${customWeights.cc} + CF×${customWeights.cf} + GH×${customWeights.gh} + SM×${customWeights.sm || 0}) / 100`;
+            : `(LC×${customWeights.lc}+CC×${customWeights.cc}+CF×${customWeights.cf}+GH×${customWeights.gh}+SM×${customWeights.sm ?? 0})/100 = ${r.custom_score ?? 0}`;
 
           return (
             <div style={{ marginTop: '2rem' }}>
@@ -277,14 +280,16 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                   <h3 style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>All Scoring Modes</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {[
-                      { key: 'dsa_mode', label: 'Overall DSA Mode', score: r.overall_dsa_mode,
-                        formula: `(DSA×0.60) + (GH×0.40)` },
-                      { key: 'github_mode', label: 'Overall GitHub Mode', score: r.overall_github_mode,
-                        formula: `(GH×0.60) + (DSA×0.40)` },
-                      { key: 'fitment_mode', label: 'Fitment Mode', score: r.fitment_score,
-                        formula: `DSA(40%) + GH(35%) + SM(25%)` },
-                      { key: 'custom', label: 'Custom Score', score: r.custom_score,
-                        formula: `(LC×${customWeights.lc}+CC×${customWeights.cc}+CF×${customWeights.cf}+GH×${customWeights.gh}+SM×${customWeights.sm || 0})/100` },
+                      { key: 'dsa_mode', label: 'DSA Mode', score: r.overall_dsa_mode,
+                        formula: `DSA(${r.dsa_score})×0.60 + GH(${r.github_score_total})×0.40` },
+                      { key: 'github_mode', label: 'GitHub Mode', score: r.overall_github_mode,
+                        formula: `GH(${r.github_score_total})×0.60 + DSA(${r.dsa_score})×0.40` },
+                      { key: 'fitment_mode', label: '🧠 Semantic Mode', score: r.fitment_score ?? 0,
+                        formula: `DSA(35%) + GH(40%) + SM(${r.semantic_score ?? 0})(25%)` },
+                      { key: 'custom', label: 'Custom Score', score: r.custom_score ?? 0,
+                        formula: `LC×${customWeights.lc}+CC×${customWeights.cc}+CF×${customWeights.cf}+GH×${customWeights.gh}+SM×${customWeights.sm ?? 0}` },
+                      { key: '_semantic_raw', label: 'Raw Semantic Score', score: r.semantic_score ?? 0,
+                        formula: `JD cosine-similarity match across skills+projects+edu+gh` },
                     ].map(item => (
                       <button
                         key={item.key}
@@ -449,6 +454,75 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                   </div>
                 </div>
               </div>
+
+              {/* Semantic/Fitment Score Card */}
+              {(r.fitment_score !== undefined || r.semantic_score !== undefined) && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                  <div className="detail-card" style={{ borderColor: 'rgba(168,85,247,0.4)' }}>
+                    <h3 style={{ color: '#a855f7', borderBottom: '1px solid rgba(168,85,247,0.2)', paddingBottom: '0.5rem' }}>🧠 Semantic / JD Fitment</h3>
+                    <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', margin: '0.75rem 0 1rem' }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: '#a855f7' }}>{r.semantic_score ?? 0}<span style={{ fontSize: '0.8rem', opacity: 0.6 }}>/100</span></div>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Raw Semantic</div>
+                      </div>
+                      <div style={{ width: '1px', background: 'var(--border)' }} />
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: '#a855f7' }}>{r.fitment_score ?? 0}<span style={{ fontSize: '0.8rem', opacity: 0.6 }}>/100</span></div>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Semantic Mode Score</div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', fontFamily: 'monospace', background: 'rgba(168,85,247,0.05)', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.2)', marginBottom: '0.75rem', color: 'var(--text-muted)' }}>
+                      Semantic Mode = DSA({r.dsa_score})×0.35 + GH({r.github_score_total})×0.40 + SM({r.semantic_score ?? 0})×0.25
+                    </div>
+                    {r.semantic_breakdown && Object.keys(r.semantic_breakdown).length > 0 && !r.semantic_breakdown.error && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.78rem' }}>
+                        <div style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>JD Match by Chunk</div>
+                        {Object.entries(r.semantic_breakdown).map(([chunkKey, bd]: [string, any]) => (
+                          <div key={chunkKey} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.25rem 0' }}>
+                            <span style={{ color: 'var(--text-primary)', textTransform: 'capitalize', fontWeight: 500 }}>
+                              {chunkKey.replace(/_/g, ' ')}
+                              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: '0.35rem' }}>×{bd.weight}</span>
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{ width: 60, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${Math.min(bd.similarity_score ?? 0, 100)}%`, background: '#a855f7', borderRadius: 3 }} />
+                              </div>
+                              <strong style={{ color: '#a855f7', minWidth: 32, textAlign: 'right' }}>{bd.similarity_score ?? 0}%</strong>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {(!r.semantic_breakdown || r.semantic_breakdown.error) && (
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center', padding: '0.5rem' }}>
+                        {r.semantic_breakdown?.error || 'Paste a Job Description in the JD page to activate semantic scoring.'}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Fitment Blend Breakdown */}
+                  {r.fitment_breakdown && !r.fitment_breakdown.error && (
+                    <div className="detail-card" style={{ borderColor: 'rgba(168,85,247,0.4)' }}>
+                      <h3 style={{ color: '#a855f7', borderBottom: '1px solid rgba(168,85,247,0.2)', paddingBottom: '0.5rem' }}>Semantic Mode Blend</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.82rem', marginTop: '0.5rem' }}>
+                        {Object.entries(r.fitment_breakdown).map(([key, bd]: [string, any]) => (
+                          <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ color: 'var(--text-primary)', textTransform: 'capitalize', fontWeight: 600 }}>
+                              {key.replace(/_/g, ' ')} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({Math.round((bd.weight_pct ?? bd.weight ?? 0) * (bd.weight_pct > 1 ? 1 : 100))}%)</span>
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{ width: 60, height: 5, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${Math.min(bd.raw_value ?? 0, 100)}%`, background: '#a855f7', borderRadius: 3 }} />
+                              </div>
+                              <strong style={{ color: '#a855f7', minWidth: 32 }}>{bd.raw_value ?? 0}</strong>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Row 4: Detailed Extracted Live Metrics Container */}
               <div style={{ marginTop: '2rem' }}>
