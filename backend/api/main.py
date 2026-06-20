@@ -233,6 +233,15 @@ def attach_ranking(profile: StudentProfile, custom_weights: dict = None, job_des
         else:
             # Default to 0 if no JD provided
             fitment_blend = ExplainableScore(0.0, {"error": "No JD provided"})
+
+        cw = custom_weights or {}
+        custom = RuleScoreAggregator.calculate_custom(
+            lc_score=lc.total_score, cc_score=cc.total_score,
+            cf_score=cf.total_score, github_score=gh.total_score,
+            semantic_score=semantic_score_obj.total_score if semantic_score_obj else 0.0,
+            lc_weight=cw.get("lc", 20.0), cc_weight=cw.get("cc", 20.0),
+            cf_weight=cw.get("cf", 20.0), gh_weight=cw.get("gh", 20.0), sm_weight=cw.get("sm", 20.0)
+        )
             
         cw = custom_weights or {}
         custom = RuleScoreAggregator.calculate_custom(

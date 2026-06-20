@@ -236,52 +236,60 @@ class ResumeExtractor:
             data.skills = unique_skills
             data.confidence.skills = 0.8
 
+        # Parse Projects
         if sections["PROJECT"]:
-            proj_lines = [l.strip() for l in sections["PROJECT"].split('\n') if l.strip()]
-            projects = []
-            current_proj = None
-            i = 0
-            while i < len(proj_lines):
-                line = proj_lines[i]
-                is_bullet = bool(re.match(r'^[\•\-\*]', line))
-                has_tech = '·' in line or '|' in line
-                is_date = bool(re.search(r'\b(20\d{2}|present)\b', line, re.IGNORECASE)) and len(line) < 40
+            lines = [l.strip() for l in sections["PROJECT"].split('\n') if l.strip()]
+            project_blocks = []
+            current_block = []
+            
+            for line in lines:
+                is_bullet = line.startswith('•') or line.startswith('-') or line.startswith('*')
+                has_bullets_in_block = any(l.startswith('•') or l.startswith('-') or l.startswith('*') for l in current_block)
                 
-                is_title = False
-                if not is_bullet and not has_tech and not is_date and len(line) < 150:
-                    if i + 1 < len(proj_lines):
-                        nxt = proj_lines[i+1]
-                        if '·' in nxt or '|' in nxt or (bool(re.search(r'\b(20\d{2}|present)\b', nxt, re.IGNORECASE)) and len(nxt) < 40):
-                            is_title = True
-                        elif len(nxt) < 100 and not bool(re.match(r'^[\•\-\*]', nxt)):
-                            if i + 2 < len(proj_lines):
-                                nxt2 = proj_lines[i+2]
-                                if '·' in nxt2 or '|' in nxt2 or (bool(re.search(r'\b(20\d{2}|present)\b', nxt2, re.IGNORECASE)) and len(nxt2) < 40):
-                                    is_title = True
+                # Check if this line looks like a new project title
+                # If we've seen bullets, and now we see a line that doesn't start with a bullet,
+                # it's likely a new project UNLESS it's a lowercase continuation line or very long.
+                # Project titles are typically short-ish and start with a capital letter and don't end with a period.
+                if not is_bullet and has_bullets_in_block:
+                    if len(line) < 150 and re.match(r'^[A-Z0-9]', line):
+                        if not line.endswith('.') and not line.endswith(';') and not line.endswith(','):
+                            # Likely a new project title
+                            project_blocks.append(current_block)
+                            current_block = []
+                        
+                current_block.append(line)
+                
+            if current_block:
+                project_blocks.append(current_block)
 
-                if is_title:
-                    if current_proj and current_proj.title:
-                        projects.append(current_proj)
-                    current_proj = Project()
-                    current_proj.title = line
-                    current_proj.description = ""
-                elif current_proj:
-                    if has_tech:
-                        current_proj.technologies.extend([t.strip() for t in re.split(r'[·|]', line) if t.strip()])
-                    elif is_bullet:
-                        clean_bullet = re.sub(r'^[\•\-\*]\s*', '', line)
-                        current_proj.achievements.append(clean_bullet)
-                        current_proj.description += clean_bullet + " "
-                    else:
-                        if not is_date:
-                            if current_proj.achievements:
-                                current_proj.achievements[-1] += " " + line
-                            current_proj.description += " " + line
-                i += 1
+            for block in project_blocks:
+                if not block: continue
+                proj = Project()
+                proj.title = block[0][:100]
+                
+                desc_lines = []
+                achievements = []
+                technologies = []
+                for line in block[1:]:
+                    if line.startswith('•') or line.startswith('-') or line.startswith('*'):
+                        clean_line = re.sub(r'^[\•\-\*\s]+', '', line)
+                        achievements.append(clean_line)
+                    elif '·' in line or '|' in line or (' ' in line and any(tech in line.lower() for tech in ['python', 'java', 'react', 'node', 'sql', 'css', 'html', 'c++'])):
+                        techs = re.split(r'[·|,-]', line)
+                        technologies.extend([t.strip() for t in techs if t.strip() and len(t.strip()) < 30])
+                    elif not re.match(r'^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|\d{4})', line, re.IGNORECASE):
+                        desc_lines.append(line)
+                
+                # Combine bullet points into the description if desc_lines is empty
+                if not desc_lines and achievements:
+                    desc_lines = achievements
 
-            if current_proj and current_proj.title:
-                projects.append(current_proj)
-            data.projects = projects
+                proj.description = " ".join(desc_lines)[:1500] if desc_lines else ""
+                proj.technologies = list(set(technologies))
+                proj.achievements = achievements
+                
+                if proj.title and (proj.description or proj.achievements):
+                    data.projects.append(proj)
             data.confidence.projects = 0.8
 
         # Parse Experience

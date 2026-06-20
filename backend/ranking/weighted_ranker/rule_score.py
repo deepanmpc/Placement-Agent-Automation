@@ -45,29 +45,33 @@ class RuleScoreAggregator:
     def calculate_custom(
         cls,
         lc_score: float, cc_score: float, cf_score: float, github_score: float,
-        lc_weight: float = 25.0, cc_weight: float = 25.0,
-        cf_weight: float = 25.0, gh_weight: float = 25.0
+        semantic_score: float = 0.0,
+        lc_weight: float = 20.0, cc_weight: float = 20.0,
+        cf_weight: float = 20.0, gh_weight: float = 20.0,
+        sm_weight: float = 20.0
     ) -> ExplainableScore:
         """
-        CUSTOM_SCORE = Normalized weighted sum of all platforms
+        CUSTOM_SCORE = Normalized weighted sum of all platforms and semantic
         """
-        total_weight = lc_weight + cc_weight + cf_weight + gh_weight
+        total_weight = lc_weight + cc_weight + cf_weight + gh_weight + sm_weight
         if total_weight <= 0:
             total_weight = 100.0
-            lc_weight = cc_weight = cf_weight = gh_weight = 25.0
+            lc_weight = cc_weight = cf_weight = gh_weight = sm_weight = 20.0
 
         lc_pct = lc_weight / total_weight
         cc_pct = cc_weight / total_weight
         cf_pct = cf_weight / total_weight
         gh_pct = gh_weight / total_weight
+        sm_pct = sm_weight / total_weight
 
         total = (lc_score * lc_pct) + (cc_score * cc_pct) + \
-                (cf_score * cf_pct) + (github_score * gh_pct)
+                (cf_score * cf_pct) + (github_score * gh_pct) + \
+                (semantic_score * sm_pct)
 
         breakdown = {
             "leetcode":   {"raw_value": round(lc_score, 2), "weight_pct": round(lc_pct * 100, 2),
                            "formula": f"{round(lc_score,2)} × {lc_weight}",
-                           "contribution": round(lc_score * lc_weight / 100, 2)},
+                           "contribution": round(lc_score * lc_pct, 2)},
             "codechef":   {"raw_value": round(cc_score, 2), "weight_pct": round(cc_pct * 100, 2),
                            "formula": f"{round(cc_score,2)} × {round(cc_pct, 2)}",
                            "contribution": round(cc_score * cc_pct, 2)},
@@ -77,6 +81,9 @@ class RuleScoreAggregator:
             "github":     {"raw_value": round(github_score, 2), "weight_pct": round(gh_pct * 100, 2),
                            "formula": f"{round(github_score,2)} × {round(gh_pct, 2)}",
                            "contribution": round(github_score * gh_pct, 2)},
+            "semantic":   {"raw_value": round(semantic_score, 2), "weight_pct": round(sm_pct * 100, 2),
+                           "formula": f"{round(semantic_score,2)} × {round(sm_pct, 2)}",
+                           "contribution": round(semantic_score * sm_pct, 2)},
         }
         return ExplainableScore(round(max(0, min(total, 100)), 2), breakdown)
 

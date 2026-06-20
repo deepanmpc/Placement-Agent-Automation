@@ -72,7 +72,9 @@ class ProjectInfo(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     technologies: List[str] = Field(default_factory=list)
+    achievements: List[str] = Field(default_factory=list)
     github_link: Optional[str] = None
+    link: Optional[str] = None
 
 
 # ── Competitive / coding-platform profiles ────────────────────────────
