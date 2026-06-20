@@ -10,7 +10,6 @@ interface Props {
 const NAV_ITEMS: { id: PageView; label: string }[] = [
   { id: 'upload', label: 'Upload Resume' },
   { id: 'edit', label: 'Edit Profile' },
-  { id: 'dashboard', label: 'Pipeline' },
   { id: 'jd-input', label: 'Job Description' },
   { id: 'candidates', label: 'Candidates' },
   { id: 'analytics', label: 'Analytics' },

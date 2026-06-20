@@ -108,18 +108,31 @@ const DEFAULT_PLATFORM_FORMULAS = [
       { name: 'Recent Activity (90 days)', weight: 'Max 11 pts', formula: 'MIN(ActiveDays90 / 90, 1) × 11' },
     ],
   },
+  {
+    name: 'Semantic Match (SM) Details (RAG)',
+    color: '#a855f7',
+    components: [
+      { name: 'Skills Match Score', weight: 'Max 30 pts', formula: 'CosineSimilarity(Extracted Skills, Job Description) × 30' },
+      { name: 'Projects Match Score', weight: 'Max 70 pts', formula: 'CosineSimilarity(All Projects Data, Job Description) × 70' },
+    ],
+  },
+  {
+    name: 'Final Aggregation Modes',
+    color: '#ec4899',
+    components: [
+      { name: 'DSA Mode (Coding Heavy)', weight: '100 pts', formula: 'DSA_SCORE × 0.60 + GITHUB_SCORE × 0.40' },
+      { name: 'GitHub Mode (Dev Heavy)', weight: '100 pts', formula: 'GITHUB_SCORE × 0.60 + DSA_SCORE × 0.40' },
+      { name: 'Semantic Mode (Fitment)', weight: '100 pts', formula: 'DSA_SCORE × 0.35 + GITHUB_SCORE × 0.40 + SEMANTIC_SCORE × 0.25' },
+      { name: 'DSA_SCORE Base Formula', weight: '100 pts', formula: 'LC × 0.33 + CC × 0.34 + CF × 0.33' },
+    ],
+  },
 ];
 
 export default function ScoringConfig({ scoringMode, onScoringModeChange, customWeights, onCustomWeightsChange, onSave }: Props) {
   const [showFormulas, setShowFormulas] = useState(false);
-  const [dbConfig, setDbConfig] = useState<any>(null);
-  
   useEffect(() => {
     fetch('http://localhost:8000/scoring-rules', { cache: 'no-store' })
       .then(res => res.json())
-      .then(data => {
-        if (data.config) setDbConfig(data.config);
-      })
       .catch(err => console.error("Could not fetch scoring rules:", err));
   }, []);
 
@@ -132,7 +145,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
     // Budget check: Total sum of all weights cannot exceed 100%
     const sumOfOthers = (Object.keys(customWeights) as (keyof CustomWeights)[])
       .filter(k => k !== key)
-      .reduce((sum, k) => sum + customWeights[k], 0);
+      .reduce((sum, k) => sum + (customWeights[k] || 0), 0);
     const maxAllowedByBudget = 100 - sumOfOthers;
 
     if (newVal > maxAllowedByBudget) {
@@ -286,7 +299,7 @@ export default function ScoringConfig({ scoringMode, onScoringModeChange, custom
               ].map(item => {
                 const sumOfOthers = (Object.keys(customWeights) as (keyof CustomWeights)[])
                   .filter(k => k !== item.key)
-                  .reduce((sum, k) => sum + customWeights[k], 0);
+                  .reduce((sum, k) => sum + (customWeights[k] || 0), 0);
 
                 const maxVal = Math.max(0, 100 - sumOfOthers);
 

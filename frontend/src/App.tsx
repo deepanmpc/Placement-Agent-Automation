@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import type { PageView } from './types';
 import Layout from './components/Layout';
-import Dashboard from './pages/Dashboard';
 import JDInput from './pages/JDInput';
 import Candidates from './pages/Candidates';
 import StudentDetail from './pages/StudentDetail';
 import Analytics from './pages/Analytics';
 import ResumeUpload from './pages/ResumeUpload';
-import ScoringConfig from './pages/ScoringConfig';
 import EditProfile from './pages/EditProfile';
 import type { ScoringMode, CustomWeights } from './components/ScoringSettings';
 import './App.css';
@@ -41,7 +39,7 @@ function getInitialCustomWeights(): CustomWeights {
       // ignore parse error
     }
   }
-  return { lc: 25, cc: 25, cf: 25, gh: 25 };
+  return { lc: 20, cc: 20, cf: 20, gh: 20, sm: 20 };
 }
 
 function getInitialStudent(): string | null {
@@ -93,6 +91,10 @@ export default function App() {
   }, [customWeights]);
 
   useEffect(() => {
+    localStorage.setItem('scoringMode', scoringMode);
+  }, [scoringMode]);
+
+  useEffect(() => {
     fetch('http://localhost:8000/scoring-rules')
       .then(r => r.json())
       .then(res => {
@@ -121,13 +123,25 @@ export default function App() {
                  platform_weights: customWeights
              }
          };
-         return fetch('http://localhost:8000/scoring-rules', {
+         const savePython = fetch('http://localhost:8000/scoring-rules', {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify(newRule)
          });
+
+         const springConfig = {
+           "SCORING_MODE": scoringMode,
+           "CUSTOM_WEIGHTS": JSON.stringify(customWeights)
+         };
+         
+         const saveSpring = fetch('http://localhost:9090/api/config', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify(springConfig)
+         }).catch(err => console.warn('Could not sync with Spring Backend:', err));
+
+         return Promise.all([savePython, saveSpring]);
       })
-      .then(res => res.json())
       .then(() => alert('Configuration Saved Successfully!'))
       .catch(console.error);
   };
@@ -184,10 +198,9 @@ export default function App() {
         }}>
           {page === 'upload' && <ResumeUpload />}
           {page === 'edit' && <EditProfile />}
-          {page === 'dashboard' && <Dashboard />}
           {page === 'jd-input' && (
             <JDInput 
-              onParsed={() => setPage('dashboard')} 
+              onParsed={() => setPage('candidates')} 
               scoringMode={scoringMode} 
               onScoringModeChange={setScoringMode} 
               customWeights={customWeights} 

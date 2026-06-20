@@ -79,31 +79,6 @@ class SemanticRanker:
         except Exception:
             pass
 
-        # Education chunk for contextual match
-        try:
-            if profile.education:
-                edu_parts = []
-                if getattr(profile.education, "degree", None):
-                    edu_parts.append(profile.education.degree)
-                if getattr(profile.education, "branch", None):
-                    edu_parts.append(profile.education.branch)
-                if getattr(profile.education, "college", None):
-                    edu_parts.append(profile.education.college)
-                if edu_parts:
-                    chunks.append({"type": "education", "text": "Education: " + ", ".join(edu_parts), "weight": 0.10})
-        except Exception:
-            pass
-
-        # GitHub summary chunk
-        try:
-            if profile.github:
-                gh = profile.github
-                langs = getattr(gh, "languages", None) or []
-                if langs and isinstance(langs, list):
-                    gh_text = f"GitHub: {gh.public_repos or 0} repos, languages: {', '.join(str(l) for l in langs if l)}"
-                    chunks.append({"type": "github_summary", "text": gh_text, "weight": 0.25})
-        except Exception:
-            pass
 
         if not chunks:
             return ExplainableScore(0.0, {"error": "Profile has no extractable chunks (no skills, projects, or education)"})

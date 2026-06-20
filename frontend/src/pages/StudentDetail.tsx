@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { ChevronDown, ChevronUp, Activity } from 'lucide-react';
 import type { PageView } from '../types';
@@ -98,6 +98,42 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
     }
   };
 
+  const aggregatedSemanticBreakdown = useMemo(() => {
+    if (!profile?.ranking?.semantic_breakdown?.breakdown) return null;
+    
+    const breakdown = profile.ranking.semantic_breakdown.breakdown;
+    const skills = breakdown.skills || { similarity_score: 0, weight: 0.3, text_snippet: 'No skills found' };
+    
+    const projectKeys = Object.keys(breakdown).filter(k => k.startsWith('project_'));
+    let projectTotalScore = 0;
+    let projectTotalWeight = 0;
+    let projectSnippets: string[] = [];
+    
+    projectKeys.forEach(k => {
+      const p = breakdown[k];
+      if (!p.error) {
+        projectTotalScore += p.similarity_score * p.weight;
+        projectTotalWeight += p.weight;
+        if (p.text_snippet) projectSnippets.push(p.text_snippet);
+      }
+    });
+    
+    const projectAvgScore = projectTotalWeight > 0 ? (projectTotalScore / projectTotalWeight) : 0;
+    
+    return {
+      skills: {
+        similarity_score: skills.similarity_score || 0,
+        weight: skills.weight || 0,
+        text_snippet: skills.text_snippet || ''
+      },
+      projects: {
+        similarity_score: Math.round(projectAvgScore * 100) / 100,
+        weight: Math.round(projectTotalWeight * 100) / 100,
+        text_snippet: projectSnippets.length > 0 ? projectSnippets.join(' | ') : 'No projects found'
+      }
+    };
+  }, [profile?.ranking?.semantic_breakdown]);
+
   if (!studentId) {
     return <div className="page"><div className="page-header"><h1>No student selected. Please go back to the dashboard.</h1></div></div>;
   }
@@ -135,8 +171,8 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <div className="detail-main">
-          <div className="detail-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
+          <div className="detail-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem' }}>
+            <div style={{ flex: 1, minWidth: '300px' }}>
               <h1>{s.personal_info.name || 'No Name'} {s.personal_info.id_number ? `(${s.personal_info.id_number})` : ''}</h1>
               <p className="detail-meta">
                 {s.personal_info.email} &middot; {s.personal_info.phone}
@@ -147,20 +183,20 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
               </p>
             </div>
             {s.ranking && (
-              <div style={{ padding: '1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '12px', textAlign: 'right' }}>
-                <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>
+              <div style={{ padding: '1.5rem 2.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '280px', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
+                <div style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.08em', marginBottom: '0.4rem', fontWeight: 600, textAlign: 'center' }}>
                   {scoringMode === 'dsa_mode' ? 'DSA Mode'
                    : scoringMode === 'github_mode' ? 'GitHub Mode'
                    : scoringMode === 'fitment_mode' ? 'Semantic Mode'
                    : 'Custom Weights'} Score
                 </div>
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: scoringMode === 'fitment_mode' ? '#a855f7' : 'var(--accent)' }}>
+                <div style={{ fontSize: '3rem', fontWeight: 900, color: scoringMode === 'fitment_mode' ? '#a855f7' : 'var(--accent)', lineHeight: 1, textAlign: 'center' }}>
                   {scoringMode === 'dsa_mode' ? s.ranking.overall_dsa_mode
                    : scoringMode === 'github_mode' ? s.ranking.overall_github_mode
                    : scoringMode === 'fitment_mode' ? (s.ranking.fitment_score ?? 0)
-                   : (s.ranking.custom_score ?? s.ranking.total_technical_score)}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/100</span>
+                   : (s.ranking.custom_score ?? s.ranking.total_technical_score)}<span style={{ fontSize: '1.2rem', color: 'var(--text-muted)', fontWeight: 600, marginLeft: '0.2rem' }}>/100</span>
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.85rem', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600, flexWrap: 'wrap', justifyContent: 'center' }}>
                   {s.ranking.github_score.total_score > 0 && <span>GH: {s.ranking.github_score.total_score}</span>}
                   {s.ranking.leetcode_score.total_score > 0 && <span>LC: {s.ranking.leetcode_score.total_score}</span>}
                   {s.ranking.codeforces_score.total_score > 0 && <span>CF: {s.ranking.codeforces_score.total_score}</span>}
@@ -207,24 +243,13 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                   <div key={idx} style={{ padding: '1.25rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                       <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--primary)', fontWeight: 700 }}>{proj.title}</h4>
-                      {proj.link && (
-                        <a href={proj.link.startsWith('http') ? proj.link : `https://${proj.link}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#fff', background: 'var(--accent)', padding: '0.2rem 0.6rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 600 }}>
+                      {proj.github_link && (
+                        <a href={proj.github_link.startsWith('http') ? proj.github_link : `https://${proj.github_link}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: '#fff', background: 'var(--accent)', padding: '0.2rem 0.6rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 600 }}>
                           View
                         </a>
                       )}
                     </div>
                     {proj.description && <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: 1.6 }}>{proj.description}</p>}
-                    
-                    {proj.achievements && proj.achievements.length > 0 && (
-                      <div style={{ marginBottom: '1rem' }}>
-                        <strong style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Key Achievements:</strong>
-                        <ul style={{ margin: '0.4rem 0 0', paddingLeft: '1.2rem', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                          {proj.achievements.map((ach, i) => (
-                            <li key={i} style={{ marginBottom: '0.2rem' }}>{ach}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
 
                     {proj.technologies && proj.technologies.length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.5rem' }}>
@@ -482,10 +507,10 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                     <div style={{ fontSize: '0.72rem', fontFamily: 'monospace', background: 'rgba(168,85,247,0.05)', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid rgba(168,85,247,0.2)', marginBottom: '0.75rem', color: 'var(--text-muted)' }}>
                       Semantic Mode = DSA({r.dsa_score})×0.35 + GH({r.github_score_total})×0.40 + SM({r.semantic_score ?? 0})×0.25
                     </div>
-                    {r.semantic_breakdown && Object.keys(r.semantic_breakdown).length > 0 && !r.semantic_breakdown.error && (
+                    {aggregatedSemanticBreakdown && Object.keys(aggregatedSemanticBreakdown).length > 0 && !s.ranking?.semantic_breakdown?.error && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.78rem' }}>
                         <div style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>JD Match by Chunk</div>
-                        {Object.entries(r.semantic_breakdown).map(([chunkKey, bd]: [string, any]) => (
+                        {Object.entries(aggregatedSemanticBreakdown).map(([chunkKey, bd]: [string, any]) => (
                           <div key={chunkKey} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.25rem 0' }}>
                             <span style={{ color: 'var(--text-primary)', textTransform: 'capitalize', fontWeight: 500 }}>
                               {chunkKey.replace(/_/g, ' ')}
@@ -501,14 +526,13 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                         ))}
                       </div>
                     )}
-                    {(!r.semantic_breakdown || r.semantic_breakdown.error) && (
+                    {(!aggregatedSemanticBreakdown || s.ranking?.semantic_breakdown?.error || Object.keys(aggregatedSemanticBreakdown || {}).length === 0) && (
                       <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center', padding: '0.5rem' }}>
                         {r.semantic_breakdown?.error || 'Paste a Job Description in the JD page to activate semantic scoring.'}
                       </div>
                     )}
                   </div>
-
-
+                </div>
               )}
 
               {/* Row 4: Detailed Extracted Live Metrics Container */}
@@ -573,7 +597,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
-                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                  formatter={(_value: any, _name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
                                 />
                                 <Bar dataKey="percent" fill="var(--accent)" radius={[0, 4, 4, 0]} barSize={28} />
                               </BarChart>
@@ -641,7 +665,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
-                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                  formatter={(_value: any, _name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
                                 />
                                 <Bar dataKey="percent" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} />
                               </BarChart>
@@ -702,7 +726,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}} 
-                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                  formatter={(_value: any, _name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
                                 />
                                 <Bar dataKey="percent" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
                               </BarChart>
@@ -767,7 +791,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 <RechartsTooltip 
                                   cursor={{fill: 'var(--bg-secondary)'}} 
                                   contentStyle={{backgroundColor: 'var(--bg)', borderColor: 'var(--border)', borderRadius: '8px'}}
-                                  formatter={(value: any, name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
+                                  formatter={(_value: any, _name: any, props: any) => [`${props.payload.score} / ${props.payload.max}`, 'Score']}
                                 />
                                 <Bar dataKey="percent" fill="#10b981" radius={[0, 4, 4, 0]} barSize={16} />
                               </BarChart>
@@ -786,7 +810,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                               <tbody>
                                 {[
                                   { name: 'Original Repos', val: r.github_score?.breakdown?.original_repos_score?.raw_value || '0', score: `${r.github_score?.breakdown?.original_repos_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.original_repos_score?.formula },
-                                  { name: 'Proj Depth', val: s.github.repositories.length.toString(), score: `${r.github_score?.breakdown?.project_depth_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.project_depth_score?.formula },
+                                  { name: 'Proj Depth', val: r.github_score?.breakdown?.project_depth_score?.raw_value?.toString() || '0', score: `${r.github_score?.breakdown?.project_depth_score?.contribution || 0} / 10`, formula: r.github_score?.breakdown?.project_depth_score?.formula },
                                   { name: 'Momentum', val: r.github_score?.breakdown?.momentum_score?.raw_value?.toString() || '0', score: `${r.github_score?.breakdown?.momentum_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.momentum_score?.formula },
                                   { name: 'Stars', val: s.github.total_stars || '0', score: `${r.github_score?.breakdown?.stars_score?.contribution || 0} / 3`, formula: r.github_score?.breakdown?.stars_score?.formula },
                                   { name: 'Commits', val: r.github_score?.breakdown?.commits_score?.raw_value?.toString() || '0', score: `${r.github_score?.breakdown?.commits_score?.contribution || 0} / 15`, formula: r.github_score?.breakdown?.commits_score?.formula },
@@ -809,7 +833,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                       </div>
                     )}
                     {/* SEMANTIC / FITMENT SECTION */}
-                    {r.semantic_breakdown && Object.keys(r.semantic_breakdown).length > 0 && (
+                    {aggregatedSemanticBreakdown && Object.keys(aggregatedSemanticBreakdown).length > 0 && (
                       <div className="detail-card" style={{ borderColor: 'var(--border)', display: 'flex', flexDirection: 'column' }}>
                         <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--accent)', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between' }}>
                           <span>Semantic Fitment Match (RAG)</span>
@@ -827,7 +851,7 @@ export default function StudentDetail({ studentId, onNavigate, scoringMode, onSc
                                 </tr>
                               </thead>
                               <tbody>
-                                {Object.entries(r.semantic_breakdown).map(([key, data]: [string, any], idx) => (
+                                {Object.entries(aggregatedSemanticBreakdown).map(([key, data]: [string, any], idx) => (
                                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                                     <td style={{ padding: '0.5rem', fontWeight: 600, textTransform: 'capitalize' }}>{key.replace('_', ' ')}</td>
                                     <td style={{ padding: '0.5rem', color: 'var(--text-primary)', maxWidth: '400px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.text_snippet}</td>

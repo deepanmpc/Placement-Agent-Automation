@@ -45,7 +45,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const [missingFilter, setMissingFilter] = useState<string | null>(null);
   const [showExportPreview, setShowExportPreview] = useState(false);
   const [exportPreviewData, setExportPreviewData] = useState<any[]>([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  
 
   const getCandidateScore = (p: Profile): number => {
     if (!p.ranking) return 0;
@@ -109,7 +109,7 @@ export default function Candidates({ onSelect, onNavigate, scoringMode, customWe
   const wasActiveRef = useRef(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setTimeout>;
     const pollStatus = async () => {
       try {
         const res = await fetch('http://localhost:8000/profiles/extraction-job/status');

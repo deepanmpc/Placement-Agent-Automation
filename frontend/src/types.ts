@@ -151,4 +151,4 @@ export interface JDRequirements {
   minCodingScore: number;
 }
 
-export type PageView = 'upload' | 'dashboard' | 'jd-input' | 'candidates' | 'student' | 'analytics' | 'scoring-config' | 'edit';
+export type PageView = 'upload' | 'jd-input' | 'candidates' | 'student' | 'analytics' | 'scoring-config' | 'edit';

@@ -675,6 +675,7 @@ async def sync_platforms(
     cf_w: Optional[float] = None,
     gh_w: Optional[float] = None,
     sm_w: Optional[float] = None,
+    job_description: Optional[str] = None,
     db: AsyncSession = Depends(get_db)
 ):
     from backend.collection.service import PlatformSyncService
@@ -697,7 +698,7 @@ async def sync_platforms(
         if active_rule and "platform_weights" in active_rule.config:
             custom_weights = active_rule.config["platform_weights"]
         
-    attach_ranking(profile, custom_weights=custom_weights)
+    attach_ranking(profile, custom_weights=custom_weights, job_description=job_description)
         
     return {
         "status": "success",
