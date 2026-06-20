@@ -166,7 +166,16 @@ export default function EditProfile() {
                 <input type="text" value={idNumber} onChange={e => setIdNumber(e.target.value)} style={inputStyle} />
                 
                 <label style={labelStyle}>Graduation Batch</label>
-                <input type="number" value={batch} onChange={e => setBatch(e.target.value)} style={inputStyle} />
+                <select 
+                  value={batch} 
+                  onChange={e => setBatch(e.target.value)} 
+                  style={{ ...inputStyle, cursor: 'pointer' }}
+                >
+                  <option value="2023">Y23</option>
+                  <option value="2024">Y24</option>
+                  <option value="2025">Y25</option>
+                  <option value="2026">Y26</option>
+                </select>
                 
                 <label style={labelStyle}>Email</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
