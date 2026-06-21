@@ -402,6 +402,139 @@ async def update_profile(
     return {"status": "success", "message": "Profile updated successfully"}
 
 
+@app.get("/analytics")
+async def get_analytics(
+    db: AsyncSession = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+):
+    service = IngestionService(db_session=db, settings=settings)
+    profiles = await service.get_all_profiles(limit=10000, offset=0)
+    
+    total_students = len(profiles)
+    
+    platform_counts = {"github": 0, "leetcode": 0, "codeforces": 0, "codechef": 0}
+    skills_counter = {}
+    branch_counts = {}
+    batch_counts = {}
+    
+    total_cgpa = 0
+    cgpa_count = 0
+    
+    total_lc_rating = 0
+    lc_count = 0
+    total_cf_rating = 0
+    cf_count = 0
+    total_cc_rating = 0
+    cc_count = 0
+    
+    # We will compute base coding scores (DSA mode) without JD to get a distribution
+    from backend.ranking.weighted_ranker.coding_ranker.leetcode_score import LeetCodeRanker
+    from backend.ranking.weighted_ranker.coding_ranker.codeforces_score import CodeforcesRanker
+    from backend.ranking.weighted_ranker.coding_ranker.codechef_score import CodeChefRanker
+    from backend.ranking.weighted_ranker.coding_ranker.aggregator import CodingAggregator
+    from backend.ranking.weighted_ranker.behavioral_ranker.github_score import GitHubEngineeringRanker
+    from backend.ranking.weighted_ranker.rule_aggregator import RuleScoreAggregator
+    
+    top_candidates = []
+    
+    for p in profiles:
+        # Platform counts
+        if p.github and p.github.github_url: platform_counts["github"] += 1
+        if p.leetcode and p.leetcode.leetcode_username: platform_counts["leetcode"] += 1
+        if p.codeforces and p.codeforces.codeforces_username: platform_counts["codeforces"] += 1
+        if p.codechef and p.codechef.codechef_username: platform_counts["codechef"] += 1
+        
+        # CGPA
+        if p.education and p.education.cgpa is not None:
+            total_cgpa += p.education.cgpa
+            cgpa_count += 1
+            
+        # Ratings
+        if p.leetcode and getattr(p.leetcode, 'contest_rating', None):
+            total_lc_rating += p.leetcode.contest_rating
+            lc_count += 1
+        if p.codeforces and getattr(p.codeforces, 'rating', None):
+            total_cf_rating += p.codeforces.rating
+            cf_count += 1
+        if p.codechef and getattr(p.codechef, 'rating', None):
+            total_cc_rating += p.codechef.rating
+            cc_count += 1
+            
+        # Skills
+        if p.skills and p.skills.languages:
+            for s in p.skills.languages:
+                skills_counter[s] = skills_counter.get(s, 0) + 1
+        if p.skills and p.skills.frameworks:
+            for s in p.skills.frameworks:
+                skills_counter[s] = skills_counter.get(s, 0) + 1
+                
+        # Branch
+        if p.education and p.education.degree:
+            b = p.education.degree.upper()
+            branch_counts[b] = branch_counts.get(b, 0) + 1
+            
+        # Batch
+        if p.education and p.education.graduation_year:
+            y = str(p.education.graduation_year)
+            batch_counts[y] = batch_counts.get(y, 0) + 1
+            
+        # Base Score Calculation
+        lc_data = p.leetcode.model_dump() if p.leetcode else {}
+        cf_data = p.codeforces.model_dump() if p.codeforces else {}
+        cc_data = p.codechef.model_dump() if p.codechef else {}
+        lc = LeetCodeRanker.calculate(lc_data)
+        cf = CodeforcesRanker.calculate(cf_data)
+        cc = CodeChefRanker.calculate(cc_data)
+        dsa = CodingAggregator.calculate(lc, cf, cc)
+        
+        gh_raw = p.github.model_dump() if p.github else {}
+        if getattr(p, 'github', None) and getattr(p.github, 'github_strength', None):
+            gh_raw.update(p.github.github_strength.model_dump())
+        gh = GitHubEngineeringRanker.calculate(gh_raw)
+        
+        dsa_mode = RuleScoreAggregator.calculate_dsa_mode(dsa.total_score, gh.total_score)
+        score = dsa_mode.total_score
+        
+        top_candidates.append({
+            "uuid": p.student_uuid,
+            "name": p.personal_info.name if p.personal_info else "Unknown",
+            "score": round(score, 2),
+            "cgpa": p.education.cgpa if p.education else None
+        })
+        
+    top_candidates = sorted(top_candidates, key=lambda x: x["score"], reverse=True)[:10]
+    
+    top_skills = [{"name": k, "value": v} for k, v in sorted(skills_counter.items(), key=lambda item: item[1], reverse=True)[:15]]
+    branch_distribution = [{"name": k, "value": v} for k, v in branch_counts.items()]
+    batch_distribution = [{"name": k, "value": v} for k, v in batch_counts.items()]
+    
+    platform_engagement = [
+        {"name": "GitHub", "value": platform_counts["github"]},
+        {"name": "LeetCode", "value": platform_counts["leetcode"]},
+        {"name": "Codeforces", "value": platform_counts["codeforces"]},
+        {"name": "CodeChef", "value": platform_counts["codechef"]},
+    ]
+    
+    avg_cgpa = round(total_cgpa / cgpa_count, 2) if cgpa_count > 0 else 0
+    avg_lc = round(total_lc_rating / lc_count, 0) if lc_count > 0 else 0
+    avg_cf = round(total_cf_rating / cf_count, 0) if cf_count > 0 else 0
+    avg_cc = round(total_cc_rating / cc_count, 0) if cc_count > 0 else 0
+    
+    return {
+        "overview": {
+            "total_students": total_students,
+            "average_cgpa": avg_cgpa,
+            "avg_lc_rating": avg_lc,
+            "avg_cf_rating": avg_cf,
+            "avg_cc_rating": avg_cc
+        },
+        "platform_engagement": platform_engagement,
+        "top_skills": top_skills,
+        "branch_distribution": branch_distribution,
+        "batch_distribution": batch_distribution,
+        "top_candidates": top_candidates
+    }
+
 @app.post("/profiles/{student_uuid}/resume")
 async def update_profile_resume(
     student_uuid: str,
