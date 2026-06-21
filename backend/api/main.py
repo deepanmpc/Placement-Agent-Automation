@@ -431,18 +431,18 @@ async def get_analytics(
     from backend.ranking.weighted_ranker.coding_ranker.leetcode_score import LeetCodeRanker
     from backend.ranking.weighted_ranker.coding_ranker.codeforces_score import CodeforcesRanker
     from backend.ranking.weighted_ranker.coding_ranker.codechef_score import CodeChefRanker
-    from backend.ranking.weighted_ranker.coding_ranker.aggregator import CodingAggregator
-    from backend.ranking.weighted_ranker.behavioral_ranker.github_score import GitHubEngineeringRanker
-    from backend.ranking.weighted_ranker.rule_aggregator import RuleScoreAggregator
+    from backend.ranking.weighted_ranker.coding_ranker.coding_aggregator import CodingAggregator
+    from backend.ranking.weighted_ranker.github_ranker.github_engineering import GitHubEngineeringRanker
+    from backend.ranking.weighted_ranker.rule_score import RuleScoreAggregator
     
     top_candidates = []
     
     for p in profiles:
         # Platform counts
-        if p.github and p.github.github_url: platform_counts["github"] += 1
-        if p.leetcode and p.leetcode.leetcode_username: platform_counts["leetcode"] += 1
-        if p.codeforces and p.codeforces.codeforces_username: platform_counts["codeforces"] += 1
-        if p.codechef and p.codechef.codechef_username: platform_counts["codechef"] += 1
+        if p.github and p.github.username: platform_counts["github"] += 1
+        if p.leetcode and p.leetcode.username: platform_counts["leetcode"] += 1
+        if p.codeforces and p.codeforces.username: platform_counts["codeforces"] += 1
+        if p.codechef and p.codechef.username: platform_counts["codechef"] += 1
         
         # CGPA
         if p.education and p.education.cgpa is not None:
@@ -450,8 +450,8 @@ async def get_analytics(
             cgpa_count += 1
             
         # Ratings
-        if p.leetcode and getattr(p.leetcode, 'contest_rating', None):
-            total_lc_rating += p.leetcode.contest_rating
+        if p.leetcode and getattr(p.leetcode, 'rating', None):
+            total_lc_rating += p.leetcode.rating
             lc_count += 1
         if p.codeforces and getattr(p.codeforces, 'rating', None):
             total_cf_rating += p.codeforces.rating
@@ -461,8 +461,8 @@ async def get_analytics(
             cc_count += 1
             
         # Skills
-        if p.skills and p.skills.languages:
-            for s in p.skills.languages:
+        if p.skills and p.skills.programming_languages:
+            for s in p.skills.programming_languages:
                 skills_counter[s] = skills_counter.get(s, 0) + 1
         if p.skills and p.skills.frameworks:
             for s in p.skills.frameworks:
