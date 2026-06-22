@@ -413,19 +413,19 @@ async def get_analytics(
     total_students = len(profiles)
     
     platform_counts = {"github": 0, "leetcode": 0, "codeforces": 0, "codechef": 0}
-    skills_counter = {}
+    
+    skills_counter = {"languages": {}, "frameworks": {}, "tools": {}}
     branch_counts = {}
     batch_counts = {}
     
     total_cgpa = 0
     cgpa_count = 0
     
-    total_lc_rating = 0
-    lc_count = 0
-    total_cf_rating = 0
-    cf_count = 0
-    total_cc_rating = 0
-    cc_count = 0
+    # Detailed stats accumulators
+    lc_stats = {"easy": 0, "medium": 0, "hard": 0, "total": 0, "rating_sum": 0, "count": 0, "max_rating": 0}
+    cf_stats = {"rating_sum": 0, "count": 0, "max_rating": 0, "solved": 0}
+    cc_stats = {"rating_sum": 0, "count": 0, "max_rating": 0}
+    gh_stats = {"stars": 0, "commits": 0, "repos": 0, "count": 0}
     
     # We will compute base coding scores (DSA mode) without JD to get a distribution
     from backend.ranking.weighted_ranker.coding_ranker.leetcode_score import LeetCodeRanker
@@ -449,24 +449,47 @@ async def get_analytics(
             total_cgpa += p.education.cgpa
             cgpa_count += 1
             
-        # Ratings
-        if p.leetcode and getattr(p.leetcode, 'rating', None):
-            total_lc_rating += p.leetcode.rating
-            lc_count += 1
-        if p.codeforces and getattr(p.codeforces, 'rating', None):
-            total_cf_rating += p.codeforces.rating
-            cf_count += 1
-        if p.codechef and getattr(p.codechef, 'rating', None):
-            total_cc_rating += p.codechef.rating
-            cc_count += 1
+        # Detailed LeetCode Stats
+        if p.leetcode:
+            if getattr(p.leetcode, 'rating', None):
+                lc_stats["rating_sum"] += p.leetcode.rating
+                lc_stats["max_rating"] = max(lc_stats["max_rating"], p.leetcode.rating)
+                lc_stats["count"] += 1
+            lc_stats["easy"] += getattr(p.leetcode, 'easy_solved', 0)
+            lc_stats["medium"] += getattr(p.leetcode, 'medium_solved', 0)
+            lc_stats["hard"] += getattr(p.leetcode, 'hard_solved', 0)
+            lc_stats["total"] += getattr(p.leetcode, 'total_solved', 0)
+
+        # Detailed Codeforces Stats
+        if p.codeforces:
+            if getattr(p.codeforces, 'rating', None):
+                cf_stats["rating_sum"] += p.codeforces.rating
+                cf_stats["max_rating"] = max(cf_stats["max_rating"], p.codeforces.rating)
+                cf_stats["count"] += 1
+            cf_stats["solved"] += getattr(p.codeforces, 'solved_count', 0)
+
+        # Detailed CodeChef Stats
+        if p.codechef:
+            if getattr(p.codechef, 'rating', None):
+                cc_stats["rating_sum"] += p.codechef.rating
+                cc_stats["max_rating"] = max(cc_stats["max_rating"], p.codechef.rating)
+                cc_stats["count"] += 1
+
+        # Detailed GitHub Stats
+        if p.github:
+            gh_stats["count"] += 1
+            gh_stats["stars"] += getattr(p.github, 'total_stars', 0)
+            gh_stats["commits"] += getattr(p.github, 'commits_last_365', 0)
+            gh_stats["repos"] += getattr(p.github, 'public_repos', 0)
             
-        # Skills
-        if p.skills and p.skills.programming_languages:
-            for s in p.skills.programming_languages:
-                skills_counter[s] = skills_counter.get(s, 0) + 1
-        if p.skills and p.skills.frameworks:
-            for s in p.skills.frameworks:
-                skills_counter[s] = skills_counter.get(s, 0) + 1
+        # Skills Categorized
+        if p.skills:
+            for s in (p.skills.programming_languages or []):
+                skills_counter["languages"][s] = skills_counter["languages"].get(s, 0) + 1
+            for s in (p.skills.frameworks or []):
+                skills_counter["frameworks"][s] = skills_counter["frameworks"].get(s, 0) + 1
+            for s in (p.skills.tools or []) + (p.skills.cloud or []) + (p.skills.databases or []):
+                skills_counter["tools"][s] = skills_counter["tools"].get(s, 0) + 1
                 
         # Branch
         if p.education and p.education.degree:
@@ -504,7 +527,10 @@ async def get_analytics(
         
     top_candidates = sorted(top_candidates, key=lambda x: x["score"], reverse=True)[:10]
     
-    top_skills = [{"name": k, "value": v} for k, v in sorted(skills_counter.items(), key=lambda item: item[1], reverse=True)[:15]]
+    top_languages = [{"name": k, "value": v} for k, v in sorted(skills_counter["languages"].items(), key=lambda item: item[1], reverse=True)[:10]]
+    top_frameworks = [{"name": k, "value": v} for k, v in sorted(skills_counter["frameworks"].items(), key=lambda item: item[1], reverse=True)[:10]]
+    top_tools = [{"name": k, "value": v} for k, v in sorted(skills_counter["tools"].items(), key=lambda item: item[1], reverse=True)[:10]]
+    
     branch_distribution = [{"name": k, "value": v} for k, v in branch_counts.items()]
     batch_distribution = [{"name": k, "value": v} for k, v in batch_counts.items()]
     
@@ -516,20 +542,40 @@ async def get_analytics(
     ]
     
     avg_cgpa = round(total_cgpa / cgpa_count, 2) if cgpa_count > 0 else 0
-    avg_lc = round(total_lc_rating / lc_count, 0) if lc_count > 0 else 0
-    avg_cf = round(total_cf_rating / cf_count, 0) if cf_count > 0 else 0
-    avg_cc = round(total_cc_rating / cc_count, 0) if cc_count > 0 else 0
     
     return {
         "overview": {
             "total_students": total_students,
             "average_cgpa": avg_cgpa,
-            "avg_lc_rating": avg_lc,
-            "avg_cf_rating": avg_cf,
-            "avg_cc_rating": avg_cc
+        },
+        "leetcode_insights": {
+            "avg_rating": round(lc_stats["rating_sum"] / lc_stats["count"], 0) if lc_stats["count"] > 0 else 0,
+            "max_rating": round(lc_stats["max_rating"], 0),
+            "total_easy": lc_stats["easy"],
+            "total_medium": lc_stats["medium"],
+            "total_hard": lc_stats["hard"],
+            "total_solved": lc_stats["total"]
+        },
+        "codeforces_insights": {
+            "avg_rating": round(cf_stats["rating_sum"] / cf_stats["count"], 0) if cf_stats["count"] > 0 else 0,
+            "max_rating": round(cf_stats["max_rating"], 0),
+            "total_solved": cf_stats["solved"]
+        },
+        "codechef_insights": {
+            "avg_rating": round(cc_stats["rating_sum"] / cc_stats["count"], 0) if cc_stats["count"] > 0 else 0,
+            "max_rating": round(cc_stats["max_rating"], 0)
+        },
+        "github_insights": {
+            "total_stars": gh_stats["stars"],
+            "total_commits_1yr": gh_stats["commits"],
+            "total_repos": gh_stats["repos"]
         },
         "platform_engagement": platform_engagement,
-        "top_skills": top_skills,
+        "skills": {
+            "languages": top_languages,
+            "frameworks": top_frameworks,
+            "tools": top_tools
+        },
         "branch_distribution": branch_distribution,
         "batch_distribution": batch_distribution,
         "top_candidates": top_candidates
